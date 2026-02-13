@@ -1,6 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/sequelize';
-import User from './User';
 
 interface RefreshTokenAttributes {
   id: string;
@@ -33,6 +32,10 @@ RefreshToken.init(
     userId: {
       type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id',
+      },
     },
     hashedToken: {
       type: DataTypes.STRING(255),
@@ -54,9 +57,5 @@ RefreshToken.init(
     timestamps: true,
   }
 );
-
-// Associations
-User.hasMany(RefreshToken, { foreignKey: 'userId' });
-RefreshToken.belongsTo(User, { foreignKey: 'userId' });
 
 export default RefreshToken;

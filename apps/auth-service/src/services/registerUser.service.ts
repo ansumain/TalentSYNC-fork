@@ -1,22 +1,15 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/User';
-import { RegisterInput } from '../types/RegisterInput';
+import { RegisterUserInput } from '../types/RegisterUserInput';
+import { RegisterUserOutput } from '../types/RegisterUserOutput';
 import { Op } from 'sequelize';
-
-interface RegisterUserOutput {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  hashedPassword: string;
-}
 
 const registerUser = async ({
   name,
   email,
   phone,
   password,
-}: RegisterInput): Promise<RegisterUserOutput> => {
+}: RegisterUserInput): Promise<RegisterUserOutput> => {
   // required fields must not be null
   if (!name || !email || !phone || !password) throw new Error('Missing required field');
 

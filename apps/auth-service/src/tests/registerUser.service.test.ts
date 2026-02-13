@@ -1,17 +1,10 @@
-import { registerUser } from '../services/authentication.service';
+import { registerUser } from '../services/registerUser.service';
 import User from '../models/User';
 import bcrypt from 'bcryptjs';
+import { RegisterUserOutput } from '../types/RegisterUserOutput';
 
 jest.mock('../models/User');
 jest.mock('bcryptjs');
-
-interface RegisterUserOutput {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  hashedPassword: string;
-}
 
 describe('Authentication - Register', () => {
   let mockCreate: jest.SpyInstance;
@@ -158,7 +151,7 @@ describe('Authentication - Register', () => {
       password: 'password',
     });
 
-    expect(bcrypt.hash).toHaveBeenCalledWith('password', expect.any(String));
+    expect(mockBcryptHash).toHaveBeenCalledWith('password', expect.any(String));
     expect(User.create).toHaveBeenCalled();
 
     expect(result).toHaveProperty('id');
