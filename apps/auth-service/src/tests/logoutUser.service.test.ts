@@ -1,37 +1,137 @@
-import { logoutUser } from '../services/logoutUser.service';
+import { refreshToken } from '../services/refreshToken.service';
 import RefreshToken from '../models/RefreshToken';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 jest.mock('../models/RefreshToken');
+jest.mock('jsonwebtoken');
+jest.mock('bcryptjs');
 
-describe('Authentication - Logout', () => {
-  let mockDestroy: jest.SpyInstance;
+describe('Authentication - Refresh Token', () => {
+  let mockFindOne: jest.SpyInstance;
 
   beforeEach(() => {
     jest.resetAllMocks();
-    mockDestroy = jest.spyOn(RefreshToken, 'destroy');
+    mockFindOne = jest.spyOn(RefreshToken, 'findOne');
   });
 
-  it('should throw an error if userId is missing', async () => {
-    await expect(logoutUser({ userId: '' })).rejects.toThrow('Missing required field');
-    expect(mockDestroy).not.toHaveBeenCalled();
+  it('should throw an error if refresh token is missing', async () => {
+    await expect(refreshToken({ token: '' })).rejects.toThrow('Missing required field');
+    expect(jwt.verify).not.toHaveBeenCalled();
   });
 
-  it('should remove refresh token for given userId', async () => {
-    mockDestroy.mockResolvedValue(1);
-
-    const result = await logoutUser({ userId: 'user123' });
-
-    expect(mockDestroy).toHaveBeenCalledWith({
-      where: { userId: 'user123' },
+  it('should throw an error if token is invalid', async () => {
+    const mockJwtVerify = jwt.verify as jest.Mock;
+    mockJwtVerify.mockImplementation(() => {
+      throw new Error('Invalid token');
     });
-    expect(result).toHaveProperty('message', 'Logout successful');
+
+    await expect(refreshToken({ token: 'invalid-token' })).rejects.toThrow('Invalid token');
   });
 
-  it('should handle case when no active token found', async () => {
-    mockDestroy.mockResolvedValue(0);
+  it('should throw an error if token not found in database', async () => {
+    const mockJwtVerify = jwt.verify as jest.Mock;
+    mockJwtVerify.mockReturnValue({
+      userId: 'user123',
+      email: 'ansuman@gmail.com',
+      phone: '1234567890',
+    });
 
-    const result = await logoutUser({ userId: 'user123' });
+    mockFindOne.mockResolvedValue(null);
 
-    expect(result).toHaveProperty('message', 'Logout successful');
+    const mockBcryptCompare = bcrypt.compare as jest.Mock;
+    mockBcryptCompare.mockResolvedValue(false);
+
+    await expect(refreshToken({ token: 'valid-refresh-token' })).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
+  });
+
+  it('should throw an error if token is expired', async () => {
+    const mockJwtVerify = jwt.verify as jest.Mock;
+    mockJwtVerify.mockReturnValue({
+      userId: 'user123',
+      email: 'ansuman@gmail.com',
+      phone: '1234567890',
+    });
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
+
+    mockFindOne.mockResolvedValue({
+      id: 'tokenId',
+      userId: 'user123',
+      hashedToken: 'hashedToken',
+      expiresAt: pastDate,
+      revoked: false,
+    });
+
+    const mockBcryptCompare = bcrypt.compare as jest.Mock;
+    mockBcryptCompare.mockResolvedValue(true);
+
+    await expect(refreshToken({ token: 'valid-refresh-token' })).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
+  });
+
+  it('should throw an error if token is revoked', async () => {
+    const mockJwtVerify = jwt.verify as jest.Mock;
+    mockJwtVerify.mockReturnValue({
+      userId: 'user123',
+      email: 'ansuman@gmail.com',
+      phone: '1234567890',
+    });
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 1);
+
+    mockFindOne.mockResolvedValue({
+      id: 'tokenId',
+      userId: 'user123',
+      hashedToken: 'hashedToken',
+      expiresAt: futureDate,
+      revoked: true,
+    });
+
+    const mockBcryptCompare = bcrypt.compare as jest.Mock;
+    mockBcryptCompare.mockResolvedValue(true);
+
+    await expect(refreshToken({ token: 'valid-refresh-token' })).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
+  });
+
+  it('should return new access token on valid refresh token', async () => {
+    const mockJwtVerify = jwt.verify as jest.Mock;
+    mockJwtVerify.mockReturnValue({
+      userId: 'user123',
+      email: 'ansuman@gmail.com',
+      phone: '1234567890',
+    });
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 10);
+
+    mockFindOne.mockResolvedValue({
+      id: 'tokenId',
+      userId: 'user123',
+      hashedToken: 'hashedToken',
+      expiresAt: futureDate,
+      revoked: false,
+    });
+
+    const mockBcryptCompare = bcrypt.compare as jest.Mock;
+    mockBcryptCompare.mockResolvedValue(true);
+
+    const mockJwtSign = jwt.sign as jest.Mock;
+    mockJwtSign.mockReturnValue('new-access-token');
+
+    const result = await refreshToken({ token: 'valid-refresh-token' });
+
+    expect(mockJwtVerify).toHaveBeenCalledWith('valid-refresh-token', expect.any(String));
+    expect(mockFindOne).toHaveBeenCalled();
+    expect(mockBcryptCompare).toHaveBeenCalledWith('valid-refresh-token', 'hashedToken');
+    expect(mockJwtSign).toHaveBeenCalled();
+    expect(result).toHaveProperty('accessToken', 'new-access-token');
   });
 });
