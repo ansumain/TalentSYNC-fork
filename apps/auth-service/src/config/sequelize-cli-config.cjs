@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 // require('dotenv').config();
 import { config } from "./env"
 

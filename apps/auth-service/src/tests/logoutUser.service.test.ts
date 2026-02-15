@@ -16,7 +16,7 @@ describe('Authentication - Logout', () => {
     expect(mockDestroy).not.toHaveBeenCalled();
   });
 
-  it('should revoke refresh token for given userId', async () => {
+  it('should remove refresh token for given userId', async () => {
     mockDestroy.mockResolvedValue(1);
 
     const result = await logoutUser({ userId: 'user123' });
