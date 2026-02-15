@@ -1,0 +1,12 @@
+FROM node:24
+
+WORKDIR /apps/auth-service/src
+
+COPY package*.json ./
+
+
+COPY . .
+
+EXPOSE 4001
+
+CMD [ "npm", "start" ]

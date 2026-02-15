@@ -15,8 +15,8 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   if (!user) throw new Error('User not found');
 
   // check if valid password is entered
-  const isPassowordValid = await bcrypt.compare(password, user.hashedPassword);
-  if (!isPassowordValid) throw new Error('Invalid Password');
+  const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+  if (!isPasswordValid) throw new Error('Invalid Password');
 
   // create the access token
   const accessToken = jwt.sign(
