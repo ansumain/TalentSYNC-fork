@@ -1,14 +1,13 @@
- 
-// require('dotenv').config();
-import { config } from "./env"
+/* eslint-disable @typescript-eslint/no-require-imports */
+require('dotenv').config();
 
 module.exports = {
     development: {
-        username: config.dbUser || 'rms_user',
-        password: config.dbPassword || 'rms_password',
-        database: config.dbName || 'rms_db',
-        host: config.dbHost || 'localhost',
-        port: config.dbPort? Number(config.dbPort): 5432,
+        username: process.env.DB_USER || 'rms_user',
+        password: process.env.DB_PASSWORD || 'rms_password',
+        database: process.env.DB_NAME || 'rms_db',
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT? Number(process.env.DB_PORT): 5432,
         dialect: 'postgres'
     },
 };

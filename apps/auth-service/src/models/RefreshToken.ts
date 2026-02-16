@@ -6,20 +6,18 @@ interface RefreshTokenAttributes {
   userId: string;
   hashedToken: string;
   expiresAt: Date;
-  revoked?: boolean;
 }
 
-type RefreshTokenCreationAttributes = Optional<RefreshTokenAttributes, 'id' | 'revoked'>;
+type RefreshTokenCreationAttributes = Optional<RefreshTokenAttributes, 'id'>;
 
 class RefreshToken
   extends Model<RefreshTokenAttributes, RefreshTokenCreationAttributes>
   implements RefreshTokenAttributes
 {
-  public id!: string;
-  public userId!: string;
-  public hashedToken!: string;
-  public expiresAt!: Date;
-  public revoked!: boolean;
+  declare id: string;
+  declare userId: string;
+  declare hashedToken: string;
+  declare expiresAt: Date;
 }
 
 RefreshToken.init(
@@ -44,10 +42,6 @@ RefreshToken.init(
     expiresAt: {
       type: DataTypes.DATE,
       allowNull: false,
-    },
-    revoked: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
     },
   },
   {
