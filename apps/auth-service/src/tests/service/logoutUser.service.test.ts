@@ -1,9 +1,9 @@
-import { refreshToken } from '../services/refreshToken.service';
-import RefreshToken from '../models/RefreshToken';
+import { refreshToken } from '../../services/refreshToken.service';
+import RefreshToken from '../../models/RefreshToken';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-jest.mock('../models/RefreshToken');
+jest.mock('../../models/RefreshToken');
 jest.mock('jsonwebtoken');
 jest.mock('bcryptjs');
 

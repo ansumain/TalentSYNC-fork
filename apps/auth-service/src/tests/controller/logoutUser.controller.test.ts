@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { LogoutUserController } from '../controllers/logoutUser.controller';
-import { logoutUser } from '../services/logoutUser.service';
+import { LogoutUserController } from '../../controllers/logoutUser.controller';
+import { logoutUser } from '../../services/logoutUser.service';
 
-jest.mock('../services/logoutUser.service');
+jest.mock('../../services/logoutUser.service');
 
 describe('LogoutUserController - Logout', () => {
   let mockRequest: Partial<Request>;

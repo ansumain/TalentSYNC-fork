@@ -1,9 +1,9 @@
-import { registerUser } from '../services/registerUser.service';
-import User from '../models/User';
+import { registerUser } from '../../services/registerUser.service';
+import User from '../../models/User';
 import bcrypt from 'bcryptjs';
-import { RegisterUserOutput } from '../types/RegisterUserOutput';
+import { RegisterUserOutput } from '../../types/RegisterUserOutput';
 
-jest.mock('../models/User');
+jest.mock('../../models/User');
 jest.mock('bcryptjs');
 
 describe('Authentication - Register', () => {
