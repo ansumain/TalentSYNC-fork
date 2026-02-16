@@ -34,7 +34,7 @@ describe('RefreshTokenController - Refresh Token', () => {
       accessToken: 'new-access-token',
     });
 
-    await RefreshTokenController.refresh(mockRequest as Request, mockResponse as Response);
+    await RefreshTokenController.getAccessToken(mockRequest as Request, mockResponse as Response);
 
     expect(mockRefreshToken).toHaveBeenCalledWith({
       token: 'valid-refresh-token',
@@ -51,7 +51,7 @@ describe('RefreshTokenController - Refresh Token', () => {
 
     mockRefreshToken.mockRejectedValue(new Error('Missing required field'));
 
-    await RefreshTokenController.refresh(mockRequest as Request, mockResponse as Response);
+    await RefreshTokenController.getAccessToken(mockRequest as Request, mockResponse as Response);
 
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.json).toHaveBeenCalledWith({
@@ -67,7 +67,7 @@ describe('RefreshTokenController - Refresh Token', () => {
 
     mockRefreshToken.mockRejectedValue(new Error('Invalid token'));
 
-    await RefreshTokenController.refresh(mockRequest as Request, mockResponse as Response);
+    await RefreshTokenController.getAccessToken(mockRequest as Request, mockResponse as Response);
 
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Invalid token' });
@@ -80,7 +80,7 @@ describe('RefreshTokenController - Refresh Token', () => {
 
     mockRefreshToken.mockRejectedValue(new Error('Invalid or expired refresh token'));
 
-    await RefreshTokenController.refresh(mockRequest as Request, mockResponse as Response);
+    await RefreshTokenController.getAccessToken(mockRequest as Request, mockResponse as Response);
 
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
@@ -95,7 +95,7 @@ describe('RefreshTokenController - Refresh Token', () => {
 
     mockRefreshToken.mockRejectedValue(new Error('Invalid or expired refresh token'));
 
-    await RefreshTokenController.refresh(mockRequest as Request, mockResponse as Response);
+    await RefreshTokenController.getAccessToken(mockRequest as Request, mockResponse as Response);
 
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
@@ -111,7 +111,7 @@ describe('RefreshTokenController - Refresh Token', () => {
 
     mockRefreshToken.mockRejectedValue(new Error('Database connection failed'));
 
-    await RefreshTokenController.refresh(mockRequest as Request, mockResponse as Response);
+    await RefreshTokenController.getAccessToken(mockRequest as Request, mockResponse as Response);
 
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith({
