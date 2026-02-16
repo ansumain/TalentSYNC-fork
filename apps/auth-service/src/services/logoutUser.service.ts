@@ -1,6 +1,6 @@
 import RefreshToken from '../models/RefreshToken';
-import { LogoutUserInput } from '../types/logoutUserInput';
-import { LogoutUserOutput } from '../types/logoutUserOutput';
+import { LogoutUserInput } from '../types/LogoutUserInput';
+import { LogoutUserOutput } from '../types/LogoutUserOutput';
 
 export const logoutUser = async ({ userId }: LogoutUserInput): Promise<LogoutUserOutput> => {
   if (!userId) throw new Error('Missing required field');
