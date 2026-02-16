@@ -5,6 +5,7 @@ interface RefreshTokenAttributes {
   id: string;
   userId: string;
   hashedToken: string;
+  revoked: boolean;
   expiresAt: Date;
 }
 
@@ -18,6 +19,7 @@ class RefreshToken
   declare userId: string;
   declare hashedToken: string;
   declare expiresAt: Date;
+  declare revoked: boolean;
 }
 
 RefreshToken.init(
@@ -42,6 +44,10 @@ RefreshToken.init(
     expiresAt: {
       type: DataTypes.DATE,
       allowNull: false,
+    },
+    revoked: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
   },
   {

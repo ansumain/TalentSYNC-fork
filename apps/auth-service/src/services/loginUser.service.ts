@@ -52,13 +52,12 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
-  const getExistingRefreshToken = await RefreshToken.findOne({ where: { userId: user.id } });
+  const getExistingRefreshToken = await RefreshToken.findAll({ where: { userId: user.id } });
 
   if (getExistingRefreshToken) {
     await RefreshToken.update(
       {
-        hashedToken: hashedRefreshToken,
-        expiresAt,
+        revoked: true,
       },
       {
         where: {
@@ -66,13 +65,14 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
         },
       }
     );
-  } else {
-    await RefreshToken.create({
-      userId: user.id,
-      hashedToken: hashedRefreshToken,
-      expiresAt,
-    });
   }
+  await RefreshToken.create({
+    userId: user.id,
+    hashedToken: hashedRefreshToken,
+    expiresAt,
+    revoked: false,
+  });
+
   return { accessToken, refreshToken };
 };
 
