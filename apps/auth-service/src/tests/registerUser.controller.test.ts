@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-// import { RegisterUserController } from '../controllers/auth.controller';
 import { RegisterUserController } from '../controllers/registerUser.controller';
 import { registerUser } from '../services/registerUser.service';
 
@@ -25,44 +24,48 @@ describe('RegisterUserController - Register', () => {
     mockRegisterUser = registerUser as jest.MockedFunction<typeof registerUser>;
   });
 
-  // ──── HAPPY PATH ────
+  // Happy Path
   it('201 - should register user successfully', async () => {
     mockRequest.body = {
-      name: 'John Doe',
-      email: 'john@test.com',
+      name: 'Ansuman Panda',
+      email: 'ansuman@gmail.com',
       phone: '9876543210',
       password: 'password123',
     };
 
     mockRegisterUser.mockResolvedValue({
-      id: 'user-123',
-      name: 'John Doe',
-      email: 'john@test.com',
+      id: 'user123',
+      name: 'Ansuman Panda',
+      email: 'ansuman@gmail.com',
       phone: '9876543210',
-      hashedPassword: 'hashed-password',
+      hashedPassword: 'hashedPassword',
     });
 
     await RegisterUserController.register(mockRequest as Request, mockResponse as Response);
 
     expect(mockRegisterUser).toHaveBeenCalledWith({
-      name: 'John Doe',
-      email: 'john@test.com',
+      name: 'Ansuman Panda',
+      email: 'ansuman@gmail.com',
       phone: '9876543210',
       password: 'password123',
     });
     expect(mockResponse.status).toHaveBeenCalledWith(201);
     expect(mockResponse.json).toHaveBeenCalledWith({
-      id: 'user-123',
-      name: 'John Doe',
-      email: 'john@test.com',
+      id: 'user123',
+      name: 'Ansuman Panda',
+      email: 'ansuman@gmail.com',
       phone: '9876543210',
-      // hashedPassword should NOT be sent in response
     });
   });
 
-  // ──── VALIDATION ERRORS (400) ────
+  // Validation Errors
   it('400 - should return error for missing required field', async () => {
-    mockRequest.body = { name: '', email: 'test@test.com', phone: '1234567890', password: 'pass' };
+    mockRequest.body = {
+      name: '',
+      email: 'ansuman@gmail.com',
+      phone: '1234567890',
+      password: 'pass',
+    };
 
     mockRegisterUser.mockRejectedValue(new Error('Missing required field'));
 
@@ -76,8 +79,8 @@ describe('RegisterUserController - Register', () => {
 
   it('400 - should return error for name too short', async () => {
     mockRequest.body = {
-      name: 'Jo',
-      email: 'test@test.com',
+      name: 'An',
+      email: 'ansuman@gmail.com',
       phone: '1234567890',
       password: 'pass',
     };
@@ -92,8 +95,8 @@ describe('RegisterUserController - Register', () => {
 
   it('400 - should return error for name too long', async () => {
     mockRequest.body = {
-      name: 'ThisNameIsWayTooLongForValidation',
-      email: 'test@test.com',
+      name: 'ThisNameIsTooLongForTheValidation',
+      email: 'ansuman@gmail.com',
       phone: '1234567890',
       password: 'pass',
     };
@@ -108,8 +111,8 @@ describe('RegisterUserController - Register', () => {
 
   it('400 - should return error for weak password', async () => {
     mockRequest.body = {
-      name: 'John',
-      email: 'test@test.com',
+      name: 'Ansuman',
+      email: 'ansuman@gmail.com',
       phone: '1234567890',
       password: '123',
     };
@@ -122,11 +125,11 @@ describe('RegisterUserController - Register', () => {
     expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Weak password' });
   });
 
-  // ──── CONFLICT (409) ────
+  // Conflict Errors
   it('409 - should return error if email already exists', async () => {
     mockRequest.body = {
-      name: 'John',
-      email: 'existing@test.com',
+      name: 'Ansuman Panda',
+      email: 'existing@gmail.com',
       phone: '1234567890',
       password: 'password',
     };
@@ -141,8 +144,8 @@ describe('RegisterUserController - Register', () => {
 
   it('409 - should return error if phone already exists', async () => {
     mockRequest.body = {
-      name: 'John',
-      email: 'new@test.com',
+      name: 'Ansuman Panda',
+      email: 'new@gmail.com',
       phone: '9999999999',
       password: 'password',
     };
@@ -155,11 +158,11 @@ describe('RegisterUserController - Register', () => {
     expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Phone exists' });
   });
 
-  // ──── SERVER ERROR (500) ────
+  // Internal Server Error
   it('500 - should return server error for unexpected errors', async () => {
     mockRequest.body = {
-      name: 'John',
-      email: 'test@test.com',
+      name: 'Ansuman Panda',
+      email: 'ansuman@gmail.com',
       phone: '1234567890',
       password: 'password',
     };
