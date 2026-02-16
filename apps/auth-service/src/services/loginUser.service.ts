@@ -25,7 +25,7 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
       email: user.email,
       phone: user.phone,
     },
-    config.jwtsecret as string,
+    config.accessTokenSecret as string,
     {
       /* eslint-disable @typescript-eslint/no-explicit-any */
       expiresIn: config.jwtExpiresIn as any,
@@ -39,7 +39,7 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
       email: user.email,
       phone: user.phone,
     },
-    config.jwtsecret as string,
+    config.refreshTokenSecret as string,
     {
       expiresIn: '30d',
     }
@@ -52,13 +52,27 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
-  await RefreshToken.create({
-    userId: user.id,
-    hashedToken: hashedRefreshToken,
-    expiresAt,
-    revoked: false,
-  });
+  const getExistingRefreshToken = await RefreshToken.findOne({ where: { userId: user.id } });
 
+  if (getExistingRefreshToken) {
+    await RefreshToken.update(
+      {
+        hashedToken: hashedRefreshToken,
+        expiresAt,
+      },
+      {
+        where: {
+          userId: user.id,
+        },
+      }
+    );
+  } else {
+    await RefreshToken.create({
+      userId: user.id,
+      hashedToken: hashedRefreshToken,
+      expiresAt,
+    });
+  }
   return { accessToken, refreshToken };
 };
 

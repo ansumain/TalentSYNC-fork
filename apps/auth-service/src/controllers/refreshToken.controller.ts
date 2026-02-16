@@ -1,16 +1,23 @@
 import { Request, Response } from 'express';
 import { refreshToken } from '../services/refreshToken.service';
+import { cookieOptions } from '../utils/cookieOptions';
 
 export class RefreshTokenController {
-  static async refresh(req: Request, res: Response): Promise<void> {
+  static async getAccessToken(req: Request, res: Response): Promise<void> {
     try {
-      const { token } = req.body;
+      const token = req.cookies.refresh_token;
 
       const result = await refreshToken({ token });
 
-      res.status(200).json({
-        accessToken: result.accessToken,
+      res.cookie('access_token', result.accessToken, {
+        ...cookieOptions,
+        maxAge: 15 * 60 * 1000,
       });
+
+      res.status(200).json({
+        message: 'Access Token Renewed Successfully!',
+      });
+
       /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (error: any) {
       const errorMessage = error.message || 'Internal server error';
@@ -31,7 +38,7 @@ export class RefreshTokenController {
       }
 
       // 500 - Unexpected errors
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Internal server error, ${error}` });
     }
   }
 }

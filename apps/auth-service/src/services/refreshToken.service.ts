@@ -13,18 +13,13 @@ const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenO
   /* eslint-disable @typescript-eslint/no-explicit-any */
   let decoded: any;
   try {
-    decoded = jwt.verify(token, config.jwtsecret);
+    decoded = jwt.verify(token, config.refreshTokenSecret);
   } catch {
     throw new Error('Invalid token');
   }
 
   // Find matching refresh token in database
-  const storedToken = await RefreshToken.findOne({
-    where: {
-      userId: decoded.userId,
-      revoked: false,
-    },
-  });
+  const storedToken = await RefreshToken.findOne({ where: { userId: decoded.userId } });
 
   if (!storedToken) {
     throw new Error('Invalid or expired refresh token');
@@ -41,11 +36,6 @@ const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenO
     throw new Error('Invalid or expired refresh token');
   }
 
-  // Check if token is revoked
-  if (storedToken.revoked) {
-    throw new Error('Invalid or expired refresh token');
-  }
-
   // Generate new access token
   const accessToken = jwt.sign(
     {
@@ -53,7 +43,7 @@ const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenO
       email: decoded.email,
       phone: decoded.phone,
     },
-    config.jwtsecret,
+    config.accessTokenSecret,
     {
       /* eslint-disable @typescript-eslint/no-explicit-any */
       expiresIn: config.jwtExpiresIn as any,
