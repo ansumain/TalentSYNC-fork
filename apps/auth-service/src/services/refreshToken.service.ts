@@ -35,7 +35,12 @@ const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenO
 
   // Check if token is expired
   if (new Date() > storedToken.expiresAt) {
-    throw new Error('Expired refresh token');
+    throw new Error('Invalid or expired refresh token');
+  }
+
+  // Check if token is revoked
+  if (storedToken.revoked) {
+    throw new Error('Invalid or expired refresh token');
   }
 
   // Generate new access token

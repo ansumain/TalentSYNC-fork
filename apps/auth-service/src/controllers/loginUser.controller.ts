@@ -6,8 +6,6 @@ export class LoginUserController {
   static async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      console.log('email', email);
-      console.log('password', password);
 
       const tokens = await loginUser({ email, password });
 
@@ -49,7 +47,7 @@ export class LoginUserController {
       }
 
       // 500 - Unexpected errors
-      res.status(500).json({ error: `Internal server error, ${error}` });
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 }

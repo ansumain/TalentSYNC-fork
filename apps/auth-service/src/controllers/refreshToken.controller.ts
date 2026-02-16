@@ -38,7 +38,7 @@ export class RefreshTokenController {
       }
 
       // 500 - Unexpected errors
-      res.status(500).json({ error: `Internal server error, ${error}` });
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 }

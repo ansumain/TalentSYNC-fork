@@ -19,6 +19,7 @@ describe('LoginUserController - Login', () => {
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis(),
+      cookie: jest.fn().mockReturnThis(),
     };
 
     mockLoginUser = loginUser as jest.MockedFunction<typeof loginUser>;
@@ -43,9 +44,9 @@ describe('LoginUserController - Login', () => {
       password: 'password123',
     });
     expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.cookie).toHaveBeenCalledTimes(2);
     expect(mockResponse.json).toHaveBeenCalledWith({
-      accessToken: 'mock-access-token',
-      refreshToken: 'mock-refresh-token',
+      message: 'Login Successful',
     });
   });
 
