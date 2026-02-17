@@ -5,6 +5,7 @@ import { cookieOptions } from '../utils/cookieOptions';
 export class LoginUserController {
   static async login(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.body) throw new Error('Missing body');
       const { email, password } = req.body;
 
       const tokens = await loginUser({ email, password });
@@ -29,7 +30,10 @@ export class LoginUserController {
       const errorMessage = error.message || 'Internal server error';
 
       // 400 - Validation errors
-      if (errorMessage.includes('Missing required field')) {
+      if (
+        errorMessage.includes('Missing required field') ||
+        errorMessage.includes('Missing body')
+      ) {
         res.status(400).json({ error: errorMessage });
         return;
       }

@@ -5,6 +5,7 @@ import { cookieOptions } from '../utils/cookieOptions';
 export class LogoutUserController {
   static async logout(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');
       const userId = req.userInfo.sub;
 
       const result = await logoutUser({ userId });
@@ -27,6 +28,12 @@ export class LogoutUserController {
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {
         res.status(400).json({ error: errorMessage });
+        return;
+      }
+
+      // 401 - Unauthenticated user
+      if (errorMessage.includes('Unauthorized')) {
+        res.status(401).json({ error: errorMessage });
         return;
       }
 

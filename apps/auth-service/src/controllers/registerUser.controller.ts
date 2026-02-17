@@ -4,6 +4,7 @@ import { registerUser } from '../services/registerUser.service';
 export class RegisterUserController {
   static async register(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.body) throw new Error('Missing body');
       const { name, email, phone, password } = req.body;
 
       const user = await registerUser({ name, email, phone, password });
@@ -21,6 +22,7 @@ export class RegisterUserController {
 
       // 400 - Validation errors
       if (
+        errorMessage.includes('Missing body') ||
         errorMessage.includes('Missing required field') ||
         errorMessage.includes('Name too short') ||
         errorMessage.includes('Name too long') ||
