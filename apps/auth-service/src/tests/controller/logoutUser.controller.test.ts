@@ -48,15 +48,15 @@ describe('LogoutUserController - Logout', () => {
     });
   });
 
-  // Validation Errors
-  it('400 - should return error for missing userId', async () => {
+  // Authorization Error
+  it('401 - should return error for missing userId', async () => {
     mockLogoutUser.mockRejectedValue(new Error('Missing required field'));
 
     await LogoutUserController.logout(mockRequest as Request, mockResponse as Response);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(400);
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
-      error: 'Missing required field',
+      error: 'Unauthorized',
     });
   });
 
