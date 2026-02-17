@@ -4,7 +4,7 @@ import { RegisterUserInput } from '../types/RegisterUserInput';
 import { RegisterUserOutput } from '../types/RegisterUserOutput';
 import { Op } from 'sequelize';
 
-const registerUser = async ({
+export const registerUser = async ({
   name,
   email,
   phone,
@@ -50,5 +50,3 @@ const registerUser = async ({
     hashedPassword: user.hashedPassword,
   };
 };
-
-export { registerUser };

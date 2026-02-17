@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import { config } from '../config/env';
 import RefreshToken from '../models/RefreshToken';
 
-const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUserOutput> => {
+export const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUserOutput> => {
   // required fields must not be null
   if (!email || !password) throw new Error('Missing required field');
 
@@ -60,5 +60,3 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
 
   return { accessToken, refreshToken };
 };
-
-export { loginUser };
