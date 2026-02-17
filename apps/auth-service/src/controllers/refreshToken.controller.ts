@@ -33,6 +33,7 @@ export class RefreshTokenController {
         errorMessage.includes('Invalid token') ||
         errorMessage.includes('Invalid or expired refresh token')
       ) {
+        res.clearCookie('refresh_token', { ...cookieOptions, path: '/auth/refresh-token' });
         res.status(401).json({ error: errorMessage });
         return;
       }

@@ -21,9 +21,8 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   // create the access token
   const accessToken = jwt.sign(
     {
-      userId: user.id,
-      email: user.email,
-      phone: user.phone,
+      sub: user.id,
+      name: user.name,
     },
     config.accessTokenSecret as string,
     {
@@ -35,9 +34,7 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   // create the refresh token
   const refreshToken = jwt.sign(
     {
-      userId: user.id,
-      email: user.email,
-      phone: user.phone,
+      sub: user.id,
     },
     config.refreshTokenSecret as string,
     {
@@ -52,20 +49,8 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
-  const getExistingRefreshToken = await RefreshToken.findAll({ where: { userId: user.id } });
+  await RefreshToken.update({ revoked: true }, { where: { userId: user.id, revoked: false } });
 
-  if (getExistingRefreshToken) {
-    await RefreshToken.update(
-      {
-        revoked: true,
-      },
-      {
-        where: {
-          userId: user.id,
-        },
-      }
-    );
-  }
   await RefreshToken.create({
     userId: user.id,
     hashedToken: hashedRefreshToken,

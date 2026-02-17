@@ -4,11 +4,11 @@ import { userProfile } from '../services/userProfile.service';
 export class UserProfileController {
   static async userProfile(req: Request, res: Response): Promise<void> {
     try {
-      if (!req.userInfo || !req.userInfo.userId) {
+      if (!req.userInfo || !req.userInfo.sub) {
         throw new Error('Unauthorized');
       }
 
-      const userId = req.userInfo.userId;
+      const userId = req.userInfo.sub;
       const user = await userProfile({ userId });
 
       res.status(200).json({ data: user });

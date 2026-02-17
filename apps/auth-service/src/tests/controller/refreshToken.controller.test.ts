@@ -20,6 +20,7 @@ describe('RefreshTokenController - Refresh Token', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis(),
       cookie: jest.fn().mockReturnThis(),
+      clearCookie: jest.fn().mockReturnThis(),
     };
 
     mockRefreshToken = refreshToken as jest.MockedFunction<typeof refreshToken>;
@@ -49,8 +50,6 @@ describe('RefreshTokenController - Refresh Token', () => {
 
   // Validation Error
   it('400 - should return error for missing token', async () => {
-    mockRequest.cookies = {};
-
     mockRefreshToken.mockRejectedValue(new Error('Missing required field'));
 
     await RefreshTokenController.getAccessToken(mockRequest as Request, mockResponse as Response);
@@ -73,6 +72,10 @@ describe('RefreshTokenController - Refresh Token', () => {
 
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Invalid token' });
+    expect(mockResponse.clearCookie).toHaveBeenCalledWith(
+      'refresh_token',
+      expect.objectContaining({ path: '/auth/refresh-token' })
+    );
   });
 
   it('401 - should return error for expired token', async () => {
@@ -88,6 +91,10 @@ describe('RefreshTokenController - Refresh Token', () => {
     expect(mockResponse.json).toHaveBeenCalledWith({
       error: 'Invalid or expired refresh token',
     });
+    expect(mockResponse.clearCookie).toHaveBeenCalledWith(
+      'refresh_token',
+      expect.objectContaining({ path: '/auth/refresh-token' })
+    );
   });
 
   it('401 - should return error for revoked token', async () => {
@@ -103,6 +110,10 @@ describe('RefreshTokenController - Refresh Token', () => {
     expect(mockResponse.json).toHaveBeenCalledWith({
       error: 'Invalid or expired refresh token',
     });
+    expect(mockResponse.clearCookie).toHaveBeenCalledWith(
+      'refresh_token',
+      expect.objectContaining({ path: '/auth/refresh-token' })
+    );
   });
 
   // Internal Server Error

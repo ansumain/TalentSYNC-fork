@@ -5,7 +5,7 @@ import { cookieOptions } from '../utils/cookieOptions';
 export class LogoutUserController {
   static async logout(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.userInfo.userId;
+      const userId = req.userInfo.sub;
 
       const result = await logoutUser({ userId });
 

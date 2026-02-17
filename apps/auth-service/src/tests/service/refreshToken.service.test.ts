@@ -1,9 +1,11 @@
 import { refreshToken } from '../../services/refreshToken.service';
 import RefreshToken from '../../models/RefreshToken';
+import User from '../../models/User';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 jest.mock('../../models/RefreshToken');
+jest.mock('../../models/User');
 jest.mock('jsonwebtoken');
 jest.mock('bcryptjs');
 
@@ -31,9 +33,7 @@ describe('Authentication - Refresh Token', () => {
 
   it('should throw an error if token not found in database', async () => {
     mockJwtVerify.mockReturnValue({
-      userId: 'user123',
-      email: 'ansuman@gmail.com',
-      phone: '1234567890',
+      sub: 'user123',
     });
 
     mockFindOne.mockResolvedValue(null);
@@ -48,9 +48,7 @@ describe('Authentication - Refresh Token', () => {
 
   it('should throw an error if token is expired', async () => {
     mockJwtVerify.mockReturnValue({
-      userId: 'user123',
-      email: 'ansuman@gmail.com',
-      phone: '1234567890',
+      sub: 'user123',
     });
 
     const pastDate = new Date();
@@ -74,9 +72,7 @@ describe('Authentication - Refresh Token', () => {
 
   it('should throw an error if token is revoked', async () => {
     mockJwtVerify.mockReturnValue({
-      userId: 'user123',
-      email: 'ansuman@gmail.com',
-      phone: '1234567890',
+      sub: 'user123',
     });
 
     const futureDate = new Date();
@@ -100,9 +96,8 @@ describe('Authentication - Refresh Token', () => {
 
   it('should return new access token on valid refresh token', async () => {
     mockJwtVerify.mockReturnValue({
-      userId: 'user123',
-      email: 'ansuman@gmail.com',
-      phone: '1234567890',
+      sub: 'user123',
+      name: 'Ansuman Panda',
     });
 
     const futureDate = new Date();
@@ -116,6 +111,11 @@ describe('Authentication - Refresh Token', () => {
       revoked: false,
     });
 
+    (User.findOne as jest.Mock).mockResolvedValue({
+      id: 'user123',
+      name: 'Ansuman Panda',
+    });
+
     const mockBcryptCompare = bcrypt.compare as jest.Mock;
     mockBcryptCompare.mockResolvedValue(true);
 
@@ -127,6 +127,7 @@ describe('Authentication - Refresh Token', () => {
     expect(mockJwtVerify).toHaveBeenCalledWith('valid-refresh-token', expect.any(String));
     expect(mockFindOne).toHaveBeenCalled();
     expect(mockBcryptCompare).toHaveBeenCalledWith('valid-refresh-token', 'hashedToken');
+    expect(User.findOne as jest.Mock).toHaveBeenCalledWith({ where: { id: 'user123' } });
     expect(mockJwtSign).toHaveBeenCalled();
     expect(result).toHaveProperty('accessToken', 'new-access-token');
   });

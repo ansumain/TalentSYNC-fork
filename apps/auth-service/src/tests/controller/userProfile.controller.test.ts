@@ -14,9 +14,8 @@ describe('UserProfileController - User Profile', () => {
 
     mockRequest = {
       userInfo: {
-        userId: '',
-        email: '',
-        phone: '',
+        sub: '',
+        name: '',
       },
     };
 
@@ -31,9 +30,8 @@ describe('UserProfileController - User Profile', () => {
   // Happy Path
   it('200 - should return user profile successfully', async () => {
     mockRequest.userInfo = {
-      userId: 'user123',
-      email: 'ansuman@gmail.com',
-      phone: '9090909090',
+      sub: 'user123',
+      name: 'Ansuman Panda',
     };
 
     mockUserProfile.mockResolvedValue({
@@ -75,9 +73,8 @@ describe('UserProfileController - User Profile', () => {
   // User Not Found
   it('404 - should return error if user not found', async () => {
     mockRequest.userInfo = {
-      userId: 'invalid-userId',
-      email: '',
-      phone: '',
+      sub: 'invalid-userId',
+      name: '',
     };
 
     mockUserProfile.mockRejectedValue(new Error('User not found'));
@@ -93,9 +90,8 @@ describe('UserProfileController - User Profile', () => {
   // Internal Server Error
   it('500 - should return server error for unexpected errors', async () => {
     mockRequest.userInfo = {
-      userId: 'user123',
-      email: '',
-      phone: '',
+      sub: 'user123',
+      name: 'Ansuman Panda',
     };
 
     mockUserProfile.mockRejectedValue(new Error('Database connection failed'));

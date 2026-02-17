@@ -4,6 +4,7 @@ import { RefreshTokenOutput } from '../types/RefreshTokenOutput';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/env';
+import User from '../models/User';
 
 const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenOutput> => {
   // required fields must not be null
@@ -20,14 +21,14 @@ const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenO
 
   // Find matching refresh token in database
   const storedToken = await RefreshToken.findOne({
-    where: { userId: decoded.userId, revoked: false },
+    where: { userId: decoded.sub, revoked: false },
   });
 
   if (!storedToken) {
     throw new Error('Invalid or expired refresh token');
   }
 
-  // Check if token matches (compare hashed)
+  // Check if token matches (compare hashedToken from DB)
   const isTokenValid = await bcrypt.compare(token, storedToken.hashedToken);
   if (!isTokenValid) {
     throw new Error('Invalid or expired refresh token');
@@ -43,12 +44,15 @@ const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenO
     throw new Error('Invalid or expired refresh token');
   }
 
+  const user = (await User.findOne({ where: { id: decoded.sub } })) as User;
+
+  if (!user) throw new Error('User not found');
+
   // Generate new access token
   const accessToken = jwt.sign(
     {
-      userId: decoded.userId,
-      email: decoded.email,
-      phone: decoded.phone,
+      sub: decoded.sub,
+      name: user.name,
     },
     config.accessTokenSecret,
     {

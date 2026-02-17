@@ -13,7 +13,7 @@ describe('LogoutUserController - Logout', () => {
     jest.clearAllMocks();
 
     mockRequest = {
-      userInfo: { userId: '', email: '', phone: '' },
+      userInfo: { sub: '', name: '' },
     };
 
     mockResponse = {
@@ -28,9 +28,8 @@ describe('LogoutUserController - Logout', () => {
   // Happy Path
   it('200 - should logout user successfully', async () => {
     mockRequest.userInfo = {
-      userId: 'user123',
-      email: 'ansuman@gmail.com',
-      phone: '9090909090',
+      sub: 'user123',
+      name: 'Ansuman Panda',
     };
 
     mockLogoutUser.mockResolvedValue({
@@ -51,8 +50,6 @@ describe('LogoutUserController - Logout', () => {
 
   // Validation Errors
   it('400 - should return error for missing userId', async () => {
-    mockRequest.userInfo = { userId: '', email: '', phone: '' };
-
     mockLogoutUser.mockRejectedValue(new Error('Missing required field'));
 
     await LogoutUserController.logout(mockRequest as Request, mockResponse as Response);
@@ -66,9 +63,8 @@ describe('LogoutUserController - Logout', () => {
   // Internal Server Error
   it('500 - should return server error for unexpected errors', async () => {
     mockRequest.userInfo = {
-      userId: 'user123',
-      email: 'ansuman@gmail.com',
-      phone: '8989898989',
+      sub: 'user123',
+      name: 'Ansuman Panda',
     };
 
     mockLogoutUser.mockRejectedValue(new Error('Database connection failed'));
