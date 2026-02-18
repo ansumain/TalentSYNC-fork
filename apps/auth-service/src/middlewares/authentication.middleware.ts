@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config/env';
 import { UserInfo } from '../types/UserInfo';
 
-const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+const authenticationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies.access_token;
     if (!token) {
@@ -20,4 +20,4 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-export { authMiddleware };
+export { authenticationMiddleware };

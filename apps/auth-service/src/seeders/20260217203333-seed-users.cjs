@@ -1,5 +1,6 @@
 'use strict';
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const bcrypt = require('bcryptjs');
 
 /** @type {import('sequelize-cli').Migration} */
@@ -7,7 +8,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const now = new Date();
     
-    // Hash password for all seeded users (password: "password")
+    // Hash password for all seeded users (password: "password123")
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash('password123', salt);
 

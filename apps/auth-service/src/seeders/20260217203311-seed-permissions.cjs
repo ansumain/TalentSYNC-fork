@@ -29,6 +29,7 @@ module.exports = {
     );
   },
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete(
       { tableName: 'permissions', schema: 'auth' }

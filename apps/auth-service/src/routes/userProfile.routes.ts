@@ -1,12 +1,20 @@
 import express from 'express';
-import { authMiddleware } from '../middlewares/auth.middleware';
+import { authenticationMiddleware } from '../middlewares/authentication.middleware';
 import { UserProfileController } from '../controllers/userProfile.controller';
 import { UpdateUserProfileController } from '../controllers/updateUserProfile.controller';
 import { UpdatePasswordController } from '../controllers/updatePassword.controller';
 const userProfileRouter = express.Router();
 
-userProfileRouter.get('/me', authMiddleware, UserProfileController.userProfile);
-userProfileRouter.put('/me', authMiddleware, UpdateUserProfileController.updateUserProfile);
-userProfileRouter.patch('/me/password', authMiddleware, UpdatePasswordController.updatePassword);
+userProfileRouter.get('/me', authenticationMiddleware, UserProfileController.userProfile);
+userProfileRouter.put(
+  '/me',
+  authenticationMiddleware,
+  UpdateUserProfileController.updateUserProfile
+);
+userProfileRouter.patch(
+  '/me/password',
+  authenticationMiddleware,
+  UpdatePasswordController.updatePassword
+);
 
 export default userProfileRouter;
