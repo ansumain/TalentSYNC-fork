@@ -5,10 +5,14 @@ import { LoginUserController } from '../controllers/loginUser.controller';
 import { LogoutUserController } from '../controllers/logoutUser.controller';
 import { RefreshTokenController } from '../controllers/refreshToken.controller';
 import { authenticationMiddleware } from '../middlewares/authentication.middleware';
+import { RequestPasswordResetController } from '../controllers/requestPasswordReset.controller';
+import { ResetPasswordController } from '../controllers/resetPassword.controller';
 
 authRouter.post('/register', RegisterUserController.register);
 authRouter.post('/login', LoginUserController.login);
 authRouter.post('/logout', authenticationMiddleware, LogoutUserController.logout);
 authRouter.post('/refresh-token', RefreshTokenController.getAccessToken);
+authRouter.post('/forgot-password', RequestPasswordResetController.requestReset);
+authRouter.post('/reset-password', ResetPasswordController.resetPassword);
 
 export default authRouter;
