@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { getUserPermissions, getUserRoles } from '../services/rbac.service';
-import { getAllRoles, getRoleById } from '../services/role.service';
+import { getUserPermissions } from '../services/rbac.service';
 
 const requiredPermission = (permission: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -8,7 +7,7 @@ const requiredPermission = (permission: string) => {
       const userPermissions = await getUserPermissions(req.userInfo.sub);
       if (userPermissions.includes(permission)) return next();
 
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' });
     } catch (error) {
       next(error);
     }
@@ -18,12 +17,12 @@ const requiredPermission = (permission: string) => {
 const requiredRole = (role: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userRoles = await getUserRoles(req.userInfo.sub);
-      if (userRoles.includes(role)) {
-        next();
-      } else {
-        res.status(401).json({ error: `${role} role, required` });
+      // Check role directly from JWT - no database call needed
+      if (req.userInfo.role && req.userInfo.role.name === role) {
+        return next();
       }
+
+      return res.status(403).json({ error: `${role} role, required` });
     } catch (error) {
       next(error);
     }
@@ -33,13 +32,12 @@ const requiredRole = (role: string) => {
 const requiredAnyRole = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const roles = await getAllRoles();
-      const userRoles = await getRoleById(req.userInfo.role.name);
-      const hasAny = roles.some((role) => userRoles.includes(role));
+      // Check if user has a role in JWT - no database call needed
+      if (req.userInfo.role && req.userInfo.role.name) {
+        return next();
+      }
 
-      if (hasAny) return next();
-
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' });
     } catch (error) {
       next(error);
     }
@@ -54,7 +52,7 @@ const requiredAnyPermission = (permissions: string[]) => {
 
       if (hasAny) return next();
 
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' });
     } catch (error) {
       next(error);
     }
@@ -69,7 +67,7 @@ const requiredAllPermission = (permissions: string[]) => {
 
       if (hasAll) return next();
 
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' });
     } catch (error) {
       next(error);
     }

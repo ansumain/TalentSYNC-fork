@@ -3,6 +3,8 @@ import User from '../models/User';
 import { RegisterUserInput } from '../types/RegisterUserInput';
 import { RegisterUserOutput } from '../types/RegisterUserOutput';
 import { Op } from 'sequelize';
+import Role from '../models/Role';
+import UserRole from '../models/UserRole';
 
 export const registerUser = async ({
   name,
@@ -40,6 +42,14 @@ export const registerUser = async ({
     email,
     phone,
     hashedPassword,
+  });
+
+  const candidateRole = await Role.findOne({ where: { role: 'candidate' } });
+  if (!candidateRole) throw new Error('candidate role not found');
+
+  await UserRole.create({
+    userId: user.id,
+    roleId: candidateRole.id,
   });
 
   return {

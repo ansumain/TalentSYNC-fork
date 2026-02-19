@@ -38,6 +38,16 @@ export class RefreshTokenController {
         return;
       }
 
+      // 404 - User/Role not found
+      if (
+        errorMessage.includes('User not found') ||
+        errorMessage.includes('User has no assigned role') ||
+        errorMessage.includes('Role not found')
+      ) {
+        res.status(404).json({ error: errorMessage });
+        return;
+      }
+
       // 500 - Unexpected errors
       res.status(500).json({ error: 'Internal server error' });
     }

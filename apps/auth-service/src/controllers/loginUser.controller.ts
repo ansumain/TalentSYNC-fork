@@ -44,6 +44,15 @@ export class LoginUserController {
         return;
       }
 
+      // 404 - Role issues
+      if (
+        errorMessage.includes('User has no assigned role') ||
+        errorMessage.includes('Role not found')
+      ) {
+        res.status(404).json({ error: errorMessage });
+        return;
+      }
+
       // 401 - Invalid credentials
       if (errorMessage.includes('Invalid Password')) {
         res.status(401).json({ error: errorMessage });

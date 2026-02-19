@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/env';
 import User from '../models/User';
+import UserRole from '../models/UserRole';
+import Role from '../models/Role';
 
 export const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenOutput> => {
   // required fields must not be null
@@ -48,11 +50,24 @@ export const refreshToken = async ({ token }: RefreshTokenInput): Promise<Refres
 
   if (!user) throw new Error('User not found');
 
+  // Fetch user's role(s)
+  const userRoles = await UserRole.findAll({ where: { userId: user.id } });
+  if (!userRoles || userRoles.length === 0) throw new Error('User has no assigned role');
+
+  // Get the first role details
+  const firstUserRole = userRoles[0];
+  const role = await Role.findOne({ where: { id: firstUserRole.roleId } });
+  if (!role) throw new Error('Role not found');
+
   // Generate new access token
   const accessToken = jwt.sign(
     {
       sub: decoded.sub,
       name: user.name,
+      role: {
+        id: role.id,
+        name: role.role,
+      },
     },
     config.accessTokenSecret,
     {

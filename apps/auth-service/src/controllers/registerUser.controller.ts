@@ -38,6 +38,12 @@ export class RegisterUserController {
         return;
       }
 
+      // 500 - Configuration error (missing default roles)
+      if (errorMessage.includes('candidate role not found')) {
+        res.status(500).json({ error: 'System configuration error' });
+        return;
+      }
+
       // 500 - Unexpected errors
       res.status(500).json({ error: 'Internal server error' });
     }
