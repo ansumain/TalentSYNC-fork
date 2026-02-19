@@ -5,8 +5,10 @@ import {
 } from '../services/rolePermission.service';
 
 export class RolePermissionController {
-  static async assignPermissionToRole(req: Request, res: Response) {
+  static async assignPermissionToRole(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
+      if (!req.body || !req.body.permissionId) throw new Error('Missing permission ID');
       const roleId = req.params.roleId;
       const permissionId = req.body.permissionId;
 
@@ -16,13 +18,40 @@ export class RolePermissionController {
         message: 'Permission assigned successfully',
         permissionAssigned,
       });
-    } catch (error) {
-      console.log('some error occured', error);
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+    } catch (error: any) {
+      const errorMessage = error.message || 'Internal server error';
+
+      // 400 - Validation errors
+      if (errorMessage.includes('Missing required field')) {
+        res.status(400).json({ error: errorMessage });
+        return;
+      }
+
+      // 404 - Not found
+      if (
+        errorMessage.includes('Role not found') ||
+        errorMessage.includes('Permission not found')
+      ) {
+        res.status(404).json({ error: errorMessage });
+        return;
+      }
+
+      // 409 - Conflict (duplicate)
+      if (errorMessage.includes('Permission already assigned to role')) {
+        res.status(409).json({ error: errorMessage });
+        return;
+      }
+
+      // 500 - Unexpected errors
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
-  static async revokePermissionFromRole(req: Request, res: Response) {
+  static async revokePermissionFromRole(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
+      if (!req.params || !req.params.permissionId) throw new Error('Missing permission ID');
       const roleId = req.params.roleId;
       const permissionId = req.params.permissionId;
 
@@ -31,12 +60,28 @@ export class RolePermissionController {
         String(permissionId)
       );
 
-      res.status(240).json({
-        message: 'Role revoked successfully',
+      res.status(200).json({
+        message: 'Permission revoked successfully',
         permissionRevoked,
       });
-    } catch (error) {
-      console.log('some error occured', error);
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+    } catch (error: any) {
+      const errorMessage = error.message || 'Internal server error';
+
+      // 400 - Validation errors
+      if (errorMessage.includes('Missing required field')) {
+        res.status(400).json({ error: errorMessage });
+        return;
+      }
+
+      // 404 - Not found
+      if (errorMessage.includes('Permission assignment not found')) {
+        res.status(404).json({ error: errorMessage });
+        return;
+      }
+
+      // 500 - Unexpected errors
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 }

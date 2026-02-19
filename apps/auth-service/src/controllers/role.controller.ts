@@ -4,7 +4,7 @@ import { getUserRoles } from '../services/rbac.service';
 
 // [admin]
 export class RoleController {
-  static async getAllRoles(req: Request, res: Response) {
+  static async getAllRoles(req: Request, res: Response): Promise<void> {
     try {
       const roles = await getAllRoles();
 
@@ -12,13 +12,15 @@ export class RoleController {
         message: 'Roles fetched sucessfully',
         roles,
       });
-    } catch (error) {
-      console.log('some error occured', error);
+    } catch {
+      // 500 - Unexpected errors
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
-  static async getRoleByUserId(req: Request, res: Response) {
+  static async getRoleByUserId(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.params || !req.params.userId) throw new Error('Missing user ID');
       const userId = req.params.userId;
       const roles = await getUserRoles(String(userId));
 
@@ -26,37 +28,84 @@ export class RoleController {
         message: 'Role fetched sucessfully',
         roles,
       });
-    } catch (error) {
-      console.log('some error occured', error);
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+    } catch (error: any) {
+      const errorMessage = error.message || 'Internal server error';
+
+      // 400 - Validation errors
+      if (errorMessage.includes('Missing user ID')) {
+        res.status(400).json({ error: errorMessage });
+        return;
+      }
+
+      // 404 - Not found
+      if (errorMessage.includes('User not found')) {
+        res.status(404).json({ error: errorMessage });
+        return;
+      }
+
+      // 500 - Unexpected errors
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
-  static async createRole(req: Request, res: Response) {
+  static async createRole(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.body || !req.body.role) throw new Error('Missing required field');
       const { role } = req.body;
-      const newRoleCreated = await createRole(role);
+      await createRole(role);
 
-      res.status(200).json({
+      res.status(201).json({
         message: 'Role created successfully',
-        newRoleCreated,
       });
-    } catch (error) {
-      console.log('some error occured', error);
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+    } catch (error: any) {
+      const errorMessage = error.message || 'Internal server error';
+
+      // 400 - Validation errors
+      if (errorMessage.includes('Missing required field')) {
+        res.status(400).json({ error: errorMessage });
+        return;
+      }
+
+      // 409 - Conflict (duplicate)
+      if (errorMessage.includes('Role already exists')) {
+        res.status(409).json({ error: errorMessage });
+        return;
+      }
+
+      // 500 - Unexpected errors
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
-  static async deleteRole(req: Request, res: Response) {
+  static async deleteRole(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
       const roleId = req.params.roleId;
-
-      const roleDelete = await deleteRole(String(roleId));
+      await deleteRole(String(roleId));
 
       res.status(200).json({
         message: 'Role deleted sucessfully',
-        roleDelete,
       });
-    } catch (error) {
-      console.log('some error occured', error);
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+    } catch (error: any) {
+      const errorMessage = error.message || 'Internal server error';
+
+      // 400 - Validation errors
+      if (errorMessage.includes('Missing role ID')) {
+        res.status(400).json({ error: errorMessage });
+        return;
+      }
+
+      // 404 - Not found
+      if (errorMessage.includes('Role not found')) {
+        res.status(404).json({ error: errorMessage });
+        return;
+      }
+
+      // 500 - Unexpected errors
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 }
