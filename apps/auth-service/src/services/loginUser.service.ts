@@ -5,8 +5,10 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/env';
 import RefreshToken from '../models/RefreshToken';
+import UserRole from '../models/UserRole';
+import Role from '../models/Role';
 
-const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUserOutput> => {
+export const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUserOutput> => {
   // required fields must not be null
   if (!email || !password) throw new Error('Missing required field');
 
@@ -15,17 +17,29 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   if (!user) throw new Error('User not found');
 
   // check if valid password is entered
-  const isPassowordValid = await bcrypt.compare(password, user.hashedPassword);
-  if (!isPassowordValid) throw new Error('Invalid Password');
+  const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+  if (!isPasswordValid) throw new Error('Invalid Password');
+
+  // Fetch user's role(s)
+  const userRoles = await UserRole.findAll({ where: { userId: user.id } });
+  if (!userRoles || userRoles.length === 0) throw new Error('User has no assigned role');
+
+  // Get the first role details
+  const firstUserRole = userRoles[0];
+  const role = await Role.findOne({ where: { id: firstUserRole.roleId } });
+  if (!role) throw new Error('Role not found');
 
   // create the access token
   const accessToken = jwt.sign(
     {
-      userId: user.id,
-      email: user.email,
-      phone: user.phone,
+      sub: user.id,
+      name: user.name,
+      role: {
+        id: role.id,
+        name: role.role,
+      },
     },
-    config.jwtsecret as string,
+    config.accessTokenSecret as string,
     {
       /* eslint-disable @typescript-eslint/no-explicit-any */
       expiresIn: config.jwtExpiresIn as any,
@@ -35,11 +49,9 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   // create the refresh token
   const refreshToken = jwt.sign(
     {
-      userId: user.id,
-      email: user.email,
-      phone: user.phone,
+      sub: user.id,
     },
-    config.jwtsecret as string,
+    config.refreshTokenSecret as string,
     {
       expiresIn: '30d',
     }
@@ -52,6 +64,8 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
+  await RefreshToken.update({ revoked: true }, { where: { userId: user.id, revoked: false } });
+
   await RefreshToken.create({
     userId: user.id,
     hashedToken: hashedRefreshToken,
@@ -61,5 +75,3 @@ const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUser
 
   return { accessToken, refreshToken };
 };
-
-export { loginUser };

@@ -1,12 +1,12 @@
-import { loginUser } from '../services/loginUser.service';
-import User from '../models/User';
+import { loginUser } from '../../services/loginUser.service';
+import User from '../../models/User';
 // import { RefreshToken } from "../models/RefreshToken";
-import { RefreshToken } from '../models/index';
+import { RefreshToken } from '../../models/index';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-jest.mock('../models/User');
-jest.mock('../models/RefreshToken');
+jest.mock('../../models/User');
+jest.mock('../../models/RefreshToken');
 jest.mock('jsonwebtoken');
 jest.mock('bcryptjs');
 

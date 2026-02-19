@@ -12,11 +12,11 @@ interface UserAttributes {
 type UserCreationAttributes = Optional<UserAttributes, 'id'>;
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  public id!: string;
-  public name!: string;
-  public email!: string;
-  public phone!: string;
-  public hashedPassword!: string;
+  declare id: string;
+  declare name: string;
+  declare email: string;
+  declare phone: string;
+  declare hashedPassword: string;
 }
 
 User.init(
