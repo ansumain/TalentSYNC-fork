@@ -30,5 +30,10 @@ export const config = {
   dbPassword: process.env.DB_PASSWORD as string,
   dbName: process.env.DB_NAME as string,
 
+  emailService: process.env.EMAIL_SERVICE || 'gmail',
+  emailUser: process.env.EMAIL_USER || '',
+  emailPassword: process.env.EMAIL_PASSWORD || '',
+  emailFrom: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+
   environment: (process.env.NODE_ENV as string) || 'development',
 };
