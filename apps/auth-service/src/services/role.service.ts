@@ -9,11 +9,20 @@ const getAllRoles = async (): Promise<string[]> => {
 };
 
 const getRoleById = async (roleId: string) => {
+  if (!roleId) throw new Error('Missing role ID');
+
   const getRole = await Role.findOne({ where: { id: roleId } });
-  return getRole!.role;
+  if (!getRole) throw new Error('Role not found');
+
+  return getRole.role;
 };
 
 const getRolePermissions = async (roleId: string): Promise<string[]> => {
+  if (!roleId) throw new Error('Missing role ID');
+
+  const role = await Role.findOne({ where: { id: roleId } });
+  if (!role) throw new Error('Role not found');
+
   const rolePermissions = await RolePermission.findAll({ where: { roleId } });
   const permissionIds = rolePermissions.map((rolePermission) => rolePermission.permissionId);
 
@@ -27,10 +36,21 @@ const getRolePermissions = async (roleId: string): Promise<string[]> => {
 };
 
 const createRole = async (role: string) => {
+  if (!role) throw new Error('Missing required field');
+
+  // Check if role already exists
+  const existingRole = await Role.findOne({ where: { role } });
+  if (existingRole) throw new Error('Role already exists');
+
   await Role.create({ role });
 };
 
 const deleteRole = async (roleId: string) => {
+  if (!roleId) throw new Error('Missing role ID');
+
+  const role = await Role.findOne({ where: { id: roleId } });
+  if (!role) throw new Error('Role not found');
+
   await Role.destroy({ where: { id: roleId } });
 };
 

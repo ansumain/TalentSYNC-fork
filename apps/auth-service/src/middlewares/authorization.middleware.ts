@@ -22,7 +22,7 @@ const requiredRole = (role: string) => {
       if (userRoles.includes(role)) {
         next();
       } else {
-        res.status(401).json({ error: 'Unauthorized' });
+        res.status(401).json({ error: `${role} role, required` });
       }
     } catch (error) {
       next(error);
