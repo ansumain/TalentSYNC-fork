@@ -29,7 +29,7 @@ export function SignupForm({
                     <form>
                         <FieldGroup>
                             <Field>
-                                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                                <FieldLabel htmlFor="name">Name</FieldLabel>
                                 <Input id="name" type="text" required />
                             </Field>
                             <Field>
@@ -37,16 +37,20 @@ export function SignupForm({
                                 <Input id="email" type="email" required />
                             </Field>
                             <Field>
+                                <FieldLabel htmlFor="phone">Phone</FieldLabel>
+                                <Input id="phone" type="number" required />
+                            </Field>
+                            <Field>
                                 <Field className="grid grid-cols-2 gap-4">
-                                    <Field>
-                                        <FieldLabel htmlFor="phone">
-                                            Phone
-                                        </FieldLabel>
-                                        <Input id="phone" type="number" required />
-                                    </Field>
                                     <Field>
                                         <FieldLabel htmlFor="password">Password</FieldLabel>
                                         <Input id="password" type="password" required />
+                                    </Field>
+                                    <Field>
+                                        <FieldLabel htmlFor="confirmPassword">
+                                            Confirm Password
+                                        </FieldLabel>
+                                        <Input id="confirmPassword" type="text" required />
                                     </Field>
                                 </Field>
                                 <FieldDescription>
@@ -54,10 +58,12 @@ export function SignupForm({
                                 </FieldDescription>
                             </Field>
                             <Field>
-                                <Button type="submit">Create Account</Button>
+                                <Link to="/dashboard">
+                                    <Button type="submit">Submit</Button>
+                                </Link>
                                 <FieldDescription className="text-center">
                                     Already have an account?{" "}
-                                    <Link to="/login" className="underlined">Sign in</Link>
+                                    <Link to="/signin" className="underlined">Sign in</Link>
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>
