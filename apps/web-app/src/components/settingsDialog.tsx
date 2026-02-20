@@ -163,6 +163,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     placeholder="Phone"
                     value={profile.phone}
                     disabled={!isEditing}
+                    maxLength={10}
                     onChange={(e) =>
                       setProfile({ ...profile, phone: e.target.value })
                     }
@@ -197,7 +198,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <div className="space-y-3">
                       <Input
                         type="password"
-                        placeholder="Old Password"
+                        placeholder="Current Password"
                         value={password.oldPassword}
                         onChange={(e) =>
                           setPassword({

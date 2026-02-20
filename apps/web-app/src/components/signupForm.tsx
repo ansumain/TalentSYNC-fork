@@ -44,7 +44,7 @@ export function SignupForm() {
                 phone: data.phone,
                 password: data.password,
             })
-            toast.success(`Account created successfully! Welcome, ${response.name}`)
+            toast.success(`Account created successfully! \nWelcome, ${response.name}`)
             navigate('/signin')
         } catch (error) {
             const err = error as { message: string; status?: number }
@@ -68,6 +68,7 @@ export function SignupForm() {
                                 <Input
                                     id="name"
                                     type="text"
+                                    placeholder="Enter your full name"
                                     {...register("name")}
                                     disabled={isLoading}
                                 />
@@ -79,7 +80,7 @@ export function SignupForm() {
                                 <FieldLabel htmlFor="email">Email</FieldLabel>
                                 <Input
                                     id="email"
-                                    type="email"
+                                    placeholder="Enter your email"
                                     {...register("email")}
                                     disabled={isLoading}
                                 />
@@ -92,6 +93,8 @@ export function SignupForm() {
                                 <Input
                                     id="phone"
                                     type="tel"
+                                    placeholder="Enter your phone number"
+                                    maxLength={10}
                                     {...register("phone")}
                                     disabled={isLoading}
                                 />
@@ -106,6 +109,7 @@ export function SignupForm() {
                                         <Input
                                             id="password"
                                             type="password"
+                                            placeholder="Create password"
                                             {...register("password")}
                                             disabled={isLoading}
                                         />
@@ -119,7 +123,8 @@ export function SignupForm() {
                                         </FieldLabel>
                                         <Input
                                             id="confirmPassword"
-                                            type="password"
+                                            type="text"
+                                            placeholder="Confirm password"
                                             {...register("confirmPassword")}
                                             disabled={isLoading}
                                         />

@@ -13,7 +13,7 @@ function App() {
 
   return (
     <>
-      <Toaster position="top-right" richColors />
+      <Toaster position="bottom-right" richColors />
       <Routes>
         {/* Public Routes - Redirect to dashboard if already logged in */}
         <Route path='/signin' element={<PublicRoute><LoginPage /></PublicRoute>} />

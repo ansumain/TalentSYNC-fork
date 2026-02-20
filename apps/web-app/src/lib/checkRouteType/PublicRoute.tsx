@@ -9,16 +9,11 @@ interface PublicRouteProps {
 
 export function PublicRoute({ children }: PublicRouteProps) {
     const user = useAuthStore((state) => state.user);
-    const loading = useAuthStore((state) => state.loading);
     const fetchUser = useAuthStore((state) => state.fetchUser);
 
     useEffect(() => {
         fetchUser();
     }, [fetchUser]);
-
-    if (loading) {
-        return null;
-    }
     
     if (user) {
         return <Navigate to="/dashboard" replace />;

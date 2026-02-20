@@ -23,10 +23,7 @@ import { authService } from "@/lib/api/auth.service"
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth.schema"
 import { useAuthStore } from "@/stores/authStore"
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function LoginForm() {
   const navigate = useNavigate()
   const fetchUser = useAuthStore((state) => state.fetchUser)
   const [isLoading, setIsLoading] = useState(false)
@@ -56,7 +53,7 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
@@ -68,7 +65,7 @@ export function LoginForm({
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
-                  type="email"
+                  placeholder="Enter you email"
                   {...register("email")}
                   disabled={isLoading}
                 />
@@ -86,6 +83,7 @@ export function LoginForm({
                 <Input 
                   id="password" 
                   type="password"
+                  placeholder="Enter your password"
                   {...register("password")}
                   disabled={isLoading}
                 />
@@ -95,7 +93,7 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? 'Signing in...' : 'Sign in'}
+                  {isLoading ? 'Signing In...' : 'Sign In'}
                 </Button>
                 <FieldDescription className="text-center">
                   Don't have an account?{" "}

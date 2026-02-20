@@ -3,11 +3,11 @@ import { z } from 'zod';
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, 'required')
+    .min(1, 'This is a required field!')
     .email('Invalid email address'),
   password: z
     .string()
-    .min(1, 'required'),
+    .min(1, 'This is a required field!'),
 });
 
 export const registerSchema = z.object({
@@ -17,7 +17,7 @@ export const registerSchema = z.object({
     .max(25, 'atmost 25 characters allowed'),
   email: z
     .string()
-    .min(1, 'required')
+    .min(1, 'This is a required field!')
     .email('Invalid email address'),
   phone: z
     .string()
@@ -40,14 +40,14 @@ export const registerSchema = z.object({
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
-    .min(1, 'required')
+    .min(1, 'This is a required field!')
     .email('Invalid email address'),
 });
 
 export const resetPasswordSchema = z.object({
   email: z
     .string()
-    .min(1, 'required')
+    .min(1, 'This is a required field!')
     .email('Invalid email address'),
   otp: z
     .string()

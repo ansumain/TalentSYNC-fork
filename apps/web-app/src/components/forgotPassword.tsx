@@ -67,7 +67,7 @@ export function ForgotPassword() {
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
-                  // type="email"
+                  placeholder="Enter your email"
                   {...register("email")}
                   disabled={isLoading}
                 />

@@ -65,7 +65,7 @@ export function ResetPassword() {
                 <CardHeader className="text-center">
                     <CardTitle className="text-xl">Reset Password</CardTitle>
                     <CardDescription>
-                        Enter the OTP sent to your email and your new password
+                        OTP sent to your registered mail
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -85,6 +85,7 @@ export function ResetPassword() {
                                 <Input
                                     id="otp"
                                     type="text"
+                                    placeholder="Enter OTP from registered mail"
                                     maxLength={6}
                                     {...register("otp")}
                                     disabled={isLoading}
@@ -98,6 +99,7 @@ export function ResetPassword() {
                                 <Input
                                     id="newPassword"
                                     type="password"
+                                    placeholder="Create new password"
                                     {...register("newPassword")}
                                     disabled={isLoading}
                                 />
