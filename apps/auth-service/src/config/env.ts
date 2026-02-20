@@ -35,5 +35,7 @@ export const config = {
   emailPassword: process.env.EMAIL_PASSWORD || '',
   emailFrom: process.env.EMAIL_FROM || process.env.EMAIL_USER,
 
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+
   environment: (process.env.NODE_ENV as string) || 'development',
 };

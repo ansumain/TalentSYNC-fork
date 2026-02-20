@@ -8,8 +8,15 @@ import roleRoutes from './routes/role.routes';
 import permissionRoutes from './routes/permissions.routes';
 import userRoleRoutes from './routes/userRole.routes';
 import rolePermissionRoutes from './routes/rolePermission.routes';
+import { config } from './config/env';
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors({
+  origin: config.frontendUrl,
+  credentials: true
+}));
 
 app.use(express.json(), cookieParser(), morgan('dev'));
 
