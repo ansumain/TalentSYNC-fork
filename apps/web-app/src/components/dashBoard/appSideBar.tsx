@@ -212,11 +212,6 @@ const navigationByRole = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user)
   const loading = useAuthStore((state) => state.loading)
-  const fetchUser = useAuthStore((state) => state.fetchUser)
-
-  React.useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
 
   const userRole = user?.roles?.[0] || 'candidate'
   

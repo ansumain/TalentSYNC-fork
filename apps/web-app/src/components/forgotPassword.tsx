@@ -23,10 +23,7 @@ import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/api/auth.service";
 import { forgotPasswordSchema, type ForgotPasswordFormData } from "@/lib/validations/auth.schema";
 
-export function ForgotPassword({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function ForgotPassword() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,7 +52,7 @@ export function ForgotPassword({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Forgot Password</CardTitle>
@@ -70,18 +67,17 @@ export function ForgotPassword({
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="you@example.com"
+                  // type="email"
                   {...register("email")}
                   disabled={isLoading}
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                  <p className="text-sm text-red-500 text-left">{errors.email.message}</p>
                 )}
               </Field>
               <Field>
                 <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? 'Sending OTP...' : 'Send OTP'}
+                  {isLoading ? 'Sending OTP...' : 'Continue'}
                 </Button>
                 <FieldDescription className="text-center">
                   Remember your password?{" "}

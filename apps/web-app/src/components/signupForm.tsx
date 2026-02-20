@@ -22,10 +22,7 @@ import { Input } from "@/components/ui/input"
 import { authService } from "@/lib/api/auth.service"
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth.schema"
 
-export function SignupForm({
-    className,
-    ...props
-}: React.ComponentProps<"div">) {
+export function SignupForm() {
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
 
@@ -58,7 +55,7 @@ export function SignupForm({
     }
 
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <div className={cn("flex flex-col" )}>
             <Card>
                 <CardHeader className="text-center">
                     <CardTitle className="text-xl">Create your account</CardTitle>
@@ -75,7 +72,7 @@ export function SignupForm({
                                     disabled={isLoading}
                                 />
                                 {errors.name && (
-                                    <p className="text-sm text-red-500">{errors.name.message}</p>
+                                    <p className="text-sm text-red-500 text-left">{errors.name.message}</p>
                                 )}
                             </Field>
                             <Field>
@@ -87,7 +84,7 @@ export function SignupForm({
                                     disabled={isLoading}
                                 />
                                 {errors.email && (
-                                    <p className="text-sm text-red-500">{errors.email.message}</p>
+                                    <p className="text-sm text-red-500 text-left">{errors.email.message}</p>
                                 )}
                             </Field>
                             <Field>
@@ -99,7 +96,7 @@ export function SignupForm({
                                     disabled={isLoading}
                                 />
                                 {errors.phone && (
-                                    <p className="text-sm text-red-500">{errors.phone.message}</p>
+                                    <p className="text-sm text-red-500 text-left">{errors.phone.message}</p>
                                 )}
                             </Field>
                             <Field>
@@ -113,7 +110,7 @@ export function SignupForm({
                                             disabled={isLoading}
                                         />
                                         {errors.password && (
-                                            <p className="text-sm text-red-500">{errors.password.message}</p>
+                                            <p className="text-xs text-red-500">{errors.password.message}</p>
                                         )}
                                     </Field>
                                     <Field>
@@ -127,13 +124,10 @@ export function SignupForm({
                                             disabled={isLoading}
                                         />
                                         {errors.confirmPassword && (
-                                            <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+                                            <p className="text-xs text-red-500 text-left">{errors.confirmPassword.message}</p>
                                         )}
                                     </Field>
                                 </Field>
-                                <FieldDescription>
-                                    Must be at least 8 characters long.
-                                </FieldDescription>
                             </Field>
                             <Field>
                                 <Button type="submit" disabled={isLoading} className="w-full">

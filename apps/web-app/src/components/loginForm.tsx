@@ -46,10 +46,10 @@ export function LoginForm({
       const response = await authService.login(data)
       toast.success(response.message || 'Login successful!')
       await fetchUser()
-      navigate('/dashboard')
+      navigate('/dashboard', { replace: true })
     } catch (error) {
       const err = error as { message: string; status?: number }
-      toast.error(err.message || 'Login failed. Please try again.')
+      toast.error(err.message || 'Login failed! Please try again!')
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +73,7 @@ export function LoginForm({
                   disabled={isLoading}
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                  <p className="text-sm text-red-500 text-left">{errors.email.message}</p>
                 )}
               </Field>
               <Field>
@@ -90,7 +90,7 @@ export function LoginForm({
                   disabled={isLoading}
                 />
                 {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                  <p className="text-sm text-red-500 text-left">{errors.password.message}</p>
                 )}
               </Field>
               <Field>
@@ -98,7 +98,7 @@ export function LoginForm({
                   {isLoading ? 'Signing in...' : 'Sign in'}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account?{" "}
+                  Don't have an account?{" "}
                   <Link to="/signup" className="underline">Sign Up</Link>
                 </FieldDescription>
               </Field>

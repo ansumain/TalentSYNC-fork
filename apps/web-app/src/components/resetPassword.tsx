@@ -23,10 +23,7 @@ import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/api/auth.service";
 import { resetPasswordSchema, type ResetPasswordFormData } from "@/lib/validations/auth.schema";
 
-export function ResetPassword({
-    className,
-    ...props
-}: React.ComponentProps<"div">) {
+export function ResetPassword() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +37,6 @@ export function ResetPassword({
         resolver: zodResolver(resetPasswordSchema),
     });
 
-    // Pre-fill email if coming from forgot password page
     useEffect(() => {
         const email = location.state?.email;
         if (email) {
@@ -54,7 +50,7 @@ export function ResetPassword({
         try {
             const response = await authService.resetPassword(data);
             toast.success(response.message || 'Password reset successfully!');
-            navigate('/signin');
+            navigate('/signin', { replace: true });
         } catch (error) {
             const err = error as { message: string };
             toast.error(err.message || 'Failed to reset password. Please try again.');
@@ -64,7 +60,7 @@ export function ResetPassword({
     };
 
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <div className={cn("flex flex-col gap-6")}>
             <Card>
                 <CardHeader className="text-center">
                     <CardTitle className="text-xl">Reset Password</CardTitle>
@@ -80,26 +76,21 @@ export function ResetPassword({
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="you@example.com"
                                     {...register("email")}
-                                    disabled={isLoading}
+                                    disabled={true}
                                 />
-                                {errors.email && (
-                                    <p className="text-sm text-red-500">{errors.email.message}</p>
-                                )}
                             </Field>
                             <Field>
-                                <FieldLabel htmlFor="otp">OTP (6 digits)</FieldLabel>
+                                <FieldLabel htmlFor="otp">OTP</FieldLabel>
                                 <Input
                                     id="otp"
                                     type="text"
-                                    placeholder="123456"
                                     maxLength={6}
                                     {...register("otp")}
                                     disabled={isLoading}
                                 />
                                 {errors.otp && (
-                                    <p className="text-sm text-red-500">{errors.otp.message}</p>
+                                    <p className="text-sm text-red-500 text-left">{errors.otp.message}</p>
                                 )}
                             </Field>
                             <Field>
@@ -107,16 +98,12 @@ export function ResetPassword({
                                 <Input
                                     id="newPassword"
                                     type="password"
-                                    placeholder="••••••••"
                                     {...register("newPassword")}
                                     disabled={isLoading}
                                 />
                                 {errors.newPassword && (
-                                    <p className="text-sm text-red-500">{errors.newPassword.message}</p>
+                                    <p className="text-sm text-red-500 text-left">{errors.newPassword.message}</p>
                                 )}
-                                <FieldDescription>
-                                    Must be at least 8 characters with uppercase, lowercase, and number
-                                </FieldDescription>
                             </Field>
                             <Field>
                                 <Button type="submit" disabled={isLoading} className="w-full">
