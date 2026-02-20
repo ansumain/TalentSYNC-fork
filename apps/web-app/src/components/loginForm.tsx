@@ -1,3 +1,9 @@
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useNavigate, Link } from "react-router-dom"
+import { toast } from "sonner"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,12 +19,42 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Link } from "react-router-dom"
+import { authService } from "@/lib/api/auth.service"
+import { loginSchema, type LoginFormData } from "@/lib/validations/auth.schema"
+import { useAuthStore } from "@/stores/authStore"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const navigate = useNavigate()
+  const fetchUser = useAuthStore((state) => state.fetchUser)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
+
+  const onSubmit = async (data: LoginFormData) => {
+    setIsLoading(true)
+    
+    try {
+      const response = await authService.login(data)
+      toast.success(response.message || 'Login successful!')
+      await fetchUser()
+      navigate('/dashboard')
+    } catch (error) {
+      const err = error as { message: string; status?: number }
+      toast.error(err.message || 'Login failed. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -26,15 +62,19 @@ export function LoginForm({
           <CardTitle className="text-xl">Welcome back</CardTitle>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   type="email"
-                  required
+                  {...register("email")}
+                  disabled={isLoading}
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -43,12 +83,20 @@ export function LoginForm({
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password"
+                  {...register("password")}
+                  disabled={isLoading}
+                />
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                )}
               </Field>
               <Field>
-                <Link to="/dashboard">
-                  <Button type="submit">Submit</Button>
-                </Link>
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? 'Signing in...' : 'Sign in'}
+                </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?{" "}
                   <Link to="/signup" className="underline">Sign Up</Link>
