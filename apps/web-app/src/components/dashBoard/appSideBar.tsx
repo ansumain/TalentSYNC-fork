@@ -1,21 +1,7 @@
-"use client"
-
 import * as React from "react"
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react"
+import { SquareTerminal } from "lucide-react"
 
 import { NavMain } from "@/components/dashBoard/navMain"
-import { NavProjects } from "@/components/dashBoard/navProjects"
 import { NavUser } from "@/components/dashBoard/navUser"
 import { TeamSwitcher } from "@/components/dashBoard/teamSwitcher"
 import {
@@ -25,149 +11,241 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { useAuthStore } from "@/stores/authStore"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
+// Navigation options by role
+const navigationByRole = {
+  candidate: [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
+      title: "Interviews",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "History",
+          title: "Scheduled",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Applied",
           url: "#",
         },
         {
-          title: "Settings",
+          title: "Completed",
           url: "#",
-        },
+        }
       ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
+    }
   ],
-  projects: [
+  interviewer: [
     {
-      name: "Design Engineering",
+      title: "Interviews",
       url: "#",
-      icon: Frame,
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Assigned",
+          url: "#",
+        },
+        {
+          title: "Scheduled",
+          url: "#",
+        },
+        {
+          title: "Completed",
+          url: "#",
+        },
+        {
+          title: "Feedback Pending",
+          url: "#",
+        },
+      ],
     },
     {
-      name: "Sales & Marketing",
+      title: "Candidates",
       url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "My Candidates",
+          url: "#",
+        }
+      ],
+    }
   ],
+  manager: [
+    {
+      title: "Interviews",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Assigned",
+          url: "#",
+        },
+        {
+          title: "Schedule",
+          url: "#",
+        },
+        {
+          title: "Completed",
+          url: "#",
+        },
+        {
+          title: "Pending Feedback",
+          url: "#",
+        }
+      ],
+    },
+    {
+      title: "Candidates",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Shortlisted",
+          url: "#",
+        },
+        {
+          title: "Hired",
+          url: "#",
+        },
+        {
+          title: "Rejected",
+          url: "#",
+        },
+      ],
+    }
+  ],
+  admin: [
+    {
+      title: "Interviews",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Assigned",
+          url: "#",
+        },
+        {
+          title: "Schedule",
+          url: "#",
+        },
+        {
+          title: "Completed",
+          url: "#",
+        },
+        {
+          title: "Pending Feedback",
+          url: "#",
+        }
+      ],
+    },
+    {
+      title: "Candidates",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Shortlisted",
+          url: "#",
+        },
+        {
+          title: "Hired",
+          url: "#",
+        },
+        {
+          title: "Rejected",
+          url: "#",
+        },
+        {
+          title: "All",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Manage",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Roles",
+          url: "#",
+        },
+        {
+          title: "Permissions",
+          url: "#",
+        }
+      ],
+    },
+    {
+      title: "Analytics",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Interview Report",
+          url: "#",
+        },
+        {
+          title: "Candidate Report",
+          url: "#",
+        },
+        {
+          title: "Hiring Summary",
+          url: "#",
+        },
+      ],
+    }
+  ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = useAuthStore((state) => state.user)
+  const loading = useAuthStore((state) => state.loading)
+  const fetchUser = useAuthStore((state) => state.fetchUser)
+
+  React.useEffect(() => {
+    fetchUser()
+  }, [fetchUser])
+
+  const userRole = user?.roles?.[0] || 'candidate'
+  
+  const navigationItems = navigationByRole[userRole as keyof typeof navigationByRole] || navigationByRole.candidate
+
+  const userData = user ? {
+    name: user.name,
+    role: userRole,
+    avatar: "/avatars/shadcn.jpg",
+  } : {
+    name: "Loading...",
+    role: "...",
+    avatar: "/avatars/shadcn.jpg",
+  }
+
+  if (loading) {
+    return null
+  }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navigationItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
