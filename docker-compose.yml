@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   postgres: 
     image: postgres:15
-    container_name: rms-postgres
+    container_name: TalentSYNC-postgres
     restart: always
     environment:
       POSTGRES_USER: rms_user
@@ -13,3 +11,50 @@ services:
       - "5432:5432"
     volumes:
       - D:/rms_postgres_data:/var/lib/postgresql/data
+
+  auth-service:
+    build: 
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    container_name: TalentSYNC-auth-service
+    ports:
+      - "4001:4001"
+    environment:
+      PORT: 4001
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
+      JWT_EXPIRES_IN: 15m
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: "uqvt jjlk djxl pqtq"
+      EMAIL_FROM: "TalentSYNC <mfsi.ansuman@gmail.com>" 
+      FRONTEND_URL: http://localhost:5173
+      NODE_ENV: development
+    depends_on:
+      - postgres
+
+  web-app:
+    container_name: TalentSYNC-web-app
+    build:
+      context: .
+      dockerfile: ./apps/web-app/Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - auth-service
+
+  nginx:
+    image: nginx:alpine
+    container_name: TalentSYNC-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - auth-service
+      - web-app
