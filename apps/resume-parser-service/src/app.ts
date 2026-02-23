@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import morgan from 'morgan';
+import resumeRoutes from './routes/resume.routes'
 
 const app = express();
 
@@ -12,6 +13,8 @@ app.get('/health', (req: Request, res: Response) => {
         currentTime: `${new Date().toISOString()}`,
     });
 });
+
+app.use('/api/resume', resumeRoutes);
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
