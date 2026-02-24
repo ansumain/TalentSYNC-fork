@@ -14,6 +14,7 @@ export class ResumeParserController {
       for (const file of files) {
         if (allowedMimeTypes.IMAGE.includes(file.mimetype)) rawText.push(await getTextUsingOCR(file.path));
         else if (allowedMimeTypes.PDF.includes(file.mimetype)) rawText.push(await getTextUsingPdfparse(file.path));
+        else if (allowedMimeTypes.DOCX.includes(file.mimetype)) rawText.push(await getTextUsingMammoth(file.path));
       }
 
       res.status(201).json({

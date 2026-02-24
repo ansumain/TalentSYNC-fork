@@ -45,7 +45,6 @@ const extractTextFromPDFImage = async (filePath: string) => {
         const pdfPages = await convertPDFToImages(filePath);
 
         const ocrPromises = pdfPages.map(async (pagePath) => {
-            // const pageFile = { path: pagePath } as UploadedFile;
             return await getTextUsingOCR(pagePath);
         });
 
@@ -57,5 +56,21 @@ const extractTextFromPDFImage = async (filePath: string) => {
         throw new Error('Error parsing image based PDF');
     }
 }
+
+// File - DOCX
+export const getTextUsingMammoth = async (filePath: string): Promise<string> => {
+    try {
+        const result = await mammoth.extractRawText({ path: filePath });
+
+        if (result.messages.length > 0) {
+            console.log('Mammoth warnings:', result.messages);
+        }
+
+        return result.value.trim();
+    } catch (error) {
+        console.log('Error parsing DOCX with Mammoth:', error);
+        throw new Error('Error parsing DOCX with Mammoth');
+    }
+};
 
 export { getTextUsingOCR, getTextUsingPdfparse }
