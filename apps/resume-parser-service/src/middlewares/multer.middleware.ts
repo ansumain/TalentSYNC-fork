@@ -1,7 +1,8 @@
 import multer, { FileFilterCallback } from 'multer'
-import { Request } from 'express'
+import { Request, RequestHandler } from 'express'
 import path from 'path';
 import fs from 'fs';
+import { allowedMimeTypes } from '../config/allowed-file-type';
 
 const uploadDir = 'uploads/';
 if (!fs.existsSync(uploadDir)) {
@@ -18,29 +19,20 @@ const storage = multer.diskStorage({
     }
 });
 
-const allowedMimeTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-];
-
 const FileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-    if (allowedMimeTypes.includes(file.mimetype)) {
+    if (allowedMimeTypes.IMAGE.includes(file.mimetype) || allowedMimeTypes.PDF.includes(file.mimetype) || allowedMimeTypes.DOC.includes(file.mimetype) || allowedMimeTypes.DOCX.includes(file.mimetype)) {
         cb(null, true)
     } else {
         cb(new Error(`Invalid document type`) as any, false);
     }
 }
 
-const resumeUpload = multer({
+const resumeUpload: RequestHandler = multer({
     storage,
     fileFilter: FileFilter,
     limits: {
         fileSize: 10 * 1024 * 1024   // 10MB
     }
-}).single('resume');
+}).array('resume')
 
 export { resumeUpload };

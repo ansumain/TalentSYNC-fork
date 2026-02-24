@@ -1,27 +1,30 @@
 import { Request, Response } from 'express';
-import { getTextFromResume } from '../services/tesseract.service';
+import { getTextUsingMammoth, getTextUsingOCR, getTextUsingPdfparse } from '../services/extractText.service';
+import { UploadedFile } from '../types/UploadedFile';
+import { allowedMimeTypes } from '../config/allowed-file-type';
 
 export class ResumeParserController {
   static async parseResume(req: Request, res: Response): Promise<void> {
     try {
+      if (!req.files) throw new Error('No File Uploaded');
 
-        if(!req.file) throw new Error('No File Uploaded');
+      const files = req.files as unknown as UploadedFile[];
+      let rawText: string[] = [];
 
-        const rawTextFromResume = await getTextFromResume(req.file.path);
-        console.log('raw text - ', rawTextFromResume);
-        if(rawTextFromResume){
-            res.status(201).json({
-                rawText: rawTextFromResume
-            })
-        } else {
-            res.status(201).json({
-                message: 'Resume uploaded but not parsed!'
-            })
-        }
+      for (const file of files) {
+        if (allowedMimeTypes.IMAGE.includes(file.mimetype)) rawText.push(await getTextUsingOCR(file.path));
+        else if (allowedMimeTypes.PDF.includes(file.mimetype)) rawText.push(await getTextUsingPdfparse(file.path));
+      }
+
+      res.status(201).json({
+        message: 'uploaded',
+        rawText
+      })
 
       /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (error: any) {
-      res.status(500).json({ error: 'Internal server error' });
+      const errorMessage = error.message || 'Internal server error';
+      res.status(500).json({ error: errorMessage });
     }
   }
 }

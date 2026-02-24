@@ -1,4 +1,4 @@
-import express, { NextFunction } from 'express';
+import express, { Application, NextFunction } from 'express';
 import { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
@@ -11,7 +11,7 @@ import rolePermissionRoutes from './routes/rolePermission.routes';
 import { config } from './config/env';
 import cors from 'cors';
 
-const app = express();
+const app: Application = express();
 
 app.use(cors({
   origin: config.frontendUrl,

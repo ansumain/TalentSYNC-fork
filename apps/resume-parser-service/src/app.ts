@@ -16,6 +16,8 @@ app.get('/health', (req: Request, res: Response) => {
 
 app.use('/api/resume', resumeRoutes);
 
+app.use('/files', express.static('uploads'))
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err);

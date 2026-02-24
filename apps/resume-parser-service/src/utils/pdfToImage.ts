@@ -1,0 +1,21 @@
+import pdfPoppler from 'pdf-poppler';
+import path from 'path';
+import fs from 'fs';
+
+export const convertPDFToImages = async (pdfPath: string) => {
+    const outputDir = path.join(process.cwd(), "temp", `${pdfPath}-images`);
+
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    const options = {
+        format: 'png' as const,
+        out_dir: outputDir,
+        out_prefix: 'page',
+        page: null,
+        dpi: 300
+    };
+
+    await pdfPoppler.convert(pdfPath, options);
+
+    return fs.readdirSync(outputDir).filter(file => file.startsWith('page')).map(file => path.join(outputDir, file));
+}
