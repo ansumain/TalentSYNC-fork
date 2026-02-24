@@ -11,7 +11,4 @@ declare module 'pdf-poppler' {
         file: string,
         options?: ConvertOptions
     ): Promise<void>;
-
-    export default { convert };
-
 }

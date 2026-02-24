@@ -2,27 +2,48 @@ import { Request, Response } from 'express';
 import { getTextUsingMammoth, getTextUsingOCR, getTextUsingPdfparse } from '../services/extractText.service';
 import { UploadedFile } from '../types/UploadedFile';
 import { allowedMimeTypes } from '../config/allowed-file-type';
+import { extractBasicDetails } from '../services/parseToJSONFromRawText.service';
+
+export interface FormattedJson {
+  name: string | null;
+  phone: string | null;
+  email: string | null;
+}
 
 export class ResumeParserController {
   static async parseResume(req: Request, res: Response): Promise<void> {
     try {
-      if (!req.files) throw new Error('No File Uploaded');
+      if (!req.files || (req.files as any).length === 0) throw new Error('No File Uploaded');
 
       const files = req.files as unknown as UploadedFile[];
-      let rawText: string[] = [];
+      let rawTextData: string[] = [];
+      let formattedJson: FormattedJson[] = [];
 
       for (const file of files) {
-        if (allowedMimeTypes.IMAGE.includes(file.mimetype)) rawText.push(await getTextUsingOCR(file.path));
-        else if (allowedMimeTypes.PDF.includes(file.mimetype)) rawText.push(await getTextUsingPdfparse(file.path));
-        else if (allowedMimeTypes.DOCX.includes(file.mimetype)) rawText.push(await getTextUsingMammoth(file.path));
+        let extractedText = '';
+
+        if (allowedMimeTypes.IMAGE.includes(file.mimetype)) {
+          extractedText = await getTextUsingOCR(file.path);
+        } 
+        else if (allowedMimeTypes.PDF.includes(file.mimetype)) {
+          extractedText = await getTextUsingPdfparse(file.path);
+        } 
+        else if (allowedMimeTypes.DOCX.includes(file.mimetype)) {
+          extractedText = await getTextUsingMammoth(file.path);
+        }
+
+        if (extractedText) {
+          rawTextData.push(`${file.mimetype} == ${extractedText}`);
+          formattedJson.push(extractBasicDetails(extractedText));
+        }
       }
 
       res.status(201).json({
         message: 'uploaded',
-        rawText
-      })
+        rawTextData,
+        formattedJson
+      });
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (error: any) {
       const errorMessage = error.message || 'Internal server error';
       res.status(500).json({ error: errorMessage });
