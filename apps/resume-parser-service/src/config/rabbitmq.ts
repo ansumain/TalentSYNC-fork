@@ -100,9 +100,12 @@ const consumeQueue = async (
     queue: string,
     handler: (content: any) => Promise<void>,
 ): Promise<void> => {
+    console.log('consumption initiated')
     if (!consumeChannel) {
         throw new Error('Consume channel not initialized. Call connectRabbitMQ() first.');
     }
+
+    console.log('consumption started')
 
     const channel = consumeChannel as Channel;
 

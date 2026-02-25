@@ -1,4 +1,4 @@
-import { FormattedJson } from "../controllers/resume-parser.controller";
+import { FormattedJson } from "../services/parseResume.service";
 
 export function normalizeText(text: string): string {
   return text

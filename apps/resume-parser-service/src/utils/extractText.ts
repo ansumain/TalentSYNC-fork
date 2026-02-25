@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const pdf = require('pdf-parse');
 import fs from 'fs/promises';
-import { convertPDFToImages } from '../utils/pdfToImage';
+import { convertPDFToImages } from './pdfToImage';
 import mammoth from 'mammoth';
 
 const tesseractConfig = {
