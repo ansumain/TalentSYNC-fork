@@ -1,6 +1,7 @@
 import app from './app';
 import { config } from './config/env';
 import { connectRabbitMQ, gracefulShutdown } from './config/rabbitmq';
+import {sequelize} from './config/sequelize';
 
 process.on('SIGTERM', async () => {
   await gracefulShutdown('SIGTERM');
@@ -21,6 +22,9 @@ process.on('uncaughtException', (error: Error) => {
 
 const startServer = async (): Promise<void> => {
   try {
+    await sequelize.authenticate();
+    console.log('Database connected successfully');
+
     await connectRabbitMQ();
     console.log('RabbitMQ initialized');
 

@@ -26,6 +26,13 @@ export const config = {
   port: requireEnvNumber('PORT', 4002),
   environment: (process.env.NODE_ENV as string) || 'development',
 
+
+  dbHost: requireEnv('DB_HOST', 'localhost'),
+  dbUser: requireEnv('DB_USER', 'rms_user'),
+  dbPassword: requireEnv('DB_PASSWORD', 'rms_password'),
+  dbName: requireEnv('DB_NAME', 'rms_db'),
+  dbPort: requireEnvNumber('DB_PORT', 5432),
+
   rabbitmq: {
     hostname: requireEnv('RABBIT_MQ_HOST', 'localhost'),
     port: requireEnvNumber('RABBIT_MQ_PORT', 5672),
