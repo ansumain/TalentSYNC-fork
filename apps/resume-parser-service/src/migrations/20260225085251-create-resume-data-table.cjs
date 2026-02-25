@@ -1,5 +1,11 @@
 'use strict';
 
+const allowedMimeTypes = {
+    IMAGE: ['image/jpeg', 'image/png', 'image/webp'],
+    PDF: ['application/pdf'],
+    DOCX: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+}
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -23,6 +29,10 @@ module.exports = {
         fileName: {
           type: Sequelize.STRING(100),
           allowNull: false,
+        },
+        mimeType: {
+          type: Sequelize.STRING(100),
+          allowNull: false
         },
         fileURL: {
           type: Sequelize.STRING(150),

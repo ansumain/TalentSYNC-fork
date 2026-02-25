@@ -1,4 +1,4 @@
-export interface UploadedFile {
+export interface ResumeDataModel {
   fieldname: string;
   originalname: string;
   encoding: string;
