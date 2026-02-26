@@ -5,5 +5,6 @@ const candidateRouter: Router = express.Router();
 candidateRouter.get('/parsed', CandidateController.getCandidateJSONData);
 candidateRouter.get('/parsed/filter/name', CandidateController.getCandidateDataFromName);
 candidateRouter.get('/parsed/filter/userId', CandidateController.getCandidateDataFromUserId);
+candidateRouter.get('/parsed/filter/resumeId', CandidateController.getCandidateDataFromResumeId);
 
 export default candidateRouter;

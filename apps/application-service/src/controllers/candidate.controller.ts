@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getCandiateParsedData, getCandidateDataFromName, getCandidateDataFromUserId } from '../services/candidate.service';
+import { getCandiateParsedData, getCandidateDataFromName, getCandidateDataFromResumeId, getCandidateDataFromUserId } from '../services/candidate.service';
 
 export class CandidateController {
     static async getCandidateJSONData(req: Request, res: Response): Promise<void> {
@@ -39,6 +39,23 @@ export class CandidateController {
         try {
             const { userId } = req.body;
             const candidateData = await getCandidateDataFromUserId(userId);
+
+            if (candidateData) {
+                res.status(200).json({
+                    candidateData
+                });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getCandidateDataFromResumeId(req: Request, res: Response): Promise<void> {
+        try {
+            const { resumeId } = req.body;
+            const candidateData = await getCandidateDataFromResumeId(resumeId);
 
             if (candidateData) {
                 res.status(200).json({
