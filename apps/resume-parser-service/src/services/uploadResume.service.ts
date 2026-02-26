@@ -6,7 +6,7 @@ import { UploadedFileModel } from "../types/UploadedFile.type";
 
 const uploadResume = async (files: UploadedFileModel[]): Promise<boolean> => {
     try {
-        const userId = '52a5e92b-1e38-42db-807e-f822fb3f60e4';
+        const userId = '49c7305a-daeb-4f16-84ee-35928c25619a';
 
         for (const file of files) {
             const resumeData = {
