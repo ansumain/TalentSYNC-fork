@@ -143,6 +143,34 @@ services:
       - TalentSYNC-networks
     command: ["node", "dist/worker/resumeParser.worker.js"]
 
+  application-service:
+    build:
+      context: .
+      dockerfile: ./apps/applicaton-service/Dockerfile
+    container_name: TalentSYNC-applicaton-service
+    restart: unless-stopped
+    ports:
+      - "4003:4003"
+    environment:
+      PORT: 4003
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   web-app:
     container_name: TalentSYNC-web-app
     build:
@@ -178,10 +206,10 @@ volumes:
     driver: local
   rabbitmq_data:
     driver: local
-  # resume_uploads:
-  #   driver: local
-  # resume_temp:
-  #   driver: local
+  resume_uploads:
+    driver: local
+  resume_temp:
+    driver: local
 
 networks:  
   TalentSYNC-networks:
