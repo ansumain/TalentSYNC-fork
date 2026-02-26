@@ -77,6 +77,72 @@ services:
       retries: 3
       start_period: 40s
 
+  resume-parser-api:
+    build:
+      context: .
+      dockerfile: ./apps/resume-parser-service/Dockerfile
+    container_name: TalentSYNC-resume-parser-api
+    restart: unless-stopped
+    ports:
+      - "4002:4002"
+    environment:
+      PORT: 4002
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      NODE_ENV: development
+    volumes:
+      - resume_uploads:/app/uploads
+      - resume_temp:/app/temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  resume-parser-worker:
+    build:
+      context: .
+      dockerfile: ./apps/resume-parser-service/Dockerfile
+    container_name: TalentSYNC-resume-parser-worker
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      NODE_ENV: development
+    volumes:
+      - resume_uploads:/app/uploads
+      - resume_temp:/app/temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - TalentSYNC-networks
+    command: ["node", "dist/worker/resumeParser.worker.js"]
+
   web-app:
     container_name: TalentSYNC-web-app
     build:
@@ -112,6 +178,10 @@ volumes:
     driver: local
   rabbitmq_data:
     driver: local
+  # resume_uploads:
+  #   driver: local
+  # resume_temp:
+  #   driver: local
 
 networks:  
   TalentSYNC-networks:
