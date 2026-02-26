@@ -1,25 +1,29 @@
 "use client";
 
-import { File, FileSpreadsheet, X } from "lucide-react";
-import { ChangeEvent, DragEvent, useRef, useState } from "react";
+import { File, FileText, Upload as UploadIcon, X, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { ChangeEvent, DragEvent, useRef } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useUploadStore } from "@/stores/uploadStore";
 
 export function FileUpload() {
-  const [uploadState, setUploadState] = useState<{
-    file: File | null;
-    progress: number;
-    uploading: boolean;
-  }>({
-    file: null,
-    progress: 0,
-    uploading: false,
-  });
-//   const [showDummy, setShowDummy] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    files,
+    totalProgress,
+    status,
+    uploadedCount,
+    failedCount,
+    addFiles,
+    removeFile,
+    uploadFiles,
+    retryFailed,
+    reset,
+  } = useUploadStore();
 
   const validFileTypes = [
     'image/jpeg',
@@ -29,55 +33,79 @@ export function FileUpload() {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ];
 
-  const handleFile = (file: File | undefined) => {
-    if (!file) return;
+  const validateAndAddFiles = (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return;
 
-    if (validFileTypes.includes(file.type)) {
-      setUploadState({ file, progress: 0, uploading: true });
+    // If previous upload is completed, reset before adding new files
+    const currentState = useUploadStore.getState();
+    if (currentState.status === 'completed' || currentState.status === 'error') {
+      reset();
+    }
 
-      const interval = setInterval(() => {
-        setUploadState((prev) => {
-          const newProgress = prev.progress + 5;
-          if (newProgress >= 100) {
-            clearInterval(interval);
-            return { ...prev, progress: 100, uploading: false };
-          }
-          return { ...prev, progress: newProgress };
+    const filesArray = Array.from(fileList);
+    const validFiles = filesArray.filter((file) => {
+      if (!validFileTypes.includes(file.type)) {
+        toast.error(`${file.name} is not a valid file type`, {
+          position: "bottom-right",
+          duration: 3000,
         });
-      }, 200);
-    } else {
-      toast.error("Please upload a CSV, XLSX, or XLS file.", {
+        return false;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`${file.name} exceeds 10MB limit`, {
+          position: "bottom-right",
+          duration: 3000,
+        });
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      addFiles(validFiles);
+      toast.success(`${validFiles.length} file(s) added`, {
         position: "bottom-right",
-        duration: 3000,
+        duration: 2000,
       });
     }
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    handleFile(event.target.files?.[0]);
+    validateAndAddFiles(event.target.files);
+    if (event.target) {
+      event.target.value = "";
+    }
   };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    handleFile(event.dataTransfer.files?.[0]);
+    validateAndAddFiles(event.dataTransfer.files);
   };
 
-  const resetFile = () => {
-    setUploadState({ file: null, progress: 0, uploading: false });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleUpload = async () => {
+    try {
+      await uploadFiles();
+      
+      // Get fresh state after upload completes
+      const currentState = useUploadStore.getState();
+      
+      if (currentState.failedCount === 0) {
+        toast.success("All resumes uploaded successfully!", {
+          position: "bottom-right",
+          duration: 3000,
+        });
+      } else {
+        toast.error(`${currentState.failedCount} file(s) failed to upload`, {
+          position: "bottom-right",
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      toast.error("Upload failed. Please try again.", {
+        position: "bottom-right",
+        duration: 3000,
+      });
     }
-  };
-
-  const getFileIcon = () => {
-    if (!uploadState.file) return <File />;
-
-    const fileExt = uploadState.file.name.split(".").pop()?.toLowerCase() || "";
-    return ["csv", "xlsx", "xls"].includes(fileExt) ? (
-      <FileSpreadsheet className="h-5 w-5 text-foreground" />
-    ) : (
-      <File className="h-5 w-5 text-foreground" />
-    );
   };
 
   const formatFileSize = (bytes: number) => {
@@ -88,138 +116,230 @@ export function FileUpload() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
-  const { file, progress, uploading } = uploadState;
+  const getFileIcon = (fileName: string) => {
+    const fileExt = fileName.split(".").pop()?.toLowerCase() || "";
+    if (["pdf"].includes(fileExt)) {
+      return <FileText className="h-5 w-5 text-red-500" />;
+    }
+    if (["doc", "docx"].includes(fileExt)) {
+      return <FileText className="h-5 w-5 text-blue-500" />;
+    }
+    if (["jpg", "jpeg", "png", "webp"].includes(fileExt)) {
+      return <File className="h-5 w-5 text-green-500" />;
+    }
+    return <File className="h-5 w-5 text-foreground" />;
+  };
+
+  const getStatusIcon = (fileStatus: string) => {
+    switch (fileStatus) {
+      case 'uploading':
+        return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
+      case 'success':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'error':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const totalFiles = files.length;
+  const pendingFiles = files.filter((f) => f.status === 'pending').length;
+  
+  // Check if any files are restored from localStorage
+  const hasRestoredFiles = files.some((f) => (f.file as any).isRestored);
+  const hasRestoredFailedFiles = files.some(
+    (f) => f.status === 'error' && (f.file as any).isRestored
+  );
 
   return (
-    <div className="flex items-center justify-center p-10 w-full max-w-lg">
-      <form className="w-full" onSubmit={(e) => e.preventDefault()}>
-        <h3 className="text-balance text-lg font-semibold text-foreground">Upload Resume</h3>
-
+    <div className="w-full">
+      <div className="w-full max-w-3xl mx-auto">
         <div
           className="flex justify-center rounded-md border mt-2 border-dashed border-input px-6 py-12"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
-          <div>
-            <File
+          <div className="text-center">
+            <UploadIcon
               className="mx-auto h-12 w-12 text-muted-foreground"
               aria-hidden={true}
             />
-            <div className="flex text-sm leading-6 text-muted-foreground">
-              <p>Drag and drop or</p>
-              <label
-                htmlFor="file-upload-03"
-                className="relative cursor-pointer rounded-sm pl-1 font-medium text-primary hover:underline hover:underline-offset-4"
-              >
-                <span>choose file</span>
-                <input
-                  id="file-upload-03"
-                  name="file-upload-03"
-                  type="file"
-                  className="sr-only"
-                  accept=".csv, .xlsx, .xls"
-                  onChange={handleFileChange}
-                  ref={fileInputRef}
-                />
-              </label>
-              <p className="text-pretty pl-1">to upload</p>
+            <div className="mt-4 flex flex-col gap-2 text-sm leading-6 text-muted-foreground">
+              <div className="flex justify-center items-center gap-1">
+                <p>Drag and drop or</p>
+                <label
+                  htmlFor="file-upload"
+                  className="relative cursor-pointer rounded-sm font-medium text-primary hover:underline hover:underline-offset-4"
+                >
+                  <span>choose files</span>
+                  <input
+                    id="file-upload"
+                    name="file-upload"
+                    type="file"
+                    className="sr-only"
+                    accept=".jpeg,.jpg,.png,.webp,.pdf,.doc,.docx"
+                    multiple
+                    onChange={handleFileChange}
+                    ref={fileInputRef}
+                    disabled={status === 'uploading'}
+                  />
+                </label>
+                <p>to upload</p>
+              </div>
             </div>
           </div>
         </div>
 
         <p className="text-pretty mt-2 text-xs leading-5 text-muted-foreground sm:flex sm:items-center sm:justify-between">
-          <span>Accepted file types: <br />jpeg, png, pdf or docx files.</span>
-          <span className="pl-1 sm:pl-0">Max. size: 10MB</span>
+          <span>
+            Accepted file types: <br />
+            JPEG, PNG, PDF or DOCX files.
+          </span>
+          <span className="pl-1 sm:pl-0">Max. size: 10MB per file</span>
         </p>
 
-        {/* {!file && showDummy && (
-          <Card className="relative mt-8 bg-muted p-4 gap-4">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="absolute right-1 top-1 text-muted-foreground hover:text-foreground"
-              aria-label="Remove"
-              onClick={() => setShowDummy(false)}
-            >
-              <X className="h-5 w-5 shrink-0" aria-hidden={true} />
-            </Button>
-
-            <div className="flex items-center space-x-2.5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-background shadow-sm ring-1 ring-inset ring-border">
-                <FileSpreadsheet
-                  className="h-5 w-5 text-foreground"
-                  aria-hidden={true}
-                />
-              </span>
+        {totalFiles > 0 && (
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-pretty text-xs font-medium text-foreground">
-                  Revenue_Q1_2024.xlsx
+                <p className="text-sm font-medium text-foreground">
+                  {status === 'uploading' && `Uploading ${uploadedCount}/${totalFiles} files`}
+                  {status === 'completed' && `✓ ${uploadedCount}/${totalFiles} files uploaded`}
+                  {status === 'error' && `${uploadedCount}/${totalFiles} uploaded, ${failedCount} failed`}
+                  {status === 'idle' && `${totalFiles} file(s) ready`}
                 </p>
-                <p className="text-pretty mt-0.5 text-xs text-muted-foreground">3.1 MB</p>
+                {hasRestoredFiles && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Previously uploaded files (from last session)
+                  </p>
+                )}
+              </div>
+              {status !== 'uploading' && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={reset}
+                  className="text-xs"
+                >
+                  Clear All
+                </Button>
+              )}
+            </div>
+
+            {status === 'uploading' && (
+              <div className="flex items-center space-x-3 mb-4">
+                <Progress value={totalProgress} className="h-2" />
+                <span className="text-sm font-medium text-muted-foreground min-w-[3rem]">
+                  {totalProgress}%
+                </span>
+              </div>
+            )}
+
+            <div className="max-h-[300px] overflow-y-auto rounded-md border p-4">
+              <div className="space-y-2">
+                {files.map((fileItem, index) => (
+                  <Card
+                    key={`${fileItem.file.name}-${index}`}
+                    className="relative bg-muted p-3"
+                  >
+                    {fileItem.status === 'pending' && status !== 'uploading' && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="absolute right-1 top-1 text-muted-foreground hover:text-foreground"
+                        aria-label="Remove"
+                        onClick={() => removeFile(index)}
+                      >
+                        <X className="h-4 w-4 shrink-0" aria-hidden={true} />
+                      </Button>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2.5 flex-1 min-w-0">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-background shadow-sm ring-1 ring-inset ring-border">
+                          {getFileIcon(fileItem.file.name)}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-foreground truncate">
+                            {fileItem.file.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <p className="text-xs text-muted-foreground">
+                              {formatFileSize(fileItem.file.size)}
+                            </p>
+                            {fileItem.error && (
+                              <p className="text-xs text-red-500 truncate">
+                                {fileItem.error}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="ml-2">{getStatusIcon(fileItem.status)}</div>
+                    </div>
+                  </Card>
+                ))}
               </div>
             </div>
-
-            <div className="flex items-center space-x-3">
-              <Progress value={45} className="h-1.5" />
-              <span className="text-xs text-muted-foreground">45%</span>
-            </div>
-          </Card>
-        )} */}
-
-        {file && (
-          <Card className="relative mt-8 bg-muted p-4 gap-4">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="absolute right-1 top-1 text-muted-foreground hover:text-foreground"
-              aria-label="Remove"
-              onClick={resetFile}
-            >
-              <X className="h-5 w-5 shrink-0" aria-hidden={true} />
-            </Button>
-
-            <div className="flex items-center space-x-2.5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-background shadow-sm ring-1 ring-inset ring-border">
-                {getFileIcon()}
-              </span>
-              <div>
-                <p className="text-pretty text-xs font-medium text-foreground">
-                  {file?.name}
-                </p>
-                <p className="text-pretty mt-0.5 text-xs text-muted-foreground">
-                  {file && formatFileSize(file.size)}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <Progress value={progress} className="h-1.5" />
-              <span className="text-xs text-muted-foreground">{progress}%</span>
-            </div>
-          </Card>
+          </div>
         )}
 
         <div className="mt-8 flex items-center justify-end space-x-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="whitespace-nowrap"
-            onClick={resetFile}
-            disabled={!file}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            className="whitespace-nowrap"
-            disabled={!file || uploading || progress < 100}
-          >
-            Upload
-          </Button>
+          {status === 'error' && failedCount > 0 && !hasRestoredFailedFiles && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={retryFailed}
+            >
+              Retry Failed ({failedCount})
+            </Button>
+          )}
+
+          {(status === 'completed' || status === 'error') && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                reset();
+                fileInputRef.current?.click();
+              }}
+            >
+              Upload More
+            </Button>
+          )}
+
+          {status !== 'completed' && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={reset}
+                disabled={status === 'uploading' || totalFiles === 0}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleUpload}
+                disabled={status === 'uploading' || pendingFiles === 0 || hasRestoredFiles}
+                title={hasRestoredFiles ? "Cannot upload restored files. Please select new files." : ""}
+              >
+                {status === 'uploading' ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  `Upload ${pendingFiles > 0 ? `(${pendingFiles})` : ''}`
+                )}
+              </Button>
+            </>
+          )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }

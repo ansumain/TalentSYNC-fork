@@ -22,12 +22,12 @@ function App() {
         <Route path='/forgot-password' element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
         <Route path='/reset-password' element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
         <Route path='/signup' element={<PublicRoute><SignupPage /></PublicRoute>} />
-        <Route path='/upload' element={<PublicRoute><UploadPage /></PublicRoute>} />        
 
-        <Route path='/table' element={<CandidateTablePage />} />        
-        
+
         {/* Protected Routes - Require authentication */}
         <Route path='/home' element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path='/upload' element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+        <Route path='/candidates' element={<ProtectedRoute><CandidateTablePage /></ ProtectedRoute>} />
 
         <Route path='*' element={<Navigate to='/signin' replace />} />
       </Routes>

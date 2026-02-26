@@ -107,6 +107,14 @@ const navigationByRole = {
       isActive: true,
       items: [
         {
+          title: "Upload Resumes",
+          url: "/upload",
+        },
+        {
+          title: "All Candidates",
+          url: "/candidates",
+        },
+        {
           title: "Shortlisted",
           url: "#",
         },
@@ -153,6 +161,14 @@ const navigationByRole = {
       isActive: true,
       items: [
         {
+          title: "Upload Resumes",
+          url: "/upload",
+        },
+        {
+          title: "All Candidates",
+          url: "/candidates",
+        },
+        {
           title: "Shortlisted",
           url: "#",
         },
@@ -163,11 +179,7 @@ const navigationByRole = {
         {
           title: "Rejected",
           url: "#",
-        },
-        {
-          title: "All",
-          url: "#",
-        },
+        }
       ],
     },
     {
@@ -214,7 +226,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const loading = useAuthStore((state) => state.loading)
 
   const userRole = user?.roles?.[0] || 'candidate'
-  
+
   const navigationItems = navigationByRole[userRole as keyof typeof navigationByRole] || navigationByRole.candidate
 
   const userData = user ? {

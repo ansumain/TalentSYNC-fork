@@ -1,8 +1,14 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction, Application } from 'express';
 import morgan from 'morgan';
 import resumeRoutes from './routes/resume.routes'
+import cors from 'cors'
 
-const app = express();
+const app: Application = express();
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+}));
 
 app.use(express.json(), morgan('dev'));
 
