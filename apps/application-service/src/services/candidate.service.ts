@@ -1,4 +1,4 @@
-import { getAllCandidatesParsedJSONRepository, getCandidateDataFromNameRepository } from "../repository/candidate.repository"
+import { getAllCandidatesParsedJSONRepository, getCandidateDataFromNameRepository, getCandidateDataFromUserIdRepository } from "../repository/candidate.repository"
 
 const getCandiateParsedData = async () => {
     const candidateJSON = await getAllCandidatesParsedJSONRepository();
@@ -9,5 +9,9 @@ const getCandidateDataFromName = async (name: string) => {
     const candidateDataFromName = await getCandidateDataFromNameRepository(name);
     return candidateDataFromName;
 }
+const getCandidateDataFromUserId = async (name: string) => {
+    const candidateDataFromUserId = await getCandidateDataFromUserIdRepository(name);
+    return candidateDataFromUserId;
+}
 
-export { getCandiateParsedData, getCandidateDataFromName };
+export { getCandiateParsedData, getCandidateDataFromName, getCandidateDataFromUserId };

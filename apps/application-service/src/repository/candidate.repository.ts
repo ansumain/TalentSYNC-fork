@@ -32,4 +32,12 @@ const getCandidateDataFromNameRepository = async (name: string) => {
     return candidateData;
 }
 
-export { getAllCandidatesParsedJSONRepository, getCandidateDataFromNameRepository }
+const getCandidateDataFromUserIdRepository = async (userId: string) => {
+    const candidate = await ResumeData.findAll({
+        attributes: ['id', 'userId', 'parsedJSON'],
+        where: { userId }
+    });
+    return candidate;
+}
+
+export { getAllCandidatesParsedJSONRepository, getCandidateDataFromNameRepository, getCandidateDataFromUserIdRepository }
