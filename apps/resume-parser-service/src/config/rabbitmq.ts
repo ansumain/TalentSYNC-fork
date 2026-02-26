@@ -93,7 +93,7 @@ const publishToQueue = async (
         { persistent: true, headers }
     );
 
-    console.log(`Published to ${queue}:`, { messageId: message.id || 'unknown', retryCount });
+    console.log(`Published to ${queue}:`, { message, retryCount });
 }
 
 const consumeQueue = async (

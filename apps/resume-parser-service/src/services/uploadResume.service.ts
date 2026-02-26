@@ -18,7 +18,7 @@ const uploadResume = async (files: UploadedFileModel[]): Promise<boolean> => {
             } as ResumeModel
             const resumeId = await addToResumeData(resumeData);
 
-            await publishToQueue(config.queues.resumeParse, { resumeId })
+            await publishToQueue(config.queues.resumeParse, { resumeId }, config.queues.retry)
         }
 
         return true;

@@ -47,6 +47,8 @@ export const config = {
   },
 
   queues: {
+    retry: requireEnvNumber('RETRY_ATTEMPTS', 3),
+
     resumeParse: requireEnv('QUEUE_RESUME_PARSE', 'resume.parse'),
     resumeRetry: requireEnv('QUEUE_RESUME_RETRY', 'resume.parse.retry'),
     resumeFailed: requireEnv('QUEUE_RESUME_FAILED', 'resume.failed'),

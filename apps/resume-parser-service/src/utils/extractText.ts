@@ -5,13 +5,7 @@ const pdf = require('pdf-parse');
 import fs from 'fs/promises';
 import { convertPDFToImages } from './pdfToImage';
 import mammoth from 'mammoth';
-
-const tesseractConfig = {
-    lang: "eng",
-    oem: 1,
-    psm: 3,
-    binary: "\"C:\\Program Files\\Tesseract-OCR\\tesseract.exe\""
-};
+import { tesseractConfig } from '../config/tesseract-config';
 
 // File - Image
 const getTextUsingOCR = async (filePath: string) => {
