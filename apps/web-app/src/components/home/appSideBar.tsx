@@ -1,9 +1,9 @@
 import * as React from "react"
 import { SquareTerminal } from "lucide-react"
 
-import { NavMain } from "@/components/dashBoard/navMain"
-import { NavUser } from "@/components/dashBoard/navUser"
-import { TeamSwitcher } from "@/components/dashBoard/teamSwitcher"
+import { NavMain } from "@/components/home/navMain"
+import { NavUser } from "@/components/home/navUser"
+import { TeamSwitcher } from "@/components/home/teamSwitcher"
 import {
   Sidebar,
   SidebarContent,

@@ -119,7 +119,7 @@ TalentSYNC-development/
   
 - **PublicRoute**: Prevents authenticated users from accessing auth pages
   - If not authenticated → SignIn Page
-  - If authenticated → Redirect to `/dashboard`
+  - If authenticated → Redirect to `/home`
 
 ### Cookie-Based Authentication
 - Access Token: 15 minutes (httpOnly, secure)

@@ -1,10 +1,10 @@
-import { AppSidebar } from "@/components/dashBoard/appSideBar"
+import { AppSidebar } from "@/components/home/appSideBar"
 import {
   SidebarInset,
   SidebarProvider
 } from "@/components/ui/sidebar"
 
-export default function DashboardPage() {
+export default function HomePage() {
   return (
     <SidebarProvider>
       <AppSidebar />

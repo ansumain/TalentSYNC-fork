@@ -43,7 +43,7 @@ export function LoginForm() {
       const response = await authService.login(data)
       toast.success(response.message || 'Login successful!')
       await fetchUser()
-      navigate('/dashboard', { replace: true })
+      navigate('/home', { replace: true })
     } catch (error) {
       const err = error as { message: string; status?: number }
       toast.error(err.message || 'Login failed! Please try again!')
