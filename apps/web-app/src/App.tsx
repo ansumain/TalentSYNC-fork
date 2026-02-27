@@ -1,3 +1,4 @@
+
 import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
@@ -10,8 +11,11 @@ import ForgotPasswordPage from './pages/ForgotPassword';
 import ResetPasswordPage from './pages/ResetPassword';
 import UploadPage from './pages/Upload';
 import CandidateTablePage from './pages/CandidateTablePage';
+import { GetAccessTokenFromRefreshTokenInterval } from './lib/api/getAccessToken';
+
 
 function App() {
+  GetAccessTokenFromRefreshTokenInterval();
 
   return (
     <>
@@ -23,7 +27,6 @@ function App() {
         <Route path='/reset-password' element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
         <Route path='/signup' element={<PublicRoute><SignupPage /></PublicRoute>} />
 
-
         {/* Protected Routes - Require authentication */}
         <Route path='/home' element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path='/upload' element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
@@ -33,7 +36,6 @@ function App() {
       </Routes>
     </>
   )
-
 }
 
 export default App
