@@ -10,8 +10,22 @@ import userRoleRoutes from './routes/userRole.routes';
 import rolePermissionRoutes from './routes/rolePermission.routes';
 import { config } from './config/env';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 const app: Application = express();
+
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests! Please try again after some time',
+  standardHeaders: true,
+  legacyHeaders: false
+})
+
+app.use(limiter);
 
 app.use(cors({
   origin: config.frontendUrl,

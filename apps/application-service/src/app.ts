@@ -3,8 +3,22 @@ import morgan from 'morgan';
 import candidateRoutes from './routes/candidate.routes';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 const app: Application = express();
+
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests! Please try again after some time',
+  standardHeaders: true,
+  legacyHeaders: false
+})
+
+app.use(limiter);
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
