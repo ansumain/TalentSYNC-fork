@@ -30,6 +30,7 @@ import {
 import { authService } from "@/lib/api/auth.service"
 import { useAuthStore } from "@/stores/authStore"
 import { SettingsDialog } from "../settingsDialog"
+import { useUploadStore } from "@/stores/uploadStore"
 
 export function NavUser({
   user,
@@ -43,6 +44,7 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
   const clearUser = useAuthStore((state) => state.clearUser)
+  const resetUploadStore = useUploadStore((state) => state.reset);
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -54,6 +56,8 @@ export function NavUser({
       const response = await authService.logout()
       toast.success(response.message || 'Logged out successfully')
       clearUser()
+      resetUploadStore()
+      localStorage.removeItem('upload-storage')
       navigate('/signin')
     } catch (error) {
       const err = error as { message: string }

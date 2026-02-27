@@ -4,9 +4,8 @@ import { addToResumeData } from "../repository/resume.repository";
 import { ResumeModel } from "../types/ResumeModel.type";
 import { UploadedFileModel } from "../types/UploadedFile.type";
 
-const uploadResume = async (files: UploadedFileModel[]): Promise<boolean> => {
+const uploadResume = async (files: UploadedFileModel[], userId: string): Promise<boolean> => {
     try {
-        const userId = '49c7305a-daeb-4f16-84ee-35928c25619a';
 
         for (const file of files) {
             const resumeData = {
