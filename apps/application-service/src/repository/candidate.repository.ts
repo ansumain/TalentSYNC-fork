@@ -4,7 +4,8 @@ import { Op, Sequelize } from "sequelize";
 const getAllCandidatesParsedJSONRepository = async () => {
     const candidateJSON = await ResumeData.findAll({
         attributes: [
-            [Sequelize.literal('DISTINCT ON ("userId") "userId"'), 'userId'],
+            // [Sequelize.literal('DISTINCT ON ("userId") "userId"'), 'userId'],
+            'userId',
             'id',
             'parsedJSON',
             'createdAt'

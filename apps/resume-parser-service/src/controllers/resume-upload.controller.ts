@@ -6,10 +6,11 @@ export class ResumeUploaderController {
     static async uploadResume(req: Request, res: Response): Promise<void> {
         try {
             if (!req.files || (req.files as any).length === 0) throw new Error('No File Uploaded');
+            const userId = req.userInfo.sub;
 
             const files = req.files as unknown as UploadedFileModel[];
 
-            const result = await uploadResume(files);
+            const result = await uploadResume(files, userId);
             if (result) {
                 res.status(201).json({
                     message: 'File upload successful'

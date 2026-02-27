@@ -25,6 +25,8 @@ const requireEnvNumber = (key: string, fallback?: number): number => {
 export const config = {
   port: requireEnvNumber('PORT', 4002),
   environment: (process.env.NODE_ENV as string) || 'development',
+  accessTokenSecret: process.env.ACCESS_TOKEN_SECRET as string,
+  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET as string,
 
 
   dbHost: requireEnv('DB_HOST', 'localhost'),

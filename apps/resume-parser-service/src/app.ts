@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction, Application } from 'express';
 import morgan from 'morgan';
 import resumeRoutes from './routes/resume.routes'
 import cors from 'cors'
+import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
@@ -10,7 +11,7 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json(), morgan('dev'));
+app.use(express.json(), cookieParser(), morgan('dev'));
 
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({

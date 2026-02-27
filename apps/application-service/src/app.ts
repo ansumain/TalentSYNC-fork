@@ -1,10 +1,17 @@
 import express, { Request, Response, NextFunction, Application } from 'express';
 import morgan from 'morgan';
 import candidateRoutes from './routes/candidate.routes';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
-app.use(express.json(), morgan('dev'));
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+}));
+
+app.use(express.json(), cookieParser(), morgan('dev'));
 
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({
