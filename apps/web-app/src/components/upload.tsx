@@ -36,9 +36,8 @@ export function FileUpload() {
   const validateAndAddFiles = (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
 
-    // If previous upload is completed, reset before adding new files
-    const currentState = useUploadStore.getState();
-    if (currentState.status === 'completed' || currentState.status === 'error') {
+    // const currentState = useUploadStore.getState();
+    if (status === 'completed' || status === 'error') {
       reset();
     }
 
@@ -65,7 +64,7 @@ export function FileUpload() {
       addFiles(validFiles);
       toast.success(`${validFiles.length} file(s) added`, {
         position: "bottom-right",
-        duration: 2000,
+        duration: 1500,
       });
     }
   };
@@ -85,19 +84,19 @@ export function FileUpload() {
   const handleUpload = async () => {
     try {
       await uploadFiles();
-      
+
       // Get fresh state after upload completes
       const currentState = useUploadStore.getState();
-      
+
       if (currentState.failedCount === 0) {
         toast.success("All resumes uploaded successfully!", {
           position: "bottom-right",
-          duration: 3000,
+          duration: 2000,
         });
       } else {
         toast.error(`${currentState.failedCount} file(s) failed to upload`, {
           position: "bottom-right",
-          duration: 4000,
+          duration: 3000,
         });
       }
     } catch (error) {
@@ -112,8 +111,8 @@ export function FileUpload() {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+    const s = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, s)).toFixed(1)) + " " + sizes[s];
   };
 
   const getFileIcon = (fileName: string) => {
@@ -145,7 +144,7 @@ export function FileUpload() {
 
   const totalFiles = files.length;
   const pendingFiles = files.filter((f) => f.status === 'pending').length;
-  
+
   // Check if any files are restored from localStorage
   const hasRestoredFiles = files.some((f) => (f.file as any).isRestored);
   const hasRestoredFailedFiles = files.some(
@@ -193,8 +192,7 @@ export function FileUpload() {
 
         <p className="text-pretty mt-2 text-xs leading-5 text-muted-foreground sm:flex sm:items-center sm:justify-between">
           <span>
-            Accepted file types: <br />
-            JPEG, PNG, PDF or DOCX files.
+            Accepted file types: JPEG, PNG, PDF or DOCX files.
           </span>
           <span className="pl-1 sm:pl-0">Max. size: 10MB per file</span>
         </p>
@@ -209,11 +207,11 @@ export function FileUpload() {
                   {status === 'error' && `${uploadedCount}/${totalFiles} uploaded, ${failedCount} failed`}
                   {status === 'idle' && `${totalFiles} file(s) ready`}
                 </p>
-                {hasRestoredFiles && (
+                {/* {hasRestoredFiles && (
                   <p className="text-xs text-muted-foreground mt-1">
                     Previously uploaded files (from last session)
                   </p>
-                )}
+                )} */}
               </div>
               {status !== 'uploading' && (
                 <Button
@@ -266,16 +264,14 @@ export function FileUpload() {
                           <p className="text-xs font-medium text-foreground truncate">
                             {fileItem.file.name}
                           </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <p className="text-xs text-muted-foreground">
-                              {formatFileSize(fileItem.file.size)}
+                          <p className="text-xs text-muted-foreground">
+                            {formatFileSize(fileItem.file.size)}
+                          </p>
+                          {fileItem.error && (
+                            <p className="text-xs text-red-500 truncate">
+                              {fileItem.error}
                             </p>
-                            {fileItem.error && (
-                              <p className="text-xs text-red-500 truncate">
-                                {fileItem.error}
-                              </p>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
                       <div className="ml-2">{getStatusIcon(fileItem.status)}</div>
@@ -325,16 +321,16 @@ export function FileUpload() {
                 type="button"
                 onClick={handleUpload}
                 disabled={status === 'uploading' || pendingFiles === 0 || hasRestoredFiles}
-                title={hasRestoredFiles ? "Cannot upload restored files. Please select new files." : ""}
+                title={hasRestoredFiles ? "Cannot upload these files. Please select the files again." : ""}
               >
                 {status === 'uploading' ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Uploading...
                   </>
-                ) : (
+                ) : 
                   `Upload ${pendingFiles > 0 ? `(${pendingFiles})` : ''}`
-                )}
+                }
               </Button>
             </>
           )}

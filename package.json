@@ -4,13 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
+    "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,js,json,css,md,tsx,jsx}\"",
-    "prepare": "husky",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",

@@ -20,7 +20,14 @@ export class CandidateController {
 
     static async getCandidateDataFromName(req: Request, res: Response): Promise<void> {
         try {
-            const { name } = req.body;
+            const { name } = req.query;
+
+            if(!name || typeof name !== 'string'){
+                res.status(400).json({
+                    error: 'name query param required'
+                });
+                return;
+            }
             const candidateData = await getCandidateDataFromName(name);
 
             if (candidateData) {

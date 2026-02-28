@@ -141,12 +141,12 @@ services:
         condition: service_healthy
     networks:
       - TalentSYNC-networks
-    command: ["node", "dist/worker/resumeParser.worker.js"]
+    command: ["pnpm", "--filter", "resume-parser-service", "worker:dev"]
 
   application-service:
     build:
       context: .
-      dockerfile: ./apps/applicaton-service/Dockerfile
+      dockerfile: ./apps/application-service/Dockerfile
     container_name: TalentSYNC-applicaton-service
     restart: unless-stopped
     ports:

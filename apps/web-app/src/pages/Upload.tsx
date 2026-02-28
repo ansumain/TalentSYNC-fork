@@ -1,8 +1,8 @@
 import { FileUpload } from "@/components/upload"
 import { AppSidebar } from "@/components/home/appSideBar"
 import {
-  SidebarInset,
-  SidebarProvider
+    SidebarInset,
+    SidebarProvider
 } from "@/components/ui/sidebar"
 
 export default function UploadPage() {

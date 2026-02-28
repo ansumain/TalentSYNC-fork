@@ -5,7 +5,7 @@ const candidateRouter: Router = express.Router();
 
 candidateRouter.get('/parsed', authenticationMiddleware, CandidateController.getCandidateJSONData);
 candidateRouter.get('/parsed/filter/name', authenticationMiddleware, CandidateController.getCandidateDataFromName);
-candidateRouter.get('/parsed/filter/userId', authenticationMiddleware, CandidateController.getCandidateDataFromUserId);
-candidateRouter.get('/parsed/filter/resumeId', authenticationMiddleware, CandidateController.getCandidateDataFromResumeId);
+candidateRouter.get('/parsed/userId', authenticationMiddleware, CandidateController.getCandidateDataFromUserId);
+candidateRouter.get('/parsed/resumeId', authenticationMiddleware, CandidateController.getCandidateDataFromResumeId);
 
 export default candidateRouter;

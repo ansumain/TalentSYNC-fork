@@ -200,22 +200,17 @@ cd TalentSYNC
 pnpm install
 ```
 
-### Step 3: Database Setup
+### Step 3: Run the project (Pre-Requisite : Docker)
 ```bash
-docker-compose up -d
+docker-compose up --build -d
 ```
 
-## Running the Project
-
-#### Run Both Services Simultaneously
+### Step 4: Open Browser, search the following in the URL
 ```bash
-# Terminal 1: Backend
-cd apps/auth-service
-pnpm run dev
-# Backend runs on http://localhost:4001
+localhost
+```
 
-# Terminal 2: Frontend
-cd apps/web-app
-pnpm run dev
-# Frontend runs on http://localhost:5173
+### Time Estimate - TalentSYNC
+```
+https://docs.google.com/spreadsheets/d/1JFqGcp4_5iVs1nwu_vNscRIF5giJ6EcFSDzm9W8GkjE/edit?gid=0#gid=0
 ```

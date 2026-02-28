@@ -68,12 +68,12 @@ export function CandidateTable() {
             </TableHeader>
             <TableBody>
               {candidates.length === 0 ? (
-                <TableRow><TableCell colSpan={4} className="text-left text-center py-8">No candidates found.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-left text-center py-8">No Candidate Data Found.</TableCell></TableRow>
               ) : candidates.map((c) => (
                 <TableRow key={c.id} className="border-b hover:bg-muted/50">
-                  <TableCell className="text-left">{c.parsedJSON.name || <span className="text-muted-foreground">N/A</span>}</TableCell>
-                  <TableCell className="text-left">{c.parsedJSON.email || <span className="text-muted-foreground">N/A</span>}</TableCell>
-                  <TableCell className="text-left">{c.parsedJSON.phone || <span className="text-muted-foreground">N/A</span>}</TableCell>
+                  <TableCell className="text-left">{c.parsedJSON.name || <span className="text-muted-foreground">-</span>}</TableCell>
+                  <TableCell className="text-left">{c.parsedJSON.email || <span className="text-muted-foreground">-</span>}</TableCell>
+                  <TableCell className="text-left">{c.parsedJSON.phone || <span className="text-muted-foreground">-</span>}</TableCell>
                   <TableCell className="text-left text-xs">{new Date(c.createdAt).toLocaleString()}</TableCell>
                 </TableRow>
               ))}

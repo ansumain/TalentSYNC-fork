@@ -19,7 +19,7 @@ app.use(helmet());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 300,
   message: 'Too many requests! Please try again after some time',
   standardHeaders: true,
   legacyHeaders: false
@@ -41,6 +41,13 @@ app.get('/health', (req: Request, res: Response) => {
     currentTime: `${new Date().toISOString()}`,
   });
 });
+
+// app.use('/api/auth', authRoutes);
+// app.use('/api/auth/users', userProfileRoutes);
+// app.use('/api/admin', roleRoutes);
+// app.use('/api/admin', permissionRoutes);
+// app.use('/api/admin', userRoleRoutes);
+// app.use('/api/admin', rolePermissionRoutes);
 
 app.use('/auth', authRoutes);
 app.use('/users', userProfileRoutes);

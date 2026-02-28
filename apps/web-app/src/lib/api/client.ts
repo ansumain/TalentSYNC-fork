@@ -30,8 +30,8 @@ axiosInstance.interceptors.response.use(
 
 // API client
 export const apiClient = {
-  async get<ResponseType>(endpoint: string): Promise<ResponseType> {
-    const response = await axiosInstance.get<ResponseType>(endpoint);
+  async get<ResponseType>(endpoint: string, params?: Record<string, any>): Promise<ResponseType> {
+    const response = await axiosInstance.get<ResponseType>(endpoint, {params});
     return response as unknown as ResponseType;
   },
 
@@ -62,7 +62,7 @@ export const apiClient = {
       },
       onUploadProgress: (ProgressEvent) => {
         if (onProgress && ProgressEvent.total) {
-          const percentCompleted = Math.round((ProgressEvent.loaded * 100) / ProgressEvent.total);
+          const percentCompleted = Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100 );
           onProgress(percentCompleted);
         }
       }

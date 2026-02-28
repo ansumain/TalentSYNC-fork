@@ -10,7 +10,7 @@ interface FileWithStatus {
   error?: string;
 }
 
-// Serializable version for localStorage (no File objects)
+// Serializable version for localStorage
 interface SerializableFileData {
   name: string;
   size: number;
@@ -24,7 +24,7 @@ interface UploadStore {
   status: UploadStatus;
   uploadedCount: number;
   failedCount: number;
-  
+
   // Actions
   addFiles: (newFiles: File[]) => void;
   removeFile: (index: number) => void;
@@ -75,7 +75,7 @@ export const useUploadStore = create<UploadStore>()(
       uploadFiles: async () => {
         const { files } = get();
         const pendingFiles = files.filter((f) => f.status === 'pending');
-        
+
         if (pendingFiles.length === 0) return;
 
         set({ status: 'uploading', uploadedCount: 0, failedCount: 0 });
@@ -103,9 +103,9 @@ export const useUploadStore = create<UploadStore>()(
               // Calculate overall progress considering all batches
               const previousBatchProgress = (processedFiles / totalFiles) * 100;
               const currentBatchWeight = (batch.length / totalFiles) * 100;
-              const overallProgress = previousBatchProgress + (progress / 100) * currentBatchWeight;
-              
-              set({ totalProgress: Math.round(overallProgress) });
+              const overallProgress = previousBatchProgress + currentBatchWeight * (progress / 100);
+
+              set({ totalProgress: overallProgress });
             });
 
             // Mark batch as success
@@ -121,7 +121,6 @@ export const useUploadStore = create<UploadStore>()(
               };
             });
 
-            processedFiles += batch.length;
           } catch (error) {
             // Mark batch as error
             const errorMessage = error instanceof Error ? error.message : 'Upload failed';
@@ -136,9 +135,8 @@ export const useUploadStore = create<UploadStore>()(
                 failedCount: failed,
               };
             });
-
-            processedFiles += batch.length;
           }
+          processedFiles += batch.length;
         }
 
         // Set final status
@@ -187,23 +185,24 @@ export const useUploadStore = create<UploadStore>()(
         uploadedCount: state.uploadedCount,
         failedCount: state.failedCount,
       }),
+      
       // Custom merge function to reconstruct state from storage
       merge: (persistedState: any, currentState) => {
         if (!persistedState?.filesData) {
           return currentState;
         }
-        
+
         // Convert stored metadata back to FileWithStatus format
         const restoredFiles: FileWithStatus[] = persistedState.filesData.map((data: SerializableFileData) => {
           // Create a dummy blob with correct size for display
           const blob = new Blob([new ArrayBuffer(data.size)]);
-          const file = new File([blob], data.name, { 
+          const file = new File([blob], data.name, {
             type: 'application/octet-stream',
           });
-          
+
           // Mark the file object - restored 
           Object.defineProperty(file, 'isRestored', { value: true, writable: false });
-          
+
           return {
             file,
             status: data.status,

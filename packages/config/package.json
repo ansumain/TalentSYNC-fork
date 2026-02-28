@@ -1,9 +1,0 @@
-{
-  "name": "@talentsync/config",
-  "version": "1.0.0",
-  "type": "module",
-  "files": ["eslint-preset.js"],
-  "exports": {
-    "./eslint-preset": "./eslint-preset.js"
-  }
-}
