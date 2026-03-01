@@ -1,6 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../config/sequelize';
-import { allowedMimeTypes } from '../config/allowed-file-type';
+import { sequelize, allowedMimeTypes } from '@talentsync/config';
 
 interface ResumeDataAttributes {
     id: string;
@@ -41,35 +40,35 @@ ResumeData.init(
             type: DataTypes.UUID,
             allowNull: false,
             references: {
-                model: {tableName: 'users', schema: 'auth'},
+                model: { tableName: 'users', schema: 'auth' },
                 key: 'id',
             },
         },
         fileName: {
             type: DataTypes.STRING(100),
-            allowNull: false
+            allowNull: false,
         },
         mimeType: {
             type: DataTypes.ENUM(...allowedMimeTypes.IMAGE, ...allowedMimeTypes.PDF, ...allowedMimeTypes.DOCX),
-            allowNull: false
+            allowNull: false,
         },
         fileURL: {
             type: DataTypes.STRING(150),
             allowNull: false,
-            unique: true
+            unique: true,
         },
         status: {
             type: DataTypes.ENUM('queued', 'processing', 'completed', 'failed'),
-            allowNull: false
+            allowNull: false,
         },
         rawText: {
             type: DataTypes.TEXT,
         },
         parsedJSON: {
-            type: DataTypes.JSONB
+            type: DataTypes.JSONB,
         },
         errorMessage: {
-            type: DataTypes.TEXT
+            type: DataTypes.TEXT,
         },
     },
     {
