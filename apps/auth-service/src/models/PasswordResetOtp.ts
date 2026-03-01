@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../config/sequelize';
+import { sequelize } from '@talentsync/config';
 
 interface PasswordResetOtpAttributes {
   id: string;
@@ -12,8 +12,7 @@ type PasswordResetOtpCreationAttributes = Optional<PasswordResetOtpAttributes, '
 
 class PasswordResetOtp
   extends Model<PasswordResetOtpAttributes, PasswordResetOtpCreationAttributes>
-  implements PasswordResetOtpAttributes
-{
+  implements PasswordResetOtpAttributes {
   declare id: string;
   declare email: string;
   declare hashedOtp: string;

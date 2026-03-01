@@ -1,5 +1,5 @@
 import { registerUser } from '../../services/registerUser.service';
-import User from '../../models/User';
+import { User } from '@talentsync/models';
 import bcrypt from 'bcryptjs';
 import { RegisterUserOutput } from '../../types/RegisterUserOutput';
 

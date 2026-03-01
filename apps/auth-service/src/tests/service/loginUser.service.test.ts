@@ -1,5 +1,6 @@
 import { loginUser } from '../../services/loginUser.service';
-import User from '../../models/User';
+// import User from '../../models/User';
+import { User } from '@talentsync/models'
 // import { RefreshToken } from "../models/RefreshToken";
 import { RefreshToken } from '../../models/index';
 import jwt from 'jsonwebtoken';

@@ -1,6 +1,6 @@
 import app from './app';
 import { config } from './config/env';
-import { sequelize } from './config/sequelize';
+import { sequelize } from '@talentsync/config';
 
 process.on('uncaughtException', (error: Error) => {
   console.error('Uncaught Exception:', error);

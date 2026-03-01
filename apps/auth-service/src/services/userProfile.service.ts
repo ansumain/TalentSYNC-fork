@@ -1,4 +1,4 @@
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import UserRole from '../models/UserRole';
 import Role from '../models/Role';
 import { UserProfileInput } from '../types/UserProfileInput';

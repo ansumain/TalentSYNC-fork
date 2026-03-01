@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/env';
-import { UserInfo } from '../types/UserInfo';
+import { UserInfo } from '@talentsync/types';
 
 const authenticationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {

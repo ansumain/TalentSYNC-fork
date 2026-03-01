@@ -1,7 +1,7 @@
 import app from './app';
 import { config } from './config/env';
 import { connectRabbitMQ, gracefulShutdown } from './config/rabbitmq';
-import {sequelize} from './config/sequelize';
+import {sequelize} from '@talentsync/config';
 
 process.on('SIGTERM', async () => {
   await gracefulShutdown('SIGTERM');

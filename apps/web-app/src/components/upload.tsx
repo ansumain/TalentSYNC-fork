@@ -1,7 +1,8 @@
 "use client";
 
 import { File, FileText, Upload as UploadIcon, X, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import { ChangeEvent, DragEvent, useRef } from "react";
+import type { ChangeEvent, DragEvent } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -328,7 +329,7 @@ export function FileUpload() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Uploading...
                   </>
-                ) : 
+                ) :
                   `Upload ${pendingFiles > 0 ? `(${pendingFiles})` : ''}`
                 }
               </Button>

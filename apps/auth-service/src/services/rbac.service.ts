@@ -2,7 +2,7 @@ import Permission from '../models/Permission';
 import Role from '../models/Role';
 import RolePermission from '../models/RolePermission';
 import UserRole from '../models/UserRole';
-import User from '../models/User';
+import { User } from '@talentsync/models';
 
 const getUserRoles = async (userId: string): Promise<string[]> => {
   if (!userId) throw new Error('Missing user ID');

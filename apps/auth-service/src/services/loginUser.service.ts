@@ -1,4 +1,4 @@
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import { LoginUserInput } from '../types/LoginUserInput';
 import { LoginUserOutput } from '../types/LoginUserOutput';
 import jwt from 'jsonwebtoken';

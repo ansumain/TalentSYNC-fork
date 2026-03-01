@@ -1,4 +1,4 @@
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import { UpdatePasswordInput } from '../types/UpdatePasswordInput';
 import { UpdatePasswordOutput } from '../types/UpdatePasswordOutput';
 import bcrypt from 'bcryptjs';

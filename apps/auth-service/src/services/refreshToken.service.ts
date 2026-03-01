@@ -4,7 +4,7 @@ import { RefreshTokenOutput } from '../types/RefreshTokenOutput';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/env';
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import UserRole from '../models/UserRole';
 import Role from '../models/Role';
 

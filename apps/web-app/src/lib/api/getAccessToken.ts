@@ -7,7 +7,7 @@ const REFRESH_INTERVAL = 13 * 60 * 1000;
 
 export function GetAccessTokenFromRefreshTokenInterval() {
   const user = useAuthStore((state) => state.user);
-  const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     async function refresh() {

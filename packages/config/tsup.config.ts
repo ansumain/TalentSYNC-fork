@@ -6,6 +6,7 @@ export default defineConfig({
   platform: 'node',
   dts: true,
   sourcemap: true,
-  clean: true,
+  clean: false,
   outDir: 'dist',
+  external: ['sequelize', 'dotenv', 'pg', 'pg-hstore']
 });

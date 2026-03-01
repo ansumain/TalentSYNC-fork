@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import { UpdateUserProfileInput } from '../types/UpdateUserProfileInput';
 import { UpdateUserProfileOutput } from '../types/UpdateUserProfileOutput';
 

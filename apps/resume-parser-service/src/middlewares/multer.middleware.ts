@@ -2,7 +2,7 @@ import multer, { FileFilterCallback } from 'multer'
 import { Request, RequestHandler } from 'express'
 import path from 'path';
 import fs from 'fs';
-import { allowedMimeTypes } from '../config/allowed-file-type';
+import { allowedMimeTypes } from '@talentsync/config';
 
 const uploadDir = 'uploads/';
 if (!fs.existsSync(uploadDir)) {

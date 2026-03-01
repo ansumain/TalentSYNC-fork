@@ -6,6 +6,6 @@ export default defineConfig({
   platform: 'node',
   dts: true,
   sourcemap: true,
-  clean: true,
+  clean: false,
   outDir: 'dist',
 });

@@ -1,6 +1,6 @@
 import { refreshToken } from '../../services/refreshToken.service';
 import RefreshToken from '../../models/RefreshToken';
-import User from '../../models/User';
+import { User } from '@talentsync/models'
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 

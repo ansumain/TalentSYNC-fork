@@ -1,8 +1,8 @@
 import { updatePassword } from '../../services/updatePassword.service';
-import User from '../../models/User';
+import { User } from '@talentsync/models';
 import bcrypt from 'bcryptjs';
 
-jest.mock('../../models/User');
+jest.mock('@talentsync/models');
 jest.mock('bcryptjs');
 
 describe('UpdatePassword Service', () => {

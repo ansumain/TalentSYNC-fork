@@ -1,4 +1,5 @@
-import ResumeData from "../models/ResumeData"
+// import ResumeData from "../models/ResumeData"
+import { ResumeData } from "@talentsync/models";
 import { Op, Sequelize } from "sequelize";
 
 const getAllCandidatesParsedJSONRepository = async () => {

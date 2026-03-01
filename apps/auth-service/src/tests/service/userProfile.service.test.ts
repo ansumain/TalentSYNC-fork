@@ -1,7 +1,7 @@
 import { userProfile } from '../../services/userProfile.service';
-import User from '../../models/User';
+import { User } from '@talentsync/models';
 
-jest.mock('../../models/User');
+jest.mock('@talentsync/models');
 
 describe('UserProfile - Get User Data service', () => {
   let mockFindOne: jest.SpyInstance;

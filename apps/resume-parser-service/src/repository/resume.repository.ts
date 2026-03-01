@@ -1,4 +1,4 @@
-import ResumeData from "../models/ResumeData"
+import { ResumeData } from "@talentsync/models";
 import { ParseResumeOutput } from "../services/parseResume.service";
 import { ResumeModel } from "../types/ResumeModel.type";
 

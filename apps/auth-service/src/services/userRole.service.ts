@@ -1,5 +1,5 @@
 import UserRole from '../models/UserRole';
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import Role from '../models/Role';
 
 const assignRoleToUser = async (userId: string, roleId: string): Promise<{ message: string }> => {

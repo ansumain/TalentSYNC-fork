@@ -1,4 +1,4 @@
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import PasswordResetOtp from '../models/PasswordResetOtp';
 import { ResetPasswordInput } from '../types/ResetPasswordInput';
 import { ResetPasswordOutput } from '../types/ResetPasswordOutput';

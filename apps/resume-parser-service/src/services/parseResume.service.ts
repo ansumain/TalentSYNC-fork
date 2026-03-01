@@ -1,5 +1,5 @@
 import { getTextUsingMammoth, getTextUsingOCR, getTextUsingPdfparse } from '../utils/extractText';
-import { allowedMimeTypes } from '../config/allowed-file-type';
+import { allowedMimeTypes } from '@talentsync/config';
 import { extractBasicDetails } from '../utils/parseToJSONFromRawText';
 
 export interface FormattedJson {
