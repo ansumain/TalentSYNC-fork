@@ -19,4 +19,17 @@ const getAllJobsRepository = async () => {
     }
 };
 
-export { addJobRepository, getAllJobsRepository }
+const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob>) => {
+    try {
+        const existingJob = Job.findOne({ where: { jobId } });
+        if (!existingJob) throw new Error('job not found');
+
+        await Job.update({ ...job }, { where: { jobId } });
+
+        return { message: 'updated' };
+    } catch {
+        throw new Error('unable to update job');
+    }
+};
+
+export { addJobRepository, getAllJobsRepository, updateExistingJobRepository }
