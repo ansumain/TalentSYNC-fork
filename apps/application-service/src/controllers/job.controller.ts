@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addAJob, deleteExistingJob, getAllJobs, updateExistingJob } from '../services/job.service';
+import { addAJob, deleteExistingJob, getJobById, getAllJobs, updateExistingJob } from '../services/job.service';
 import { CreateJob } from '../types/Job.type';
 
 export class JobController {
@@ -7,8 +7,8 @@ export class JobController {
     static async addAJob(req: Request, res: Response): Promise<void> {
         try {
 
-            if (!req.body.title || 
-                !req.body.description || 
+            if (!req.body.title ||
+                !req.body.description ||
                 req.body.openings === undefined ||
                 !req.body.location ||
                 !req.body.jobType
@@ -48,6 +48,24 @@ export class JobController {
         }
     }
 
+    static async getJobById(req: Request, res: Response): Promise<void> {
+        try {
+
+            if (!req.params.jobId) throw new Error('Missing required field');
+            const jobId = req.params.jobId as string;
+
+            const job = await getJobById(jobId);
+
+            if (job) {
+                res.status(200).json(job);
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
     static async updateExistingJob(req: Request, res: Response): Promise<void> {
         try {
             if (!req.params.jobId) throw new Error('Missing required field');
@@ -58,7 +76,7 @@ export class JobController {
             let fieldsToUpdate: Partial<CreateJob> = {};
             if (title) fieldsToUpdate.title = title;
             if (description) fieldsToUpdate.description = description;
-            if (location) fieldsToUpdate.location= location;
+            if (location) fieldsToUpdate.location = location;
             if (jobType) fieldsToUpdate.jobType = jobType;
             if (openings !== undefined) fieldsToUpdate.openings = openings;
 
@@ -81,7 +99,7 @@ export class JobController {
             const jobId = req.params.jobId as string;
 
             const deleteJob = await deleteExistingJob(jobId);
-            if(deleteJob) res.status(204).send();
+            if (deleteJob) res.status(204).send();
 
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';

@@ -5,6 +5,7 @@ const jobRouter: Router = express.Router();
 
 jobRouter.post('/add', authenticationMiddleware, JobController.addAJob);
 jobRouter.get('/', authenticationMiddleware, JobController.getAllJobs);
+jobRouter.get('/:jobId', authenticationMiddleware, JobController.getJobById);
 jobRouter.put('/:jobId', authenticationMiddleware, JobController.updateExistingJob);
 jobRouter.delete('/:jobId', authenticationMiddleware, JobController.deleteExistingJob);
 

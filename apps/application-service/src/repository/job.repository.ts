@@ -19,6 +19,16 @@ const getAllJobsRepository = async () => {
     }
 };
 
+const getJobByIdRepository = async (jobId: string) => {
+    try {
+        const job = await Job.findOne({ where: { jobId } });
+        if (!job) throw new Error('job not found');
+        return job;
+    } catch {
+        throw new Error('unable to fetch the job');
+    }
+}
+
 const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob>) => {
     try {
         const existingJob = Job.findOne({ where: { jobId } });
@@ -46,4 +56,4 @@ const deleteExistingJobRepository = async (jobId: string) => {
 
 };
 
-export { addJobRepository, getAllJobsRepository, updateExistingJobRepository, deleteExistingJobRepository }
+export { addJobRepository, getAllJobsRepository, getJobByIdRepository, updateExistingJobRepository, deleteExistingJobRepository }
