@@ -1,0 +1,8 @@
+import express, { Router } from 'express';
+import { JobController } from '../controllers/job.controller';
+import { authenticationMiddleware } from '../middlewares/authentication.middleware';
+const jobRouter: Router = express.Router();
+
+jobRouter.post('/add', authenticationMiddleware, JobController.addAJob);
+
+export default jobRouter;

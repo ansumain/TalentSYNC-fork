@@ -1,10 +1,11 @@
 import express, { Request, Response, NextFunction, Application } from 'express';
 import morgan from 'morgan';
-import candidateRoutes from './routes/candidate.routes';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import candidateRoutes from './routes/candidate.routes';
+import jobRoutes from './routes/job.routes';
 
 const app: Application = express();
 
@@ -36,6 +37,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 app.use('/api/candidate', candidateRoutes);
+app.use('/api/jobs', jobRoutes);
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
