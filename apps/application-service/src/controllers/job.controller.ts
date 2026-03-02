@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addAJob, getAllJobs, updateExistingJob } from '../services/job.service';
+import { addAJob, deleteExistingJob, getAllJobs, updateExistingJob } from '../services/job.service';
 import { CreateJob } from '../types/Job.type';
 
 export class JobController {
@@ -67,6 +67,21 @@ export class JobController {
             if (updatedJob) {
                 res.status(200).json(updatedJob);
             }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async deleteExistingJob(req: Request, res: Response): Promise<void> {
+        try {
+
+            if (!req.params.jobId) throw new Error('Missing required field');
+            const jobId = req.params.jobId as string;
+
+            const deleteJob = await deleteExistingJob(jobId);
+            if(deleteJob) res.status(204).send();
 
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';

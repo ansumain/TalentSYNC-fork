@@ -1,4 +1,4 @@
-import { getAllJobsRepository, addJobRepository, updateExistingJobRepository } from "../repository/job.repository";
+import { getAllJobsRepository, addJobRepository, updateExistingJobRepository, deleteExistingJobRepository } from "../repository/job.repository";
 import { CreateJob } from "../types/Job.type";
 
 const addAJob = async (job: CreateJob) => {
@@ -16,4 +16,9 @@ const updateExistingJob = async (jobId: string, job: Partial<CreateJob>) => {
     return updatedJobs;
 }
 
-export { addAJob, getAllJobs, updateExistingJob };
+const deleteExistingJob = async (jobId: string) => {
+    const isDeleted = await deleteExistingJobRepository(jobId);
+    if(isDeleted) return isDeleted;
+}
+
+export { addAJob, getAllJobs, updateExistingJob, deleteExistingJob };

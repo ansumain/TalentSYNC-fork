@@ -32,4 +32,18 @@ const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob
     }
 };
 
-export { addJobRepository, getAllJobsRepository, updateExistingJobRepository }
+const deleteExistingJobRepository = async (jobId: string) => {
+    try {
+        const existingJob = Job.findOne({ where: { jobId } });
+        if (!existingJob) throw new Error('job not found');
+
+        await Job.destroy({ where: { jobId } });
+
+        return { message: 'deleted' };
+    } catch {
+        throw new Error('unable to delete job!');
+    }
+
+};
+
+export { addJobRepository, getAllJobsRepository, updateExistingJobRepository, deleteExistingJobRepository }
