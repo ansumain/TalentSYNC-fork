@@ -4,5 +4,6 @@ import { authenticationMiddleware } from '../middlewares/authentication.middlewa
 const jobRouter: Router = express.Router();
 
 jobRouter.post('/add', authenticationMiddleware, JobController.addAJob);
+jobRouter.get('/', authenticationMiddleware, JobController.getAllJobs);
 
 export default jobRouter;

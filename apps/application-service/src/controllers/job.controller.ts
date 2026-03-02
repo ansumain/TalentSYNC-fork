@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addAJob } from '../services/job.service';
+import { addAJob, getAllJobs,  } from '../services/job.service';
 
 export class JobController {
 
@@ -22,6 +22,22 @@ export class JobController {
             if (newJob) {
                 res.status(200).json({
                     newJob
+                });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getAllJobs(req: Request, res: Response): Promise<void> {
+        try {
+            const currentJobs = await getAllJobs();
+
+            if (currentJobs) {
+                res.status(200).json({
+                    currentJobs
                 });
             }
 

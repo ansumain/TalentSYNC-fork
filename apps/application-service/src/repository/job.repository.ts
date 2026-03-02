@@ -10,4 +10,13 @@ const addJobRepository = async (job: CreateJob) => {
     }
 };
 
-export { addJobRepository }
+const getAllJobsRepository = async () => {
+    try {
+        const currentJobs = await Job.findAll();
+        return currentJobs;
+    } catch {
+        throw new Error('unable to get all jobs');
+    }
+};
+
+export { addJobRepository, getAllJobsRepository }

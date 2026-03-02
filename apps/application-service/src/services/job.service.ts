@@ -1,4 +1,4 @@
-import {  addJobRepository } from "../repository/job.repository";
+import { getAllJobsRepository, addJobRepository } from "../repository/job.repository";
 import { CreateJob } from "../types/Job.type";
 
 const addAJob = async (job: CreateJob) => {
@@ -6,4 +6,9 @@ const addAJob = async (job: CreateJob) => {
     return currentJobs;
 }
 
-export { addAJob };
+const getAllJobs = async () => {
+    const currentJobs = await getAllJobsRepository();
+    return currentJobs;
+}
+
+export { addAJob, getAllJobs };
