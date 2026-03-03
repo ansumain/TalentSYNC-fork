@@ -3,6 +3,8 @@ import {
     addApplication,
     getAllApplications,
     getApplicationById,
+    getApplicationsByJobId,
+
 } from '../services/jobApplication.service';
 
 export class JobApplicationController {
@@ -71,6 +73,34 @@ export class JobApplicationController {
             }
 
             if (errorMessage.includes('application not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getApplicationsByJobId(req: Request, res: Response): Promise<void> {
+        try {
+
+            if (!req.params.jobId) throw new Error('missing required field');
+            const jobId = req.params.jobId as string;
+
+            const applicationsByJobId = await getApplicationsByJobId(jobId);
+
+            if (applicationsByJobId) {
+                res.status(200).json({ applicationsByJobId });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('applications not found')) {
                 res.status(404).json({ error: errorMessage });
                 return;
             }

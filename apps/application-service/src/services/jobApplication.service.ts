@@ -2,6 +2,7 @@ import {
     addApplicationRepository,
     getAllApplicationsRepository,
     getApplicationByIdRepository,
+    getApplicationsByJobIdRepository,
 } from '../repository/jobApplication.repository'
 import { Applicaiton } from '../types/Application.type';
 
@@ -20,8 +21,14 @@ const getApplicationById = async (applicationId: string) => {
     return applicaiton;
 }
 
+const getApplicationsByJobId = async (jobId: string) => {
+    const applicaitons = await getApplicationsByJobIdRepository(jobId);
+    return applicaitons;
+}
+
 export {
     addApplication,
     getAllApplications,
     getApplicationById,
+    getApplicationsByJobId,
 };

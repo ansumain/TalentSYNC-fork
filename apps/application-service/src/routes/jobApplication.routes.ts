@@ -6,5 +6,6 @@ const jobApplicationRouter: Router = express.Router();
 jobApplicationRouter.post('/:jobId', authenticationMiddleware, JobApplicationController.addApplication);
 jobApplicationRouter.get('/', authenticationMiddleware, JobApplicationController.getAllApplications);
 jobApplicationRouter.get('/:applicationId', authenticationMiddleware, JobApplicationController.getApplicationById);
+jobApplicationRouter.get('/job/:jobId', authenticationMiddleware, JobApplicationController.getApplicationsByJobId);
 
 export default jobApplicationRouter;
