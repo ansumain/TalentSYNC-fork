@@ -11,7 +11,7 @@ interface InterviewAttributes {
     status: string;
 }
 
-type InterviewCreationAttributes = Optional<InterviewAttributes, 'interviewId'>;
+type InterviewCreationAttributes = Optional<InterviewAttributes, 'interviewId' | 'status'>;
 
 class Interview
     extends Model<InterviewAttributes, InterviewCreationAttributes>
