@@ -5,8 +5,8 @@ const addJobRepository = async (job: CreateJob) => {
     try {
         const newJob = await Job.create(job);
         return newJob;
-    } catch {
-        throw new Error('uable to create new job');
+    } catch (error: any) {
+        throw error;
     }
 };
 
@@ -14,8 +14,8 @@ const getAllJobsRepository = async () => {
     try {
         const currentJobs = await Job.findAll();
         return currentJobs;
-    } catch {
-        throw new Error('unable to get all jobs');
+    } catch (error: any) {
+        throw error;
     }
 };
 
@@ -24,34 +24,34 @@ const getJobByIdRepository = async (jobId: string) => {
         const job = await Job.findOne({ where: { jobId } });
         if (!job) throw new Error('job not found');
         return job;
-    } catch {
-        throw new Error('unable to fetch the job');
+    } catch (error: any) {
+        throw error;
     }
 }
 
 const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob>) => {
     try {
-        const existingJob = Job.findOne({ where: { jobId } });
+        const existingJob = await Job.findOne({ where: { jobId } });
         if (!existingJob) throw new Error('job not found');
 
         await Job.update({ ...job }, { where: { jobId } });
 
         return { message: 'updated' };
-    } catch {
-        throw new Error('unable to update job');
+    } catch (error: any) {
+        throw error;
     }
 };
 
 const deleteExistingJobRepository = async (jobId: string) => {
     try {
-        const existingJob = Job.findOne({ where: { jobId } });
+        const existingJob = await Job.findOne({ where: { jobId } });
         if (!existingJob) throw new Error('job not found');
 
         await Job.destroy({ where: { jobId } });
 
         return { message: 'deleted' };
-    } catch {
-        throw new Error('unable to delete job!');
+    } catch (error: any) {
+        throw error;
     }
 
 };

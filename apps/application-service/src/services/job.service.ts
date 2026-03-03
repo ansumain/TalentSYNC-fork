@@ -12,7 +12,7 @@ const getAllJobs = async () => {
 }
 
 const getJobById = async (jobId: string) => {
-    const job = getJobByIdRepository(jobId);
+    const job = await getJobByIdRepository(jobId);
     return job;
 }
 

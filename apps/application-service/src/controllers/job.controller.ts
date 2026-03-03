@@ -18,16 +18,38 @@ export class JobController {
 
             const { title, description, location, jobType, openings } = req.body;
 
-            const newJob = await addAJob({ title, description, location, jobType, openings, createdBy: userId });
+            if (!Number.isInteger(openings) || openings < 1) throw new Error('invalid openings');
 
-            if (newJob) {
-                res.status(200).json({
-                    newJob
-                });
+            const newJob = {
+                title: title.trim(),
+                description: description.trim(),
+                location: location.trim(),
+                jobType: jobType.trim(),
+                openings,
+                createdBy: userId.trim()
+            }
+
+            for (const key of Object.keys(newJob) as Array<keyof typeof newJob>)
+                if (typeof newJob[key] === 'string' && newJob[key].length === 0) throw new Error('missing required field');
+
+            const newJobCreated = await addAJob(newJob);
+
+            if (newJobCreated) {
+                res.status(201).json(newJobCreated);
             }
 
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+            if (errorMessage.includes('invalid openings')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -37,9 +59,7 @@ export class JobController {
             const currentJobs = await getAllJobs();
 
             if (currentJobs) {
-                res.status(200).json({
-                    currentJobs
-                });
+                res.status(200).json({ currentJobs });
             }
 
         } catch (e: any) {
@@ -57,11 +77,16 @@ export class JobController {
             const job = await getJobById(jobId);
 
             if (job) {
-                res.status(200).json(job);
+                res.status(200).json({ job });
             }
 
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('job not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -74,11 +99,17 @@ export class JobController {
             const { title, description, location, jobType, openings } = req.body;
 
             let fieldsToUpdate: Partial<CreateJob> = {};
-            if (title) fieldsToUpdate.title = title;
-            if (description) fieldsToUpdate.description = description;
-            if (location) fieldsToUpdate.location = location;
-            if (jobType) fieldsToUpdate.jobType = jobType;
-            if (openings !== undefined) fieldsToUpdate.openings = openings;
+            if (title) fieldsToUpdate.title = title.trim();
+            if (description) fieldsToUpdate.description = description.trim();
+            if (location) fieldsToUpdate.location = location.trim();
+            if (jobType) fieldsToUpdate.jobType = jobType.trim();
+
+            if (openings !== undefined) {
+                if (!Number.isInteger(openings) || openings < 1) throw new Error('invalid openings');
+                fieldsToUpdate.openings = openings;
+            }
+
+            if (Object.keys(fieldsToUpdate).length === 0) throw new Error('no input');
 
             const updatedJob = await updateExistingJob(jobId, fieldsToUpdate);
 
@@ -88,6 +119,21 @@ export class JobController {
 
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('no input')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('invalid openings')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('job not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -103,6 +149,12 @@ export class JobController {
 
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('job not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
+
             res.status(500).json({ error: errorMessage });
         }
     }
