@@ -66,10 +66,25 @@ const updateExistingInterviewRepository = async (interviewId: string, newIntervi
     }
 };
 
+const deleteExistingInterviewRepository = async (interviewId: string) => {
+    try {
+        const existingInterview = await Interview.findOne({ where: { interviewId } });
+        if (!existingInterview) throw new Error('interview not found');
+
+        await Interview.destroy({ where: { interviewId } });
+
+        return { message: 'deleted' };
+    } catch (error: any) {
+        throw error;
+    }
+
+};
+
 export {
     scheduleInterviewRepository,
     getAllInterviewsRepository,
     getInterviewByIdRepository,
     getInterviewsByJobIdRepository,
     updateExistingInterviewRepository,
+    deleteExistingInterviewRepository
 }

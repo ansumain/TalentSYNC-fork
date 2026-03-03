@@ -4,7 +4,8 @@ import {
     getAllInterviews, 
     getInterviewById, 
     getInterviewsByJobId,
-    updateExistingInterview,
+    updateExistingInterview, 
+    deleteExistingInterview 
 } from '../services/interview.service';
 import { CreateInterview } from '../types/CreateInterview.type';
 
@@ -172,6 +173,32 @@ export class InterviewController {
                 res.status(404).json({ error: errorMessage });
                 return;
             }
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async deleteExistingInterview(req: Request, res: Response): Promise<void> {
+        try {
+
+            if (!req.params.interviewId) throw new Error('missing required field');
+            const interviewId = req.params.interviewId as string;
+
+            const deleteInterview = await deleteExistingInterview(interviewId);
+            if (deleteInterview) res.status(204).send();
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('interview not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
+
             res.status(500).json({ error: errorMessage });
         }
     }

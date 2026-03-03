@@ -8,4 +8,6 @@ interviewRouter.get('/', authenticationMiddleware, InterviewController.getAllInt
 interviewRouter.get('/:interviewId', authenticationMiddleware, InterviewController.getInterviewById);
 interviewRouter.get('/job/:jobId', authenticationMiddleware, InterviewController.getInterviewsByJobId);
 interviewRouter.patch('/:interviewId', authenticationMiddleware, InterviewController.updateExistingInterview);
+interviewRouter.delete('/:interviewId', authenticationMiddleware, InterviewController.deleteExistingInterview);
+
 export default interviewRouter;

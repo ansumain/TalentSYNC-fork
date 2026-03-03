@@ -3,7 +3,8 @@ import {
     getAllInterviewsRepository,
     getInterviewByIdRepository,
     getInterviewsByJobIdRepository,
-    updateExistingInterviewRepository
+    updateExistingInterviewRepository,
+    deleteExistingInterviewRepository
 } from '../repository/interview.repository'
 import { CreateInterview } from '../types/CreateInterview.type';
 
@@ -32,10 +33,16 @@ const updateExistingInterview = async (interviewId: string, updateInterviewData:
     return updatedInterview;
 }
 
+const deleteExistingInterview = async (interviewId: string) => {
+    const isDeleted = await deleteExistingInterviewRepository(interviewId);
+    if (isDeleted) return isDeleted;
+}
+
 export {
     scheduleInterview,
     getAllInterviews,
     getInterviewById,
     getInterviewsByJobId,
     updateExistingInterview,
+    deleteExistingInterview
 };
