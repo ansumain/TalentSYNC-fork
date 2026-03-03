@@ -7,5 +7,5 @@ interviewRouter.post('/', authenticationMiddleware, InterviewController.schedule
 interviewRouter.get('/', authenticationMiddleware, InterviewController.getAllInterviews);
 interviewRouter.get('/:interviewId', authenticationMiddleware, InterviewController.getInterviewById);
 interviewRouter.get('/job/:jobId', authenticationMiddleware, InterviewController.getInterviewsByJobId);
-
+interviewRouter.patch('/:interviewId', authenticationMiddleware, InterviewController.updateExistingInterview);
 export default interviewRouter;

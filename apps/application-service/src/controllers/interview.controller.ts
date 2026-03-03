@@ -4,6 +4,7 @@ import {
     getAllInterviews, 
     getInterviewById, 
     getInterviewsByJobId,
+    updateExistingInterview,
 } from '../services/interview.service';
 import { CreateInterview } from '../types/CreateInterview.type';
 
@@ -127,6 +128,46 @@ export class InterviewController {
                 res.status(400).json({ error: errorMessage });
                 return;
             }
+            if (errorMessage.includes('interview not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async updateExistingInterview(req: Request, res: Response): Promise<void> {
+        try {
+            if (!req.params.interviewId) throw new Error('missing required field');
+            const interviewId = req.params.interviewId as string;
+
+            const { interviewerId, managerId } = req.body;
+
+            let fieldsToUpdate: Partial<CreateInterview> = {};
+            if (interviewerId) fieldsToUpdate.interviewerId = interviewerId.trim();
+            if (managerId) fieldsToUpdate.managerId = managerId.trim();
+
+            if (Object.keys(fieldsToUpdate).length === 0) throw new Error('no input');
+
+            const updatedInterview = await updateExistingInterview(interviewId, fieldsToUpdate);
+
+            if (updatedInterview) {
+                res.status(200).json(updatedInterview);
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('no input')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
             if (errorMessage.includes('interview not found')) {
                 res.status(404).json({ error: errorMessage });
                 return;

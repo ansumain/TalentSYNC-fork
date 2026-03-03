@@ -53,9 +53,23 @@ const getInterviewsByJobIdRepository = async (jobId: string) => {
     }
 }
 
+const updateExistingInterviewRepository = async (interviewId: string, newInterviewData: Partial<CreateInterview>) => {
+    try {
+        const existingInterview = await Interview.findOne({ where: { interviewId } });
+        if (!existingInterview) throw new Error('interview not found');
+
+        await Interview.update({ ...newInterviewData }, { where: { interviewId } });
+
+        return { message: 'updated' };
+    } catch (error: any) {
+        throw error;
+    }
+};
+
 export {
     scheduleInterviewRepository,
     getAllInterviewsRepository,
     getInterviewByIdRepository,
     getInterviewsByJobIdRepository,
+    updateExistingInterviewRepository,
 }

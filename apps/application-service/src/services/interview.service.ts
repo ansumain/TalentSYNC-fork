@@ -3,6 +3,7 @@ import {
     getAllInterviewsRepository,
     getInterviewByIdRepository,
     getInterviewsByJobIdRepository,
+    updateExistingInterviewRepository
 } from '../repository/interview.repository'
 import { CreateInterview } from '../types/CreateInterview.type';
 
@@ -26,9 +27,15 @@ const getInterviewsByJobId = async (jobId: string) => {
     return interviews;
 }
 
+const updateExistingInterview = async (interviewId: string, updateInterviewData: Partial<CreateInterview>) => {
+    const updatedInterview = await updateExistingInterviewRepository(interviewId, updateInterviewData);
+    return updatedInterview;
+}
+
 export {
     scheduleInterview,
     getAllInterviews,
     getInterviewById,
     getInterviewsByJobId,
+    updateExistingInterview,
 };
