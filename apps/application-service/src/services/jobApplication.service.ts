@@ -3,7 +3,8 @@ import {
     getAllApplicationsRepository,
     getApplicationByIdRepository,
     getApplicationsByJobIdRepository,
-    updateApplicationCurrentStatusRepository
+    updateApplicationCurrentStatusRepository,
+    deleteExistingApplicationRepository
 } from '../repository/jobApplication.repository'
 import { Applicaiton } from '../types/Application.type';
 
@@ -32,10 +33,16 @@ const updateApplicationCurrentStatus = async (applicaitonId: string, currentStat
     return updatedApplication;
 }
 
+const deleteExistingApplication = async (applicationId: string) => {
+    const isDeleted = await deleteExistingApplicationRepository(applicationId);
+    if (isDeleted) return isDeleted;
+}
+
 export {
     addApplication,
     getAllApplications,
     getApplicationById,
     getApplicationsByJobId,
-    updateApplicationCurrentStatus
+    updateApplicationCurrentStatus,
+    deleteExistingApplication
 };

@@ -56,6 +56,19 @@ const updateApplicationCurrentStatusRepository = async (applicationId: string, c
     }
 };
 
+const deleteExistingApplicationRepository = async (applicationId: string) => {
+    try {
+        const existingApplication = await JobApplication.findOne({ where: { applicationId } });
+        if (!existingApplication) throw new Error('application not found');
+
+        await JobApplication.destroy({ where: { applicationId } });
+
+        return { message: 'deleted' };
+    } catch (error: any) {
+        throw error;
+    }
+
+};
 
 export {
     addApplicationRepository,
@@ -63,4 +76,5 @@ export {
     getApplicationByIdRepository,
     getApplicationsByJobIdRepository,
     updateApplicationCurrentStatusRepository,
+    deleteExistingApplicationRepository
 }

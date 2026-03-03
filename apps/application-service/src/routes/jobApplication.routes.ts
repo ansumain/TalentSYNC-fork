@@ -8,5 +8,6 @@ jobApplicationRouter.get('/', authenticationMiddleware, JobApplicationController
 jobApplicationRouter.get('/:applicationId', authenticationMiddleware, JobApplicationController.getApplicationById);
 jobApplicationRouter.get('/job/:jobId', authenticationMiddleware, JobApplicationController.getApplicationsByJobId);
 jobApplicationRouter.patch('/:applicationId', authenticationMiddleware, JobApplicationController.updateApplicationCurrentStatus);
+jobApplicationRouter.delete('/:applicationId', authenticationMiddleware, JobApplicationController.deleteExistingApplication);
 
 export default jobApplicationRouter;
