@@ -23,8 +23,18 @@ const getAllApplicationsRepository = async () => {
     }
 };
 
+const getApplicationByIdRepository = async (applicationId: string) => {
+    try {
+        const applicaiton = await JobApplication.findOne({ where: { applicationId } });
+        if (!applicaiton) throw new Error('application not found');
+        return applicaiton;
+    } catch (error: any) {
+        throw error;
+    }
+}
 
 export {
     addApplicationRepository,
-    getAllApplicationsRepository
+    getAllApplicationsRepository,
+    getApplicationByIdRepository,
 }

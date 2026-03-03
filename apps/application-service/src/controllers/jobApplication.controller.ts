@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import {
     addApplication,
     getAllApplications,
+    getApplicationById,
 } from '../services/jobApplication.service';
 
 export class JobApplicationController {
@@ -45,6 +46,34 @@ export class JobApplicationController {
 
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getApplicationById(req: Request, res: Response): Promise<void> {
+        try {
+
+            if (!req.params.applicationId) throw new Error('missing required field');
+            const applicationId = req.params.applicationId as string;
+
+            const application = await getApplicationById(applicationId);
+
+            if (application) {
+                res.status(200).json({ application });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('application not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
             res.status(500).json({ error: errorMessage });
         }
     }
