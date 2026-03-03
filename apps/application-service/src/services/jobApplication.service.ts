@@ -3,6 +3,7 @@ import {
     getAllApplicationsRepository,
     getApplicationByIdRepository,
     getApplicationsByJobIdRepository,
+    updateApplicationCurrentStatusRepository
 } from '../repository/jobApplication.repository'
 import { Applicaiton } from '../types/Application.type';
 
@@ -26,9 +27,15 @@ const getApplicationsByJobId = async (jobId: string) => {
     return applicaitons;
 }
 
+const updateApplicationCurrentStatus = async (applicaitonId: string, currentStatus: string) => {
+    const updatedApplication = await updateApplicationCurrentStatusRepository(applicaitonId, currentStatus);
+    return updatedApplication;
+}
+
 export {
     addApplication,
     getAllApplications,
     getApplicationById,
     getApplicationsByJobId,
+    updateApplicationCurrentStatus
 };

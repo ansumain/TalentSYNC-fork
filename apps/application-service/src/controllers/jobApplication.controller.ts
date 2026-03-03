@@ -4,7 +4,7 @@ import {
     getAllApplications,
     getApplicationById,
     getApplicationsByJobId,
-
+    updateApplicationCurrentStatus
 } from '../services/jobApplication.service';
 
 export class JobApplicationController {
@@ -101,6 +101,42 @@ export class JobApplicationController {
             }
 
             if (errorMessage.includes('applications not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async updateApplicationCurrentStatus(req: Request, res: Response): Promise<void> {
+        try {
+            if (!req.params.applicationId) throw new Error('missing required field');
+            const applicationId = req.params.applicationId as string;
+
+            const { currentStatus } = req.body;
+
+            if (!currentStatus) throw new Error('no input');
+
+            const updatedApplication = await updateApplicationCurrentStatus(applicationId, currentStatus);
+
+            if (updatedApplication) {
+                res.status(200).json(updatedApplication);
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('no input')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+
+            if (errorMessage.includes('application not found')) {
                 res.status(404).json({ error: errorMessage });
                 return;
             }

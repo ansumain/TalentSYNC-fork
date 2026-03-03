@@ -43,9 +43,24 @@ const getApplicationsByJobIdRepository = async (jobId: string) => {
     }
 }
 
+const updateApplicationCurrentStatusRepository = async (applicationId: string, currentStatus: string) => {
+    try {
+        const existingApplication = await JobApplication.findOne({ where: { applicationId } });
+        if (!existingApplication) throw new Error('application not found');
+
+        await JobApplication.update({ currentStatus }, { where: { applicationId } });
+
+        return { message: 'updated' };
+    } catch (error: any) {
+        throw error;
+    }
+};
+
+
 export {
     addApplicationRepository,
     getAllApplicationsRepository,
     getApplicationByIdRepository,
     getApplicationsByJobIdRepository,
+    updateApplicationCurrentStatusRepository,
 }
