@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
     addApplication,
+    getAllApplications,
 } from '../services/jobApplication.service';
 
 export class JobApplicationController {
@@ -30,6 +31,20 @@ export class JobApplicationController {
                 return;
             }
 
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getAllApplications(req: Request, res: Response): Promise<void> {
+        try {
+            const allApplications = await getAllApplications();
+
+            if (allApplications) {
+                res.status(200).json({ allApplications });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }

@@ -14,6 +14,17 @@ const addApplicationRepository = async (application: Applicaiton) => {
     }
 };
 
+const getAllApplicationsRepository = async () => {
+    try {
+        const allApplications = await JobApplication.findAll();
+        return allApplications;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
+
 export {
     addApplicationRepository,
+    getAllApplicationsRepository
 }
