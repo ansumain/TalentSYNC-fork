@@ -4,5 +4,8 @@ import { authenticationMiddleware } from '../middlewares/authentication.middlewa
 const interviewRouter: Router = express.Router();
 
 interviewRouter.post('/', authenticationMiddleware, InterviewController.scheduleInterview);
+interviewRouter.get('/', authenticationMiddleware, InterviewController.getAllInterviews);
+interviewRouter.get('/:interviewId', authenticationMiddleware, InterviewController.getInterviewById);
+interviewRouter.get('/job/:jobId', authenticationMiddleware, InterviewController.getInterviewsByJobId);
 
 export default interviewRouter;

@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import {
     scheduleInterview,
+    getAllInterviews, 
+    getInterviewById, 
+    getInterviewsByJobId,
 } from '../services/interview.service';
 import { CreateInterview } from '../types/CreateInterview.type';
 
@@ -60,6 +63,74 @@ export class InterviewController {
                 return;
             }
 
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getAllInterviews(req: Request, res: Response): Promise<void> {
+        try {
+            const scheduledInterviews = await getAllInterviews();
+
+            if (scheduledInterviews) {
+                res.status(200).json({ scheduledInterviews });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getInterviewById(req: Request, res: Response): Promise<void> {
+        try {
+
+            if (!req.params.interviewId) throw new Error('missing required field');
+            const interviewId = req.params.interviewId as string;
+
+            const interview = await getInterviewById(interviewId);
+
+            if (interview) {
+                res.status(200).json({ interview });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+            if (errorMessage.includes('interview not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getInterviewsByJobId(req: Request, res: Response): Promise<void> {
+        try {
+
+            if (!req.params.jobId) throw new Error('missing required field');
+            const jobId = req.params.jobId as string;
+
+            const interviews = await getInterviewsByJobId(jobId);
+
+            if (interviews) {
+                res.status(200).json({ interviews });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+            if (errorMessage.includes('interview not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
             res.status(500).json({ error: errorMessage });
         }
     }
