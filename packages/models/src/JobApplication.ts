@@ -8,7 +8,7 @@ interface JobApplicationAttributes {
     currentStatus: string;
 }
 
-type JobApplicationCreationAttributes = Optional<JobApplicationAttributes, 'applicationId'>;
+type JobApplicationCreationAttributes = Optional<JobApplicationAttributes, 'applicationId' | 'currentStatus'>;
 
 class JobApplication
     extends Model<JobApplicationAttributes, JobApplicationCreationAttributes>
