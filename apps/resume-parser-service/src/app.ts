@@ -64,9 +64,8 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // app.use('/api/resume', resumeRoutes);
-app.use('/api/resume/upload', authenticationMiddleware, tusHandler);
-// app.all('/api/resume/upload/:id', authenticationMiddleware, tusHandler);
-// app.all('/api/resume/upload/*', authenticationMiddleware, tusHandler);
+app.all('/api/resume/upload', authenticationMiddleware, tusHandler);
+app.all('/api/resume/upload/:id', authenticationMiddleware, tusHandler);
 
 app.use('/files', express.static('uploads'))
 

@@ -104,7 +104,7 @@ export const useUploadStore = create<UploadStore>()(
             }));
 
             const upload = new tus.Upload(file, {
-              endpoint: 'http://localhost:4002/api/resume/upload',
+              endpoint: '/api/resume/upload',
               chunkSize: 5 * 1024 * 1024,
               withCredentials: true,
 

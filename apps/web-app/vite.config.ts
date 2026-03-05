@@ -13,6 +13,12 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
-    allowedHosts: ["web_app"]
+    allowedHosts: ["web_app"],
+    proxy: {
+      '/api/resume': {
+        target: 'http://localhost:4002',
+        changeOrigin: true,
+      }
+    }
   },
 })

@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 export const convertPDFToImages = async (pdfPath: string) => {
-    const outputDir = path.join(process.cwd(), "temp", `${pdfPath}-images`);
+    const outputDir = path.join(process.cwd(), "temp", `${path.basename(pdfPath)}-images`);
 
     fs.mkdirSync(outputDir, { recursive: true });
 
