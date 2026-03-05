@@ -1,12 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { resumeService } from '@/lib/api/resume.service';
+// import { resumeService } from '@/lib/api/resume.service';
+import * as tus from 'tus-js-client';
 
 export type UploadStatus = 'idle' | 'uploading' | 'completed' | 'error';
+
+// interface FileWithStatus {
+//   file: File;
+//   status: 'pending' | 'uploading' | 'success' | 'error';
+//   error?: string;
+// }
 
 interface FileWithStatus {
   file: File;
   status: 'pending' | 'uploading' | 'success' | 'error';
+  progress: number;
   error?: string;
 }
 
@@ -15,6 +23,7 @@ interface SerializableFileData {
   name: string;
   size: number;
   status: 'pending' | 'uploading' | 'success' | 'error';
+  progress: number;
   error?: string;
 }
 
@@ -34,7 +43,7 @@ interface UploadStore {
   reset: () => void;
 }
 
-const BATCH_SIZE = 50;
+const PARALLEL_UPLOADS = 4;
 
 export const useUploadStore = create<UploadStore>()(
   persist(
@@ -49,6 +58,7 @@ export const useUploadStore = create<UploadStore>()(
         const filesWithStatus: FileWithStatus[] = newFiles.map((file) => ({
           file,
           status: 'pending',
+          progress: 0
         }));
         set((state) => ({
           files: [...state.files, ...filesWithStatus],
@@ -78,73 +88,101 @@ export const useUploadStore = create<UploadStore>()(
 
         if (pendingFiles.length === 0) return;
 
-        set({ status: 'uploading', uploadedCount: 0, failedCount: 0 });
+        set({ status: 'uploading' });
 
-        const totalFiles = pendingFiles.length;
-        let processedFiles = 0;
+        let index = 0;
 
-        // Process files in batches
-        for (let i = 0; i < pendingFiles.length; i += BATCH_SIZE) {
-          const batch = pendingFiles.slice(i, i + BATCH_SIZE);
-          const batchFiles = batch.map((f) => f.file);
+        const uploadSingle = (fileEntry: FileWithStatus) =>
+          new Promise<void>((resolve) => {
 
-          // Mark batch as uploading
-          set((state) => ({
-            files: state.files.map((f) =>
-              batch.some((bf) => bf.file === f.file) && f.status === 'pending'
-                ? { ...f, status: 'uploading' }
-                : f
-            ),
-          }));
+            const file = fileEntry.file;
 
-          try {
-            // Upload batch with progress tracking
-            await resumeService.uploadResume(batchFiles, (progress) => {
-              // Calculate overall progress considering all batches
-              const previousBatchProgress = (processedFiles / totalFiles) * 100;
-              const currentBatchWeight = (batch.length / totalFiles) * 100;
-              const overallProgress = previousBatchProgress + currentBatchWeight * (progress / 100);
+            set((state) => ({
+              files: state.files.map((f) =>
+                f.file === file ? { ...f, status: 'uploading' } : f
+              ),
+            }));
 
-              set({ totalProgress: overallProgress });
+            const upload = new tus.Upload(file, {
+              endpoint: 'http://localhost:4002/api/resume/upload',
+              chunkSize: 5 * 1024 * 1024,
+              withCredentials: true,
+
+              metadata: {
+                filename: file.name,
+                filetype: file.type,
+              },
+
+              onError: (error: any) => {
+                set((state) => ({
+                  files: state.files.map((f) =>
+                    f.file === file
+                      ? { ...f, status: 'error', error: error.message }
+                      : f
+                  ),
+                  failedCount: state.failedCount + 1,
+                }));
+                resolve();
+              },
+
+              onProgress: (uploaded: number, total: number) => {
+                const progress = Math.round((uploaded / total) * 100);
+
+                set((state) => {
+                  const updatedFiles = state.files.map((f) =>
+                    f.file === file ? { ...f, progress } : f
+                  );
+
+                  const totalProgress =
+                    updatedFiles.reduce((sum, f) => sum + f.progress, 0) /
+                    updatedFiles.length;
+
+                  return {
+                    files: updatedFiles,
+                    totalProgress,
+                  };
+                });
+              },
+
+              onSuccess: () => {
+                set((state) => {
+                  const updatedFiles = state.files.map((f) =>
+                    f.file === file
+                      ? { ...f, status: 'success' as const, progress: 100 }
+                      : f
+                  );
+
+                  const uploadedCount = state.uploadedCount + 1;
+
+                  const allDone = updatedFiles.every(
+                    (f) => f.status === 'success' || f.status === 'error'
+                  );
+
+                  return {
+                    files: updatedFiles,
+                    uploadedCount,
+                    status: allDone ? ('completed' as UploadStatus) : state.status,
+                  };
+                });
+
+                resolve();
+              },
+            } as any);
+
+            upload.findPreviousUploads().then((prev) => {
+              if (prev.length) upload.resumeFromPreviousUpload(prev[0]);
+              upload.start();
             });
+          });
 
-            // Mark batch as success
-            set((state) => {
-              const uploaded = state.uploadedCount + batch.length;
-              return {
-                files: state.files.map((f) =>
-                  batch.some((bf) => bf.file === f.file) && f.status === 'uploading'
-                    ? { ...f, status: 'success' }
-                    : f
-                ),
-                uploadedCount: uploaded,
-              };
-            });
-
-          } catch (error) {
-            // Mark batch as error
-            const errorMessage = error instanceof Error ? error.message : 'Upload failed';
-            set((state) => {
-              const failed = state.failedCount + batch.length;
-              return {
-                files: state.files.map((f) =>
-                  batch.some((bf) => bf.file === f.file) && f.status === 'uploading'
-                    ? { ...f, status: 'error', error: errorMessage }
-                    : f
-                ),
-                failedCount: failed,
-              };
-            });
+        const workers = new Array(PARALLEL_UPLOADS).fill(null).map(async () => {
+          while (index < pendingFiles.length) {
+            const file = pendingFiles[index++];
+            await uploadSingle(file);
           }
-          processedFiles += batch.length;
-        }
-
-        // Set final status
-        const { failedCount } = get();
-        set({
-          status: failedCount > 0 ? 'error' : 'completed',
-          totalProgress: 100,
         });
+
+        await Promise.all(workers);
       },
 
       retryFailed: async () => {
@@ -178,6 +216,7 @@ export const useUploadStore = create<UploadStore>()(
           name: f.file.name,
           size: f.file.size,
           status: f.status,
+          progress: f.progress,
           error: f.error,
         })) as SerializableFileData[],
         totalProgress: state.totalProgress,
@@ -185,7 +224,7 @@ export const useUploadStore = create<UploadStore>()(
         uploadedCount: state.uploadedCount,
         failedCount: state.failedCount,
       }),
-      
+
       // Custom merge function to reconstruct state from storage
       merge: (persistedState: any, currentState) => {
         if (!persistedState?.filesData) {
@@ -206,6 +245,7 @@ export const useUploadStore = create<UploadStore>()(
           return {
             file,
             status: data.status,
+            progress: data.progress ?? 0,
             error: data.error,
           };
         });

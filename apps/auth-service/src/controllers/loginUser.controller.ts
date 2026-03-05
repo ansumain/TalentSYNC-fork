@@ -12,6 +12,8 @@ export class LoginUserController {
 
       res.cookie('access_token', tokens.accessToken, {
         ...cookieOptions,
+        sameSite: 'lax',
+        path: '/',
         maxAge: 15 * 60 * 1000,
       });
 
