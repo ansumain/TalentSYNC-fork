@@ -1,12 +1,7 @@
 import { getTextUsingMammoth, getTextUsingOCR, getTextUsingPdfparse } from '../utils/extractText';
 import { allowedMimeTypes } from '@talentsync/config';
-import { extractBasicDetails } from '../utils/parseToJSONFromRawText';
-
-export interface FormattedJson {
-    name: string | null;
-    phone: string | null;
-    email: string | null;
-}
+import { extractBasicDetails, ParsedResumeJson } from '../utils/parseToJSONFromRawText';
+export type { ParsedResumeJson as FormattedJson };
 
 export interface FileType {
     fileURL: string;
@@ -15,7 +10,7 @@ export interface FileType {
 
 export interface ParseResumeOutput {
     rawText: string;
-    parsedJSON: FormattedJson;
+    parsedJSON: ParsedResumeJson;
 }
 
 
@@ -24,7 +19,10 @@ const parseResume = async (file: FileType): Promise<ParseResumeOutput> => {
     try {
 
         let extractedText = '';
-        let formattedJson: FormattedJson = { name: '', phone: '', email: '' };
+        let parsedJSON: ParsedResumeJson = {
+            name: null, email: null, phone: null,
+            education: [], skills: [], experience: [], totalExperience: 0
+        };
 
         if (allowedMimeTypes.IMAGE.includes(mimeType)) {
             extractedText = await getTextUsingOCR(fileURL);
@@ -37,12 +35,12 @@ const parseResume = async (file: FileType): Promise<ParseResumeOutput> => {
         }
 
         if (extractedText) {
-            formattedJson = extractBasicDetails(extractedText);
+            parsedJSON = extractBasicDetails(extractedText);
         }
 
         return {
             rawText: extractedText,
-            parsedJSON: formattedJson
+            parsedJSON
         }
 
     } catch (error: any) {
