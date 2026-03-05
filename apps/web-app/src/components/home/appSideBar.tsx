@@ -17,6 +17,22 @@ import { useAuthStore } from "@/stores/authStore"
 const navigationByRole = {
   candidate: [
     {
+      title: "Jobs",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Open",
+          url: "#",
+        },
+        {
+          title: "Applied",
+          url: "#",
+        }
+      ],
+    },
+    {
       title: "Interviews",
       url: "#",
       icon: SquareTerminal,
@@ -24,10 +40,6 @@ const navigationByRole = {
       items: [
         {
           title: "Scheduled",
-          url: "#",
-        },
-        {
-          title: "Applied",
           url: "#",
         },
         {
@@ -76,84 +88,30 @@ const navigationByRole = {
     }
   ],
   manager: [
-    {
-      title: "Interviews",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Assigned",
-          url: "#",
-        },
-        {
-          title: "Schedule",
-          url: "#",
-        },
-        {
-          title: "Completed",
-          url: "#",
-        },
-        {
-          title: "Pending Feedback",
-          url: "#",
-        }
-      ],
-    },
-    {
-      title: "Candidates",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Upload Resumes",
-          url: "/upload",
-        },
-        {
-          title: "All Candidates",
-          url: "/candidates",
-        },
-        {
-          title: "Shortlisted",
-          url: "#",
-        },
-        {
-          title: "Hired",
-          url: "#",
-        },
-        {
-          title: "Rejected",
-          url: "#",
-        },
-      ],
-    }
-  ],
-  admin: [
-    {
-      title: "Interviews",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Assigned",
-          url: "#",
-        },
-        {
-          title: "Schedule",
-          url: "#",
-        },
-        {
-          title: "Completed",
-          url: "#",
-        },
-        {
-          title: "Pending Feedback",
-          url: "#",
-        }
-      ],
-    },
+    // {
+    //   title: "Interviews",
+    //   url: "#",
+    //   icon: SquareTerminal,
+    //   isActive: true,
+    //   items: [
+    //     {
+    //       title: "Assigned",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Schedule",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Completed",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Pending Feedback",
+    //       url: "#",
+    //     }
+    //   ],
+    // },
     {
       title: "Candidates",
       url: "#",
@@ -161,24 +119,12 @@ const navigationByRole = {
       isActive: true,
       items: [
         {
-          title: "Upload Resumes",
+          title: "Add Resumes",
           url: "/upload",
         },
         {
-          title: "All Candidates",
+          title: "Candidates",
           url: "/candidates",
-        },
-        {
-          title: "Shortlisted",
-          url: "#",
-        },
-        {
-          title: "Hired",
-          url: "#",
-        },
-        {
-          title: "Rejected",
-          url: "#",
         }
       ],
     },
@@ -189,13 +135,71 @@ const navigationByRole = {
       isActive: true,
       items: [
         {
-          title: "Roles",
-          url: "#",
+          title: "Jobs",
+          url: "/jobs",
+        },
+      ]
+    }
+  ],
+  admin: [
+    // {
+    //   title: "Interviews",
+    //   url: "#",
+    //   icon: SquareTerminal,
+    //   isActive: true,
+    //   items: [
+    //     {
+    //       title: "Assigned",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Schedule",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Completed",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Pending Feedback",
+    //       url: "#",
+    //     }
+    //   ],
+    // },
+    {
+      title: "Candidates",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Add Resume",
+          url: "/upload",
         },
         {
-          title: "Permissions",
-          url: "#",
+          title: "Candidates",
+          url: "/candidates",
         }
+      ],
+    },
+    {
+      title: "Manage",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Jobs",
+          url: "/jobs",
+        },
+        // {
+        //   title: "Roles",
+        //   url: "#",
+        // },
+        // {
+        //   title: "Permissions",
+        //   url: "#",
+        // }
       ],
     },
     {

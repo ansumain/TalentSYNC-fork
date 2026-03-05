@@ -12,6 +12,7 @@ import ResetPasswordPage from './pages/ResetPassword';
 import UploadPage from './pages/Upload';
 import CandidateTablePage from './pages/CandidateTablePage';
 import { GetAccessTokenFromRefreshTokenInterval } from './lib/api/getAccessToken';
+import JobTablePage from './pages/JobTablePage';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path='/home' element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path='/upload' element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
         <Route path='/candidates' element={<ProtectedRoute><CandidateTablePage /></ ProtectedRoute>} />
+        <Route path='/jobs' element={<ProtectedRoute><JobTablePage /></ ProtectedRoute>} />
 
         <Route path='*' element={<Navigate to='/signin' replace />} />
       </Routes>
