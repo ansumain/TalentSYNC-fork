@@ -5,6 +5,7 @@ interface CreateJob {
     jobType: string;
     openings: number;
     createdBy: string;
+    skillIds?: string[];
 }
 
 export type { CreateJob }

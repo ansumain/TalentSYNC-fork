@@ -1,9 +1,19 @@
 import { CreateJob } from "../types/Job.type";
-import { Job } from '@talentsync/models';
+import { Job, JobSkill } from '@talentsync/models';
 
 const addJobRepository = async (job: CreateJob) => {
     try {
-        const newJob = await Job.create(job);
+        const { skillIds, ...jobData } = job;
+        const newJob = await Job.create(jobData);
+
+        if (skillIds && skillIds.length > 0) {
+            const jobSkills = skillIds.map(skillId => ({
+                jobId: newJob.jobId,
+                skillId,
+            }));
+            await JobSkill.bulkCreate(jobSkills);
+        }
+
         return newJob;
     } catch (error: any) {
         throw error;

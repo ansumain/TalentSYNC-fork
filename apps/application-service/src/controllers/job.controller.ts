@@ -16,7 +16,7 @@ export class JobController {
 
             const userId = req.userInfo.sub;
 
-            const { title, description, location, jobType, openings } = req.body;
+            const { title, description, location, jobType, openings, skillIds } = req.body;
 
             if (!Number.isInteger(openings) || openings < 1) throw new Error('invalid openings');
 
@@ -26,7 +26,8 @@ export class JobController {
                 location: location.trim(),
                 jobType: jobType.trim(),
                 openings,
-                createdBy: userId.trim()
+                createdBy: userId.trim(),
+                skillIds: Array.isArray(skillIds) ? skillIds : [],
             }
 
             for (const key of Object.keys(newJob) as Array<keyof typeof newJob>)

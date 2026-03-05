@@ -8,6 +8,7 @@ import candidateRoutes from './routes/candidate.routes';
 import jobRoutes from './routes/job.routes';
 import interviewRoutes from './routes/interview.routes'
 import jobApplicationRoutes from './routes/jobApplication.routes'
+import skillRoutes from './routes/skill.routes'
 
 const app: Application = express();
 
@@ -42,6 +43,7 @@ app.use('/api/candidate', candidateRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/applications', jobApplicationRoutes);
+app.use('/api/skills', skillRoutes);
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

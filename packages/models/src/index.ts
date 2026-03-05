@@ -5,3 +5,5 @@ export { default as Interview } from './Interview';
 export { default as JobApplication } from './JobApplication';
 export { default as UserSkill } from './UserSkill';
 export { default as JobApplicationLifecycle } from './JobApplicationLifecycle';
+export { default as Skill } from './Skill';
+export { default as JobSkill } from './JobSkill';
