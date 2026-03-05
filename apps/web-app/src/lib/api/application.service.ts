@@ -57,6 +57,16 @@ export interface Candidate {
     name: string | null;
     email: string | null;
     phone: string | null;
+    education: { name: string; batch: string }[];
+    skills: string[];
+    experience: {
+      company: string;
+      designation: string;
+      startDate: string;
+      endDate: string;
+      durationMonths: number;
+    }[];
+    totalExperience: number;
   };
   createdAt: string;
 }
@@ -92,5 +102,37 @@ export const applicationService = {
   filterCandidatesByResumeId: async (resumeId: string): Promise<FilterCandidatesResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/parsed/filter/resumeId`;
     return apiClient.post<FilterCandidatesResponse>(url, { resumeId });
+  },
+};
+
+export interface Job {
+  jobId: string;
+  title: string;
+  description: string;
+  location: string;
+  jobType: string;
+  openings: number;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface GetAllJobsResponse {
+  currentJobs: Job[];
+}
+
+interface GetJobByIdResponse {
+  job: Job;
+}
+
+export const jobService = {
+  getAllJobs: async (): Promise<GetAllJobsResponse> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/jobs`;
+    return apiClient.get<GetAllJobsResponse>(url);
+  },
+
+  getJobById: async (jobId: string): Promise<GetJobByIdResponse> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/jobs/${jobId}`;
+    return apiClient.get<GetJobByIdResponse>(url);
   },
 };

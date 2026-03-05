@@ -1,6 +1,19 @@
 import { create } from 'zustand';
 import { applicationService } from '@/lib/api/application.service';
 
+export interface EducationEntry {
+  name: string;
+  batch: string;
+}
+
+export interface ExperienceEntry {
+  company: string;
+  designation: string;
+  startDate: string;
+  endDate: string;
+  durationMonths: number;
+}
+
 export interface Candidate {
   userId: string;
   id: string;
@@ -8,6 +21,10 @@ export interface Candidate {
     name: string | null;
     email: string | null;
     phone: string | null;
+    education: EducationEntry[];
+    skills: string[];
+    experience: ExperienceEntry[];
+    totalExperience: number;
   };
   createdAt: string;
 }

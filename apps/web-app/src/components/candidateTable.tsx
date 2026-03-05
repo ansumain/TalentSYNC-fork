@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCandidateStore } from "@/stores/candidateStore";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -24,6 +25,7 @@ export function CandidateTable() {
     clearFilter
   } = useCandidateStore();
 
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -70,7 +72,11 @@ export function CandidateTable() {
               {candidates.length === 0 ? (
                 <TableRow><TableCell colSpan={4} className="text-left text-center py-8">No Candidate Data Found.</TableCell></TableRow>
               ) : candidates.map((c) => (
-                <TableRow key={c.id} className="border-b hover:bg-muted/50">
+                <TableRow
+                  key={c.id}
+                  className="border-b hover:bg-muted/50 cursor-pointer"
+                  onClick={() => navigate(`/candidates/${c.id}`, { state: { candidate: c } })}
+                >
                   <TableCell className="text-left">{c.parsedJSON.name || <span className="text-muted-foreground">-</span>}</TableCell>
                   <TableCell className="text-left">{c.parsedJSON.email || <span className="text-muted-foreground">-</span>}</TableCell>
                   <TableCell className="text-left">{c.parsedJSON.phone || <span className="text-muted-foreground">-</span>}</TableCell>
