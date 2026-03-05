@@ -13,6 +13,15 @@ export interface Job {
   updatedAt: string;
 }
 
+interface CreateJobPayload {
+  title: string;
+  description: string;
+  location: string;
+  jobType: string;
+  openings: number;
+  skillIds: string[];
+}
+
 interface JobStore {
   jobs: Job[];
   allJobs: Job[];
@@ -21,6 +30,7 @@ interface JobStore {
   fetchAll: () => Promise<void>;
   filterByTitle: (title: string) => void;
   clearFilter: () => void;
+  createJob: (data: CreateJobPayload) => Promise<void>;
 }
 
 export const useJobStore = create<JobStore>((set, get) => ({
@@ -50,5 +60,10 @@ export const useJobStore = create<JobStore>((set, get) => ({
   clearFilter: () => {
     const { allJobs } = get();
     set({ jobs: allJobs });
+  },
+
+  createJob: async (data: CreateJobPayload) => {
+    await jobService.createJob(data);
+    await get().fetchAll();
   },
 }));

@@ -51,10 +51,10 @@ export default function JobDetailPage() {
             <>
               {/* Overview */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Job Overview</CardTitle>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base text-left">Job Overview</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-left">
                   <div>
                     <p className="text-muted-foreground text-xs mb-1">Title</p>
                     <p className="font-medium">{job.title}</p>
@@ -84,10 +84,10 @@ export default function JobDetailPage() {
 
               {/* Description */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Description</CardTitle>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base text-left">Description</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-left">
                   <p className="text-sm whitespace-pre-wrap">{job.description}</p>
                 </CardContent>
               </Card>

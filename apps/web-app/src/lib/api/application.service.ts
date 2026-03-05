@@ -105,6 +105,8 @@ export const applicationService = {
   },
 };
 
+// Job Service
+
 export interface Job {
   jobId: string;
   title: string;
@@ -134,5 +136,35 @@ export const jobService = {
   getJobById: async (jobId: string): Promise<GetJobByIdResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/jobs/${jobId}`;
     return apiClient.get<GetJobByIdResponse>(url);
+  },
+
+  createJob: async (data: {
+    title: string;
+    description: string;
+    location: string;
+    jobType: string;
+    openings: number;
+    skillIds: string[];
+  }): Promise<Job> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/jobs`;
+    return apiClient.post<Job>(url, data);
+  },
+};
+
+// Skill Service
+
+export interface Skill {
+  skillId: string;
+  skillName: string;
+}
+
+interface GetAllSkillsResponse {
+  skills: Skill[];
+}
+
+export const skillService = {
+  getAllSkills: async (): Promise<GetAllSkillsResponse> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/skills`;
+    return apiClient.get<GetAllSkillsResponse>(url);
   },
 };
