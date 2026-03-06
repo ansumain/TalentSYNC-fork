@@ -50,7 +50,7 @@ export default function JobDetailPage() {
       applicationService
         .getRankedApplicants(jobId)
         .then((res) => setRankedApplicants(res.rankedApplicants))
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => setRankedLoading(false));
     }
   }, [jobId, isAdmin]);
@@ -168,8 +168,8 @@ export default function JobDetailPage() {
                                 #{applicant.rank}
                               </div>
 
-                              <div className="flex-1 space-y-2 text-left">
-                                <div className="flex flex-wrap items-center gap-2">
+                              <div className="flex-1 space-y-3 text-left">
+                                <div className="flex flex-wrap items-center gap-4">
                                   <span className="font-medium text-sm">
                                     {applicant.candidateName ?? <span className="italic text-muted-foreground">Unknown</span>}
                                   </span>

@@ -86,7 +86,7 @@ export function extractEmail(text: string): string | null {
 }
 
 export function extractPhone(text: string): string | null {
-  const match = text.match(/\b[6-9]\d{9}\b/);
+  const match = text.match(/\b[1-9]\d{9}\b/);
   return match ? match[0] : null;
 }
 
@@ -157,7 +157,7 @@ export function extractExperience(text: string): ExperienceEntry[] {
   const entries: ExperienceEntry[] = [];
 
   const DATE_RANGE =
-    /\b((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})\s*[-–]\s*((?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})|Present)/i;
+    /\b((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})\s*[--]\s*((?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})|Present)/i;
 
   const GLUED_MONTH = /([a-z])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/;
 

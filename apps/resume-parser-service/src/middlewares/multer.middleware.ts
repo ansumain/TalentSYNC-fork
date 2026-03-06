@@ -1,38 +1,38 @@
-// import multer, { FileFilterCallback } from 'multer'
-// import { Request, RequestHandler } from 'express'
-// import path from 'path';
-// import fs from 'fs';
-// import { allowedMimeTypes } from '@talentsync/config';
+import multer, { FileFilterCallback } from 'multer'
+import { Request, RequestHandler } from 'express'
+import path from 'path';
+import fs from 'fs';
+import { allowedMimeTypes } from '@talentsync/config';
 
-// const uploadDir = 'uploads/';
-// if (!fs.existsSync(uploadDir)) {
-//     fs.mkdirSync(uploadDir, { recursive: true })
-// }
+const uploadDir = 'uploads/';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true })
+}
 
-// const storage = multer.diskStorage({
-//     destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-//         cb(null, uploadDir);
-//     },
-//     filename: (req, file, cb) => {
-//         const suffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-//         cb(null, file.fieldname + '-' + suffix + path.extname(file.originalname));
-//     }
-// });
+const storage = multer.diskStorage({
+    destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const suffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + suffix + path.extname(file.originalname));
+    }
+});
 
-// const FileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-//     if (allowedMimeTypes.IMAGE.includes(file.mimetype) || allowedMimeTypes.PDF.includes(file.mimetype) || allowedMimeTypes.DOC.includes(file.mimetype) || allowedMimeTypes.DOCX.includes(file.mimetype)) {
-//         cb(null, true)
-//     } else {
-//         cb(new Error(`Invalid document type`) as any, false);
-//     }
-// }
+const FileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+    if (allowedMimeTypes.IMAGE.includes(file.mimetype) || allowedMimeTypes.PDF.includes(file.mimetype) || allowedMimeTypes.DOC.includes(file.mimetype) || allowedMimeTypes.DOCX.includes(file.mimetype)) {
+        cb(null, true)
+    } else {
+        cb(new Error(`Invalid document type`) as any, false);
+    }
+}
 
-// const resumeUpload: RequestHandler = multer({
-//     storage,
-//     fileFilter: FileFilter,
-//     limits: {
-//         fileSize: 10 * 1024 * 1024   // 10MB
-//     }
-// }).array('resume')
+const resumeUpload: RequestHandler = multer({
+    storage,
+    fileFilter: FileFilter,
+    limits: {
+        fileSize: 10 * 1024 * 1024   // 10MB
+    }
+}).array('resume')
 
-// export { resumeUpload };
+export { resumeUpload };

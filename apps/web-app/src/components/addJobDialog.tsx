@@ -38,7 +38,7 @@ export function AddJobDialog() {
 
   useEffect(() => {
     if (open && skills.length === 0) {
-      skillService.getAllSkills().then(res => setSkills(res.skills)).catch(() => {});
+      skillService.getAllSkills().then(res => setSkills(res.skills)).catch(() => { });
     }
   }, [open]);
 
@@ -93,7 +93,7 @@ export function AddJobDialog() {
           <div className="flex flex-col gap-1.5">
             <Label>Title <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="e.g. Senior React Developer"
+              placeholder="e.g. Backend Developer"
               value={form.title}
               onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))}
             />
@@ -114,7 +114,7 @@ export function AddJobDialog() {
           <div className="flex flex-col gap-1.5">
             <Label>Location <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="e.g. Bangalore, India"
+              placeholder="e.g. Bhubaneswar, India"
               value={form.location}
               onChange={e => setForm(prev => ({ ...prev, location: e.target.value }))}
             />
@@ -142,7 +142,7 @@ export function AddJobDialog() {
                 type="number"
                 min={1}
                 value={form.openings}
-                onChange={e => setForm(prev => ({ ...prev, openings: parseInt(e.target.value) || 1 }))}
+                onChange={e => setForm(prev => ({ ...prev, openings: parseInt(e.target.value)}))}
               />
             </div>
           </div>

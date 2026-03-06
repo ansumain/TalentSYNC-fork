@@ -4,9 +4,9 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit'
-// import resumeRoutes from './routes/resume.routes'
-import { tusHandler } from './config/tus';
-import { authenticationMiddleware } from './middlewares/authentication.middleware';
+import resumeRoutes from './routes/resume.routes'
+// import { tusHandler } from './config/tus';
+// import { authenticationMiddleware } from './middlewares/authentication.middleware';
 
 const app: Application = express();
 
@@ -63,9 +63,9 @@ app.get('/health', (req: Request, res: Response) => {
     });
 });
 
-// app.use('/api/resume', resumeRoutes);
-app.all('/api/resume/upload', authenticationMiddleware, tusHandler);
-app.all('/api/resume/upload/:id', authenticationMiddleware, tusHandler);
+app.use('/api/resume', resumeRoutes);
+// app.all('/api/resume/upload', authenticationMiddleware, tusHandler);
+// app.all('/api/resume/upload/:id', authenticationMiddleware, tusHandler);
 
 app.use('/files', express.static('uploads'))
 

@@ -37,8 +37,8 @@ const tusServer = new Server({
     onUploadCreate: async (req, upload) => {
         const { filename, filetype } = upload.metadata ?? {};
 
-        console.log('(onUploadCreate) - filename:', filename);
-        console.log('(onUploadCreate) - filetype:', filetype);
+        // console.log('(onUploadCreate) - filename:', filename);
+        // console.log('(onUploadCreate) - filetype:', filetype);
 
         if (!filename || !filetype) {
             throw { status_code: 400, body: 'Missing upload metadata' };
@@ -61,8 +61,8 @@ const tusServer = new Server({
         try {
             const { filename, filetype } = upload.metadata ?? {};
 
-            console.log('(onUploadFinish) - filename:', filename);
-            console.log('(onUploadFinish) - filetype:', filetype);
+            // console.log('(onUploadFinish) - filename:', filename);
+            // console.log('(onUploadFinish) - filetype:', filetype);
 
             if (!filename || !filetype) {
                 throw { status_code: 500, body: 'Missing upload metadata on finish' };

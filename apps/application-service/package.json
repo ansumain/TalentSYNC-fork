@@ -8,8 +8,8 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "@talentsync/types": "workspace:*",
     "@talentsync/config": "workspace:*",
-    "@talentsync/models": "workspace:*"
+    "@talentsync/models": "workspace:*",
+    "@talentsync/types": "workspace:*"
   }
 }

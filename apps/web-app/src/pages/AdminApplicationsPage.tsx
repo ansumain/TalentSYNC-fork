@@ -120,9 +120,8 @@ export default function ApplicationsAdminPage() {
                           </td>
                           <td className="py-3 pr-4">
                             <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                                STATUS_COLORS[app.currentStatus] ?? "bg-secondary text-secondary-foreground"
-                              }`}
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_COLORS[app.currentStatus] ?? "bg-secondary text-secondary-foreground"
+                                }`}
                             >
                               {app.currentStatus}
                             </span>

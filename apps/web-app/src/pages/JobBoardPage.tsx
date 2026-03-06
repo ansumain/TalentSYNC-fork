@@ -82,7 +82,7 @@ export default function JobBoardPage() {
           {!loading &&
             jobs.map((job) => (
               <Card key={job.jobId}>
-                <CardHeader className="pb-2">
+                <CardContent className="pb-2">
                   <div className="flex items-start justify-between gap-4">
                     <div className="text-left">
                       <CardTitle className="text-base">{job.title}</CardTitle>
@@ -101,7 +101,7 @@ export default function JobBoardPage() {
                       {applying[job.jobId] ? "Applying..." : applied[job.jobId] ? "Applied" : "Apply"}
                     </Button>
                   </div>
-                </CardHeader>
+                </CardContent>
                 <CardContent className="text-left text-sm text-muted-foreground space-y-3">
                   <p className="line-clamp-3">{job.description}</p>
                   <div className="flex items-center gap-4 text-xs">
