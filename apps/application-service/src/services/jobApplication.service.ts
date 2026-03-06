@@ -5,9 +5,10 @@ import {
     getApplicationsByJobIdRepository,
     getApplicationsByUserIdRepository,
     updateApplicationCurrentStatusRepository,
-    deleteExistingApplicationRepository
+    deleteExistingApplicationRepository,
+    getRankedApplicantsByJobIdRepository
 } from '../repository/jobApplication.repository'
-import type { ApplicationWithJob, EnrichedApplication } from '../repository/jobApplication.repository';
+import type { ApplicationWithJob, EnrichedApplication, RankedApplicant } from '../repository/jobApplication.repository';
 import { Applicaiton } from '../types/Application.type';
 
 const addApplication = async (application: Applicaiton) => {
@@ -45,6 +46,10 @@ const deleteExistingApplication = async (applicationId: string) => {
     if (isDeleted) return isDeleted;
 }
 
+const getRankedApplicantsByJobId = async (jobId: string): Promise<RankedApplicant[]> => {
+    return getRankedApplicantsByJobIdRepository(jobId);
+};
+
 export {
     addApplication,
     getAllApplications,
@@ -52,5 +57,6 @@ export {
     getApplicationsByJobId,
     getApplicationsByUserId,
     updateApplicationCurrentStatus,
-    deleteExistingApplication
+    deleteExistingApplication,
+    getRankedApplicantsByJobId
 };

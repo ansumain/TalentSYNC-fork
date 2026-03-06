@@ -4,17 +4,32 @@ import { AppSidebar } from "@/components/home/appSideBar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import { jobService } from "@/lib/api/application.service";
-import type { Job } from "@/lib/api/application.service";
+import { ChevronLeft, Medal } from "lucide-react";
+import { jobService, applicationService } from "@/lib/api/application.service";
+import type { Job, RankedApplicant } from "@/lib/api/application.service";
+import { useAuthStore } from "@/stores/authStore";
+
+const STATUS_COLORS: Record<string, string> = {
+  applied: "bg-blue-100 text-blue-700",
+  shortlisted: "bg-yellow-100 text-yellow-700",
+  interviewing: "bg-purple-100 text-purple-700",
+  hired: "bg-green-100 text-green-700",
+  rejected: "bg-red-100 text-red-700",
+};
+
+const RANK_COLORS = ["bg-yellow-400 text-yellow-900", "bg-gray-300 text-gray-800", "bg-orange-300 text-orange-900"];
 
 export default function JobDetailPage() {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const isAdmin = roles.includes("admin") || roles.includes("manager");
 
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [rankedApplicants, setRankedApplicants] = useState<RankedApplicant[]>([]);
+  const [rankedLoading, setRankedLoading] = useState(false);
 
   useEffect(() => {
     if (!jobId) return;
@@ -29,7 +44,16 @@ export default function JobDetailPage() {
         setError(err.message || "Failed to load job.");
         setLoading(false);
       });
-  }, [jobId]);
+
+    if (isAdmin) {
+      setRankedLoading(true);
+      applicationService
+        .getRankedApplicants(jobId)
+        .then((res) => setRankedApplicants(res.rankedApplicants))
+        .catch(() => {})
+        .finally(() => setRankedLoading(false));
+    }
+  }, [jobId, isAdmin]);
 
   return (
     <SidebarProvider>
@@ -112,6 +136,84 @@ export default function JobDetailPage() {
                   <p className="text-sm whitespace-pre-wrap">{job.description}</p>
                 </CardContent>
               </Card>
+
+              {/* Ranked Applicants — admin/manager only */}
+              {isAdmin && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-2 text-left">
+                      <Medal className="h-4 w-4 text-muted-foreground" />
+                      <CardTitle className="text-base">Applicant Ranking</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {rankedLoading && (
+                      <p className="text-sm text-muted-foreground py-2">Loading applicants...</p>
+                    )}
+                    {!rankedLoading && rankedApplicants.length === 0 && (
+                      <p className="text-sm text-muted-foreground py-2">No applicants yet.</p>
+                    )}
+                    {!rankedLoading && rankedApplicants.length > 0 && (
+                      <div className="space-y-3">
+                        {rankedApplicants.map((applicant) => {
+                          const totalRequired = job.skills?.length ?? 0;
+                          const rankColorClass = RANK_COLORS[applicant.rank - 1] ?? "bg-secondary text-secondary-foreground";
+                          return (
+                            <div
+                              key={applicant.applicationId}
+                              className="flex flex-col sm:flex-row sm:items-start gap-3 rounded-lg border p-3"
+                            >
+                              {/* Rank badge */}
+                              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${rankColorClass}`}>
+                                #{applicant.rank}
+                              </div>
+
+                              <div className="flex-1 space-y-2 text-left">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="font-medium text-sm">
+                                    {applicant.candidateName ?? <span className="italic text-muted-foreground">Unknown</span>}
+                                  </span>
+                                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_COLORS[applicant.currentStatus] ?? "bg-secondary text-secondary-foreground"}`}>
+                                    {applicant.currentStatus}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    Applied {new Date(applicant.appliedAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+
+                                {/* Match score */}
+                                <p className="text-xs text-muted-foreground">
+                                  <span className="font-semibold text-foreground">{applicant.matchCount}</span>
+                                  {totalRequired > 0 ? `/${totalRequired}` : ""} required skill{applicant.matchCount !== 1 ? "s" : ""} matched
+                                </p>
+
+                                {/* Matched skills */}
+                                {applicant.matchedSkills.length > 0 && (
+                                  <div className="flex flex-wrap gap-1">
+                                    {applicant.matchedSkills.map((skill) => (
+                                      <span key={skill} className="inline-flex items-center rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium">
+                                        {skill}
+                                      </span>
+                                    ))}
+                                    {applicant.candidateSkills
+                                      .filter((cs) => !applicant.matchedSkills.some((ms) => ms.toLowerCase() === cs.toLowerCase()))
+                                      .slice(0, 5)
+                                      .map((skill) => (
+                                        <span key={skill} className="inline-flex items-center rounded-full bg-secondary text-secondary-foreground px-2 py-0.5 text-xs">
+                                          {skill}
+                                        </span>
+                                      ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </>
           )}
         </div>

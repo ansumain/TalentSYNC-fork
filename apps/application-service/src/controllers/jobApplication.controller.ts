@@ -6,7 +6,8 @@ import {
     getApplicationsByJobId,
     getApplicationsByUserId,
     updateApplicationCurrentStatus,
-    deleteExistingApplication
+    deleteExistingApplication,
+    getRankedApplicantsByJobId
 } from '../services/jobApplication.service';
 
 export class JobApplicationController {
@@ -182,6 +183,22 @@ export class JobApplicationController {
                 return;
             }
 
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getRankedApplicantsByJobId(req: Request, res: Response): Promise<void> {
+        try {
+            if (!req.params.jobId) throw new Error('missing required field');
+            const jobId = req.params.jobId as string;
+            const rankedApplicants = await getRankedApplicantsByJobId(jobId);
+            res.status(200).json({ rankedApplicants });
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+            if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
             res.status(500).json({ error: errorMessage });
         }
     }

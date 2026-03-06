@@ -109,7 +109,7 @@ export const candidateService = {
   },
 };
 
-// Job Service
+// Job Service 
 
 export interface Job {
   jobId: string;
@@ -133,9 +133,23 @@ export interface JobApplication {
   currentStatus: ApplicationStatus;
   createdAt: string;
   updatedAt: string;
+  
   candidateName?: string | null;
   jobTitle?: string | null;
+  
   job?: Pick<Job, 'jobId' | 'title' | 'location' | 'jobType'>;
+}
+
+export interface RankedApplicant {
+  applicationId: string;
+  userId: string;
+  currentStatus: ApplicationStatus;
+  appliedAt: string;
+  candidateName: string | null;
+  candidateSkills: string[];
+  matchedSkills: string[];
+  matchCount: number;
+  rank: number;
 }
 
 interface GetAllJobsResponse {
@@ -236,5 +250,10 @@ export const applicationService = {
   deleteApplication: async (applicationId: string): Promise<void> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/${applicationId}`;
     return apiClient.delete<void>(url);
+  },
+
+  getRankedApplicants: async (jobId: string): Promise<{ rankedApplicants: RankedApplicant[] }> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/job/${jobId}/ranked`;
+    return apiClient.get<{ rankedApplicants: RankedApplicant[] }>(url);
   },
 };

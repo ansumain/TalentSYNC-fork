@@ -1,11 +1,23 @@
 import { Applicaiton } from "../types/Application.type";
-import { JobApplication, Job, ResumeData } from '@talentsync/models';
+import { JobApplication, Job, JobSkill, Skill, ResumeData } from '@talentsync/models';
 import type { JobAttributes, JobApplicationAttributes } from '@talentsync/models';
 
 export interface ApplicationWithJob extends JobApplicationAttributes {
     createdAt: Date | string;
     updatedAt: Date | string;
     job: Pick<JobAttributes, 'jobId' | 'title' | 'location' | 'jobType'> | null;
+}
+
+export interface RankedApplicant {
+    applicationId: string;
+    userId: string;
+    currentStatus: string;
+    appliedAt: Date | string;
+    candidateName: string | null;
+    candidateSkills: string[];
+    matchedSkills: string[];
+    matchCount: number;
+    rank: number;
 }
 
 export interface EnrichedApplication extends JobApplicationAttributes {
@@ -18,7 +30,7 @@ export interface EnrichedApplication extends JobApplicationAttributes {
 
 const addApplicationRepository = async (application: Applicaiton) => {
     try {
-        // Check if user has a uploaded-parsed resume before allowing application
+        // Check if user has a completed resume before allowing application
         const resume = await ResumeData.findOne({ where: { userId: application.userId, status: 'completed' } });
         if (!resume) throw new Error('no resume found, please upload your resume before applying');
 
@@ -121,6 +133,58 @@ const getApplicationsByUserIdRepository = async (userId: string): Promise<Applic
     }
 };
 
+const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<RankedApplicant[]> => {
+    try {
+        const jobSkillRows = await JobSkill.findAll({
+            where: { jobId },
+            include: [{ model: Skill, as: 'skill', attributes: ['skillName'] }]
+        });
+        const requiredSkills: string[] = jobSkillRows
+            .map((js: any) => js.toJSON().skill?.skillName as string | undefined)
+            .filter((s): s is string => !!s);
+        const requiredSkillsLower = requiredSkills.map((s) => s.toLowerCase());
+
+        const applications = await JobApplication.findAll({ where: { jobId }, order: [['createdAt', 'DESC']] });
+
+        const enriched = await Promise.all(
+            applications.map(async (app) => {
+                const appData = app.toJSON() as any;
+                const resume = await ResumeData.findOne({ where: { userId: appData.userId, status: 'completed' } });
+                const parsedJSON = resume ? (resume.toJSON() as any).parsedJSON : null;
+                const candidateName: string | null = parsedJSON?.name ?? null;
+                const candidateSkills: string[] = parsedJSON?.skills ?? [];
+                const candidateSkillsLower = candidateSkills.map((s: string) => s.toLowerCase());
+
+                const matchedSkills = requiredSkills.filter((rs, idx) => {
+                    const rsLower = requiredSkillsLower[idx];
+                    return candidateSkillsLower.some(
+                        (cs) => cs.includes(rsLower) || rsLower.includes(cs)
+                    );
+                });
+
+                return {
+                    applicationId: appData.applicationId as string,
+                    userId: appData.userId as string,
+                    currentStatus: appData.currentStatus as string,
+                    appliedAt: appData.createdAt as Date | string,
+                    candidateName,
+                    candidateSkills,
+                    matchedSkills,
+                    matchCount: matchedSkills.length,
+                    rank: 0,
+                } satisfies Omit<RankedApplicant, 'rank'> & { rank: number };
+            })
+        );
+
+        enriched.sort((a, b) => b.matchCount - a.matchCount || new Date(a.appliedAt).getTime() - new Date(b.appliedAt).getTime());
+        enriched.forEach((r, i) => { r.rank = i + 1; });
+
+        return enriched as RankedApplicant[];
+    } catch (error: any) {
+        throw error;
+    }
+};
+
 export {
     addApplicationRepository,
     getAllApplicationsRepository,
@@ -128,5 +192,6 @@ export {
     getApplicationsByJobIdRepository,
     getApplicationsByUserIdRepository,
     updateApplicationCurrentStatusRepository,
-    deleteExistingApplicationRepository
+    deleteExistingApplicationRepository,
+    getRankedApplicantsByJobIdRepository
 }
