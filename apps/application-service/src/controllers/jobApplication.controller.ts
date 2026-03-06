@@ -4,6 +4,7 @@ import {
     getAllApplications,
     getApplicationById,
     getApplicationsByJobId,
+    getApplicationsByUserId,
     updateApplicationCurrentStatus,
     deleteExistingApplication
 } from '../services/jobApplication.service';
@@ -26,6 +27,10 @@ export class JobApplicationController {
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
 
+            if (errorMessage.includes('no resume found')) {
+                res.status(403).json({ error: errorMessage });
+                return;
+            }
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
                 return;
@@ -36,6 +41,16 @@ export class JobApplicationController {
             }
 
             res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    static async getMyApplications(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.userInfo.sub;
+            const applications = await getApplicationsByUserId(userId);
+            res.status(200).json({ applications });
+        } catch (e: any) {
+            res.status(500).json({ error: e.message || 'Internal server error' });
         }
     }
 

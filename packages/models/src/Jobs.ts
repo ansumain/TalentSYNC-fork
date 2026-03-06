@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '@talentsync/config';
 
-interface JobAttributes {
+export interface JobAttributes {
     jobId: string;
     title: string;
     description: string;

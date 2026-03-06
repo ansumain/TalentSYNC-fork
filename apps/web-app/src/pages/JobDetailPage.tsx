@@ -82,6 +82,27 @@ export default function JobDetailPage() {
                 </CardContent>
               </Card>
 
+              {/* Required Skills */}
+              {job.skills && job.skills.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base text-left">Required Skills</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-left">
+                    <div className="flex flex-wrap gap-2">
+                      {job.skills.map((skill) => (
+                        <span
+                          key={skill.skillId}
+                          className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium"
+                        >
+                          {skill.skillName}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Description */}
               <Card>
                 <CardHeader className="pb-2">

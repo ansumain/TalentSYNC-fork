@@ -1,5 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '@talentsync/config';
+import Skill from './Skill';
 
 interface JobSkillAttributes {
     id: string;
@@ -47,5 +48,7 @@ JobSkill.init(
         timestamps: true,
     }
 );
+
+JobSkill.belongsTo(Skill, { foreignKey: 'skillId', as: 'skill' })
 
 export default JobSkill;

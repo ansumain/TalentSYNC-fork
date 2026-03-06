@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { applicationService } from '@/lib/api/application.service';
+import { candidateService } from '@/lib/api/application.service';
 
 export interface EducationEntry {
   name: string;
@@ -54,7 +54,7 @@ export const useCandidateStore = create<CandidateStore>((set) => ({
   fetchAll: async () => {
     set({ loading: true, error: null, filterType: 'none', filterValue: '' });
     try {
-      const res = await applicationService.getAllCandidates();
+      const res = await candidateService.getAllCandidates();
       set({ candidates: res.candidateJSONData, loading: false });
     } catch (err: any) {
       set({ error: err.message || 'Failed to fetch candidates', loading: false });
@@ -64,7 +64,7 @@ export const useCandidateStore = create<CandidateStore>((set) => ({
   filterByName: async (name) => {
     set({ loading: true, error: null, filterType: 'name', filterValue: name });
     try {
-      const res = await applicationService.filterCandidatesByName(name);
+      const res = await candidateService.filterCandidatesByName(name);
       set({ candidates: res.candidateData, loading: false });
     } catch (err: any) {
       set({ error: err.message || 'Failed to filter candidates', loading: false });
@@ -74,7 +74,7 @@ export const useCandidateStore = create<CandidateStore>((set) => ({
   filterByUserId: async (userId) => {
     set({ loading: true, error: null, filterType: 'userId', filterValue: userId });
     try {
-      const res = await applicationService.filterCandidatesByUserId(userId);
+      const res = await candidateService.filterCandidatesByUserId(userId);
       set({ candidates: res.candidateData, loading: false });
     } catch (err: any) {
       set({ error: err.message || 'Failed to filter candidates', loading: false });
@@ -84,7 +84,7 @@ export const useCandidateStore = create<CandidateStore>((set) => ({
   filterByResumeId: async (resumeId) => {
     set({ loading: true, error: null, filterType: 'resumeId', filterValue: resumeId });
     try {
-      const res = await applicationService.filterCandidatesByResumeId(resumeId);
+      const res = await candidateService.filterCandidatesByResumeId(resumeId);
       set({ candidates: res.candidateData, loading: false });
     } catch (err: any) {
       set({ error: err.message || 'Failed to filter candidates', loading: false });

@@ -1,9 +1,27 @@
 import { Applicaiton } from "../types/Application.type";
-import { JobApplication } from '@talentsync/models';
+import { JobApplication, Job, ResumeData } from '@talentsync/models';
+import type { JobAttributes, JobApplicationAttributes } from '@talentsync/models';
+
+export interface ApplicationWithJob extends JobApplicationAttributes {
+    createdAt: Date | string;
+    updatedAt: Date | string;
+    job: Pick<JobAttributes, 'jobId' | 'title' | 'location' | 'jobType'> | null;
+}
+
+export interface EnrichedApplication extends JobApplicationAttributes {
+    createdAt: Date | string;
+    updatedAt: Date | string;
+    candidateName: string | null;
+    jobTitle: string | null;
+}
 
 
 const addApplicationRepository = async (application: Applicaiton) => {
     try {
+        // Check if user has a uploaded-parsed resume before allowing application
+        const resume = await ResumeData.findOne({ where: { userId: application.userId, status: 'completed' } });
+        if (!resume) throw new Error('no resume found, please upload your resume before applying');
+
         // check existing application
         const existingApplication = await JobApplication.findAll({ where: { ...application} });
         if (existingApplication.length > 0) throw new Error('application already exists');
@@ -14,10 +32,28 @@ const addApplicationRepository = async (application: Applicaiton) => {
     }
 };
 
-const getAllApplicationsRepository = async () => {
+const getAllApplicationsRepository = async (): Promise<EnrichedApplication[]> => {
     try {
-        const allApplications = await JobApplication.findAll();
-        return allApplications;
+        const allApplications = await JobApplication.findAll({ order: [['createdAt', 'DESC']] });
+        const enriched = await Promise.all(
+            allApplications.map(async (app: { userId: string; jobId: string; toJSON: () => Record<string, unknown> }) => {
+                const [job, resume] = await Promise.all([
+                    Job.findOne({ where: { jobId: app.jobId }, attributes: ['title'] }),
+                    ResumeData.findOne({
+                        where: { userId: app.userId, status: 'completed' },
+                        order: [['createdAt', 'DESC']],
+                        attributes: ['parsedJSON'],
+                    }),
+                ]);
+                const parsedJSON = resume?.parsedJSON as { name?: string } | null;
+                return {
+                    ...app.toJSON(),
+                    jobTitle: job ? (job.toJSON() as { title: string }).title : null,
+                    candidateName: parsedJSON?.name ?? null,
+                } as EnrichedApplication;
+            })
+        );
+        return enriched;
     } catch (error: any) {
         throw error;
     }
@@ -70,11 +106,27 @@ const deleteExistingApplicationRepository = async (applicationId: string) => {
 
 };
 
+const getApplicationsByUserIdRepository = async (userId: string): Promise<ApplicationWithJob[]> => {
+    try {
+        const applications = await JobApplication.findAll({ where: { userId }, order: [['createdAt', 'DESC']] });
+        const appWithJobs = await Promise.all(
+            applications.map(async (app: { jobId: string; toJSON: () => Record<string, unknown> }) => {
+                const job = await Job.findOne({ where: { jobId: app.jobId }, attributes: ['jobId', 'title', 'location', 'jobType'] });
+                return { ...app.toJSON(), job: job ? (job.toJSON() as ApplicationWithJob['job']) : null } as ApplicationWithJob;
+            })
+        );
+        return appWithJobs;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
 export {
     addApplicationRepository,
     getAllApplicationsRepository,
     getApplicationByIdRepository,
     getApplicationsByJobIdRepository,
+    getApplicationsByUserIdRepository,
     updateApplicationCurrentStatusRepository,
     deleteExistingApplicationRepository
 }

@@ -1,5 +1,5 @@
 import { CreateJob } from "../types/Job.type";
-import { Job, JobSkill } from '@talentsync/models';
+import { Job, JobSkill, Skill } from '@talentsync/models';
 
 const addJobRepository = async (job: CreateJob) => {
     try {
@@ -33,7 +33,14 @@ const getJobByIdRepository = async (jobId: string) => {
     try {
         const job = await Job.findOne({ where: { jobId } });
         if (!job) throw new Error('job not found');
-        return job;
+
+        const jobSkills = await JobSkill.findAll({
+            where: { jobId },
+            include: [{ model: Skill, as: 'skill', attributes: ['skillId', 'skillName'] }],
+        });
+
+        const skills = jobSkills.map((js: any) => js.skill);
+        return { ...job.toJSON(), skills };
     } catch (error: any) {
         throw error;
     }

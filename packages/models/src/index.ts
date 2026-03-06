@@ -1,8 +1,10 @@
 export { default as ResumeData } from './ResumeData';
 export { default as User } from './User';
 export { default as Job } from './Jobs';
+export type { JobAttributes } from './Jobs';
 export { default as Interview } from './Interview';
 export { default as JobApplication } from './JobApplication';
+export type { JobApplicationAttributes } from './JobApplication';
 export { default as UserSkill } from './UserSkill';
 export { default as JobApplicationLifecycle } from './JobApplicationLifecycle';
 export { default as Skill } from './Skill';

@@ -24,11 +24,11 @@ const navigationByRole = {
       items: [
         {
           title: "Open",
-          url: "#",
+          url: "/job-board",
         },
         {
           title: "Applied",
-          url: "#",
+          url: "/my-applications",
         }
       ],
     },
@@ -138,6 +138,10 @@ const navigationByRole = {
           title: "Jobs",
           url: "/jobs",
         },
+        {
+          title: "Applications",
+          url: "/applications",
+        },
       ]
     }
   ],
@@ -191,6 +195,10 @@ const navigationByRole = {
         {
           title: "Jobs",
           url: "/jobs",
+        },
+        {
+          title: "Applications",
+          url: "/applications",
         },
         // {
         //   title: "Roles",

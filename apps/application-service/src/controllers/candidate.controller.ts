@@ -1,7 +1,18 @@
 import { Request, Response } from 'express';
 import { getCandiateParsedData, getCandidateDataFromName, getCandidateDataFromResumeId, getCandidateDataFromUserId } from '../services/candidate.service';
+import { ResumeData } from '@talentsync/models';
 
 export class CandidateController {
+    static async getMyResumeStatus(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.userInfo.sub;
+            const resume = await ResumeData.findOne({ where: { userId, status: 'completed' } });
+            res.status(200).json({ hasResume: !!resume });
+        } catch (e: any) {
+            res.status(500).json({ error: e.message || 'Internal server error' });
+        }
+    }
+
     static async getCandidateJSONData(req: Request, res: Response): Promise<void> {
         try {
             const candidateJSONData = await getCandiateParsedData();

@@ -31,6 +31,7 @@ interface JobStore {
   filterByTitle: (title: string) => void;
   clearFilter: () => void;
   createJob: (data: CreateJobPayload) => Promise<void>;
+  deleteJob: (jobId: string) => Promise<void>;
 }
 
 export const useJobStore = create<JobStore>((set, get) => ({
@@ -65,5 +66,12 @@ export const useJobStore = create<JobStore>((set, get) => ({
   createJob: async (data: CreateJobPayload) => {
     await jobService.createJob(data);
     await get().fetchAll();
+  },
+
+  deleteJob: async (jobId: string) => {
+    await jobService.deleteJob(jobId);
+    const { allJobs } = get();
+    const updated = allJobs.filter(j => j.jobId !== jobId);
+    set({ jobs: updated, allJobs: updated });
   },
 }));

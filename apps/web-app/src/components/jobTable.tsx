@@ -6,6 +6,8 @@ import { useJobStore } from "@/stores/jobStore";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -22,11 +24,13 @@ export function JobTable() {
     error,
     fetchAll,
     filterByTitle,
-    clearFilter
+    clearFilter,
+    deleteJob,
   } = useJobStore();
 
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [deleting, setDeleting] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchAll();
@@ -43,6 +47,20 @@ export function JobTable() {
   const handleClear = () => {
     setSearch("");
     clearFilter();
+  };
+
+  const handleDelete = async (e: React.MouseEvent, jobId: string) => {
+    e.stopPropagation();
+    if (!window.confirm('Delete this job? This cannot be undone.')) return;
+    setDeleting(prev => ({ ...prev, [jobId]: true }));
+    try {
+      await deleteJob(jobId);
+      toast.success('Job deleted.');
+    } catch {
+      toast.error('Failed to delete job.');
+    } finally {
+      setDeleting(prev => ({ ...prev, [jobId]: false }));
+    }
   };
 
   return (
@@ -72,11 +90,12 @@ export function JobTable() {
                 <TableHead>Job Type</TableHead>
                 <TableHead>Openings</TableHead>
                 <TableHead>Posted At</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {jobs.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-8">No jobs found.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center py-8">No jobs found.</TableCell></TableRow>
               ) : jobs.map((job) => (
                 <TableRow
                   key={job.jobId}
@@ -88,6 +107,17 @@ export function JobTable() {
                   <TableCell className="text-left">{job.jobType}</TableCell>
                   <TableCell className="text-left">{job.openings}</TableCell>
                   <TableCell className="text-left text-xs">{new Date(job.createdAt).toLocaleString()}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={deleting[job.jobId]}
+                      onClick={(e) => handleDelete(e, job.jobId)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

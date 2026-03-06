@@ -15,6 +15,9 @@ import CandidateProfilePage from './pages/CandidateProfilePage';
 import { GetAccessTokenFromRefreshTokenInterval } from './lib/api/getAccessToken';
 import JobTablePage from './pages/JobTablePage';
 import JobDetailPage from './pages/JobDetailPage';
+import JobBoardPage from './pages/JobBoardPage';
+import ApplicationsPage from './pages/ApplicationsPage';
+import AdminApplicationsPage from './pages/AdminApplicationsPage';
 
 
 function App() {
@@ -35,8 +38,11 @@ function App() {
         <Route path='/upload' element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
         <Route path='/candidates' element={<ProtectedRoute><CandidateTablePage /></ ProtectedRoute>} />
         <Route path='/candidates/:id' element={<ProtectedRoute><CandidateProfilePage /></ ProtectedRoute>} />
-        <Route path='/jobs' element={<ProtectedRoute><JobTablePage /></ ProtectedRoute>} />
-        <Route path='/jobs/:jobId' element={<ProtectedRoute><JobDetailPage /></ ProtectedRoute>} />
+        <Route path='/jobs' element={<ProtectedRoute><JobTablePage /></ProtectedRoute>} />
+        <Route path='/jobs/:jobId' element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>} />
+        <Route path='/job-board' element={<ProtectedRoute><JobBoardPage /></ProtectedRoute>} />
+        <Route path='/my-applications' element={<ProtectedRoute><ApplicationsPage /></ProtectedRoute>} />
+        <Route path='/applications' element={<ProtectedRoute><AdminApplicationsPage /></ProtectedRoute>} />
 
         <Route path='*' element={<Navigate to='/signin' replace />} />
       </Routes>

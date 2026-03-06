@@ -79,11 +79,15 @@ interface FilterCandidatesResponse {
   candidateData: Candidate[];
 }
 
-export const applicationService = {
-  // GET all candidates (distinct by userId)
+export const candidateService = {
   getAllCandidates: async (): Promise<GetAllCandidatesResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/parsed`;
     return apiClient.get<GetAllCandidatesResponse>(url);
+  },
+
+  getMyResumeStatus: async (): Promise<{ hasResume: boolean }> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/resume-status`;
+    return apiClient.get<{ hasResume: boolean }>(url);
   },
 
   // POST filter by name
@@ -117,6 +121,21 @@ export interface Job {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  skills?: Skill[];
+}
+
+export type ApplicationStatus = 'applied' | 'shortlisted' | 'interviewing' | 'hired' | 'rejected';
+
+export interface JobApplication {
+  applicationId: string;
+  userId: string;
+  jobId: string;
+  currentStatus: ApplicationStatus;
+  createdAt: string;
+  updatedAt: string;
+  candidateName?: string | null;
+  jobTitle?: string | null;
+  job?: Pick<Job, 'jobId' | 'title' | 'location' | 'jobType'>;
 }
 
 interface GetAllJobsResponse {
@@ -149,6 +168,11 @@ export const jobService = {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/jobs`;
     return apiClient.post<Job>(url, data);
   },
+
+  deleteJob: async (jobId: string): Promise<void> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/jobs/${jobId}`;
+    return apiClient.delete<void>(url);
+  },
 };
 
 // Skill Service
@@ -166,5 +190,51 @@ export const skillService = {
   getAllSkills: async (): Promise<GetAllSkillsResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/skills`;
     return apiClient.get<GetAllSkillsResponse>(url);
+  },
+};
+
+// Application Service
+
+interface GetAllApplicationsResponse {
+  allApplications: JobApplication[];
+}
+
+interface GetApplicationsByJobIdResponse {
+  applicationsByJobId: JobApplication[];
+}
+
+interface GetMyApplicationsResponse {
+  applications: JobApplication[];
+}
+
+export const applicationService = {
+  applyToJob: async (jobId: string): Promise<JobApplication> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/${jobId}`;
+    return apiClient.post<JobApplication>(url, {});
+  },
+
+  getMyApplications: async (): Promise<GetMyApplicationsResponse> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/user/me`;
+    return apiClient.get<GetMyApplicationsResponse>(url);
+  },
+
+  getAllApplications: async (): Promise<GetAllApplicationsResponse> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications`;
+    return apiClient.get<GetAllApplicationsResponse>(url);
+  },
+
+  getApplicationsByJobId: async (jobId: string): Promise<GetApplicationsByJobIdResponse> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/job/${jobId}`;
+    return apiClient.get<GetApplicationsByJobIdResponse>(url);
+  },
+
+  updateApplicationStatus: async (applicationId: string, currentStatus: ApplicationStatus): Promise<void> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/${applicationId}`;
+    return apiClient.patch<void>(url, { currentStatus });
+  },
+
+  deleteApplication: async (applicationId: string): Promise<void> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/${applicationId}`;
+    return apiClient.delete<void>(url);
   },
 };
