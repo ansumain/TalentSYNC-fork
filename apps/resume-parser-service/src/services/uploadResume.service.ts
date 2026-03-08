@@ -4,8 +4,11 @@ import { addToResumeData } from "../repository/resume.repository";
 import { ResumeModel } from "../types/ResumeModel.type";
 import { UploadedFileModel } from "../types/UploadedFile.type";
 
-const uploadResume = async (files: UploadedFileModel[], userId: string): Promise<boolean> => {
+const uploadResume = async (files: UploadedFileModel[], userId: string, roleName: string): Promise<boolean> => {
     try {
+        if (roleName === 'candidate' && files.length > 1) {
+            throw new Error('Candidates can only upload one resume at a time.');
+        }
 
         for (const file of files) {
             const resumeData = {

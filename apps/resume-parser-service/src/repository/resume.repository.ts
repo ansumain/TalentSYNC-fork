@@ -1,4 +1,5 @@
 import { ResumeData } from "@talentsync/models";
+import { Op } from "sequelize";
 import { ParseResumeOutput } from "../services/parseResume.service";
 import { ResumeModel } from "../types/ResumeModel.type";
 
@@ -22,4 +23,8 @@ const updateAfterParsing = async (resumeId: string, resumeData: ParseResumeOutpu
     await ResumeData.update({ rawText, parsedJSON }, { where: { id: resumeId } });
 }
 
-export { addToResumeData, getResumeByResumeId, updateStatusByResumeId, updateAfterParsing };
+const getActiveResumeCountByUserId = async (userId: string): Promise<number> => {
+    return ResumeData.count({ where: { userId, status: { [Op.ne]: 'failed' } } });
+};
+
+export { addToResumeData, getResumeByResumeId, updateStatusByResumeId, updateAfterParsing, getActiveResumeCountByUserId };

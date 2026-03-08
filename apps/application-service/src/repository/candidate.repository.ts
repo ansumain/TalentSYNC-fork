@@ -72,8 +72,8 @@ const getCandidateDataFromResumeIdRepository = async (resumeId: string) => {
 };
 
 const getMyResumeStatusRepository = async (userId: string): Promise<boolean> => {
-    const resume = await ResumeData.findOne({ where: { userId, status: 'completed' } });
-    return !!resume;
+    const count = await ResumeData.count({ where: { userId, status: { [Op.ne]: 'failed' } } });
+    return count > 0;
 };
 
 export { getAllCandidatesParsedJSONRepository, getCandidateDataFromUserIdRepository, getCandidateDataFromResumeIdRepository, getMyResumeStatusRepository };

@@ -17,6 +17,18 @@ import { useAuthStore } from "@/stores/authStore"
 const navigationByRole = {
   candidate: [
     {
+      title: "Resume",
+      url: "#",
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Upload Resume",
+          url: "/upload",
+        }
+      ],
+    },
+    {
       title: "Jobs",
       url: "#",
       icon: SquareTerminal,

@@ -4,6 +4,7 @@ import { File, FileText, Upload as UploadIcon, X, CheckCircle2, XCircle, Loader2
 import type { ChangeEvent, DragEvent } from "react";
 import { useRef } from "react";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/authStore";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,9 @@ import { useUploadStore } from "@/stores/uploadStore";
 
 export function FileUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const user = useAuthStore((state) => state.user);
+  const isCandidate = user?.roles?.includes('candidate') ?? false;
 
   const {
     files,
@@ -43,6 +47,25 @@ export function FileUpload() {
     }
 
     const filesArray = Array.from(fileList);
+
+    // Candidates may only upload one file at a time
+    if (isCandidate) {
+      if (filesArray.length > 1) {
+        toast.error('You can only upload one resume at a time.', {
+          position: "bottom-right",
+          duration: 3000,
+        });
+        return;
+      }
+      if (files.length >= 1) {
+        toast.error('Remove the current file before adding a new one.', {
+          position: "bottom-right",
+          duration: 3000,
+        });
+        return;
+      }
+    }
+
     const validFiles = filesArray.filter((file) => {
       if (!validFileTypes.includes(file.type)) {
         toast.error(`${file.name} is not a valid file type`, {
@@ -172,14 +195,14 @@ export function FileUpload() {
                   htmlFor="file-upload"
                   className="relative cursor-pointer rounded-sm font-medium text-primary hover:underline hover:underline-offset-4"
                 >
-                  <span>choose files</span>
+                  <span>{isCandidate ? 'choose file' : 'choose files'}</span>
                   <input
                     id="file-upload"
                     name="file-upload"
                     type="file"
                     className="sr-only"
                     accept=".jpeg,.jpg,.png,.webp,.pdf,.doc,.docx"
-                    multiple
+                    multiple={!isCandidate}
                     onChange={handleFileChange}
                     ref={fileInputRef}
                     disabled={status === 'uploading'}
