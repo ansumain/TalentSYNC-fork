@@ -6,9 +6,14 @@ const addAJob = async (job: CreateJob) => {
     return currentJobs;
 }
 
-const getAllJobs = async () => {
-    const currentJobs = await getAllJobsRepository();
-    return currentJobs;
+const getAllJobs = async (params: {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    search?: string;
+}) => {
+    return getAllJobsRepository(params);
 }
 
 const getJobById = async (jobId: string) => {
@@ -23,7 +28,7 @@ const updateExistingJob = async (jobId: string, job: Partial<CreateJob>) => {
 
 const deleteExistingJob = async (jobId: string) => {
     const isDeleted = await deleteExistingJobRepository(jobId);
-    if(isDeleted) return isDeleted;
+    if (isDeleted) return isDeleted;
 }
 
 export { addAJob, getAllJobs, getJobById, updateExistingJob, deleteExistingJob };

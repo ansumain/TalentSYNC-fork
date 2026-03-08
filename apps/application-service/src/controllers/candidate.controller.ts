@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { getCandiateParsedData, getCandidateDataFromName, getCandidateDataFromResumeId, getCandidateDataFromUserId } from '../services/candidate.service';
-import { ResumeData } from '@talentsync/models';
+import { getCandiateParsedData, getCandidateDataFromResumeId, getCandidateDataFromUserId, getMyResumeStatus } from '../services/candidate.service';
+import { parsePaginationParams } from '../utils/parsePaginationParams';
 
 export class CandidateController {
     static async getMyResumeStatus(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.userInfo.sub;
-            const resume = await ResumeData.findOne({ where: { userId, status: 'completed' } });
-            res.status(200).json({ hasResume: !!resume });
+            const hasResume = await getMyResumeStatus(userId);
+            res.status(200).json({ hasResume });
         } catch (e: any) {
             res.status(500).json({ error: e.message || 'Internal server error' });
         }
@@ -15,41 +15,17 @@ export class CandidateController {
 
     static async getCandidateJSONData(req: Request, res: Response): Promise<void> {
         try {
-            const candidateJSONData = await getCandiateParsedData();
-
-            if (candidateJSONData) {
-                res.status(200).json({
-                    candidateJSONData
-                });
-            }
-
+            const params = parsePaginationParams(req.query);
+            const result = await getCandiateParsedData(params);
+            res.status(200).json({
+                candidateJSONData: result.data,
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                totalPages: result.totalPages,
+            });
         } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
-            res.status(500).json({ error: errorMessage });
-        }
-    }
-
-    static async getCandidateDataFromName(req: Request, res: Response): Promise<void> {
-        try {
-            const { name } = req.query;
-
-            if(!name || typeof name !== 'string'){
-                res.status(400).json({
-                    error: 'name query param required'
-                });
-                return;
-            }
-            const candidateData = await getCandidateDataFromName(name);
-
-            if (candidateData) {
-                res.status(200).json({
-                    candidateData
-                });
-            }
-
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
-            res.status(500).json({ error: errorMessage });
+            res.status(500).json({ error: e.message || 'Internal server error' });
         }
     }
 

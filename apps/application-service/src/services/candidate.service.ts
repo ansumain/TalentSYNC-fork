@@ -1,23 +1,27 @@
-import { getAllCandidatesParsedJSONRepository, getCandidateDataFromNameRepository, getCandidateDataFromUserIdRepository, getCandidateDataFromResumeIdRepository } from "../repository/candidate.repository"
+import { getAllCandidatesParsedJSONRepository, getCandidateDataFromUserIdRepository, getCandidateDataFromResumeIdRepository, getMyResumeStatusRepository } from "../repository/candidate.repository"
 
-const getCandiateParsedData = async () => {
-    const candidateJSON = await getAllCandidatesParsedJSONRepository();
-    return candidateJSON;
+interface PaginationParams {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    search?: string;
 }
 
-const getCandidateDataFromName = async (name: string) => {
-    const candidateDataFromName = await getCandidateDataFromNameRepository(name);
-    return candidateDataFromName;
+const getCandiateParsedData = async (params: PaginationParams) => {
+    return getAllCandidatesParsedJSONRepository(params);
 }
 
-const getCandidateDataFromUserId = async (name: string) => {
-    const candidateDataFromUserId = await getCandidateDataFromUserIdRepository(name);
-    return candidateDataFromUserId;
+const getCandidateDataFromUserId = async (userId: string) => {
+    return getCandidateDataFromUserIdRepository(userId);
 }
 
-const getCandidateDataFromResumeId = async (name: string) => {
-    const candidateDataResumeId = await getCandidateDataFromResumeIdRepository(name);
-    return candidateDataResumeId;
+const getCandidateDataFromResumeId = async (resumeId: string) => {
+    return getCandidateDataFromResumeIdRepository(resumeId);
 }
 
-export { getCandiateParsedData, getCandidateDataFromName, getCandidateDataFromUserId, getCandidateDataFromResumeId };
+const getMyResumeStatus = async (userId: string): Promise<boolean> => {
+    return getMyResumeStatusRepository(userId);
+};
+
+export { getCandiateParsedData, getCandidateDataFromUserId, getCandidateDataFromResumeId, getMyResumeStatus };

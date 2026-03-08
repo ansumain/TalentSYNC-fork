@@ -16,9 +16,14 @@ const addApplication = async (application: Applicaiton) => {
     return newApplication;
 }
 
-const getAllApplications = async (): Promise<EnrichedApplication[]> => {
-    const allApplications = await getAllApplicationsRepository();
-    return allApplications;
+const getAllApplications = async (params: {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    search?: string;
+}) => {
+    return getAllApplicationsRepository(params);
 }
 
 const getApplicationById = async (applicationId: string) => {
@@ -31,9 +36,14 @@ const getApplicationsByJobId = async (jobId: string) => {
     return applicaitons;
 }
 
-const getApplicationsByUserId = async (userId: string): Promise<ApplicationWithJob[]> => {
-    const applications = await getApplicationsByUserIdRepository(userId);
-    return applications;
+const getApplicationsByUserId = async (userId: string, params: {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    search?: string;
+}) => {
+    return getApplicationsByUserIdRepository(userId, params);
 }
 
 const updateApplicationCurrentStatus = async (applicaitonId: string, currentStatus: string) => {

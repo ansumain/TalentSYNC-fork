@@ -99,7 +99,7 @@ export function extractEducation(text: string): EducationEntry[] {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    const rangeMatch = line.match(/(\d{4})\s*[–\-]\s*(\d{4})/);
+    const rangeMatch = line.match(/(\d{4})\s*[-\-]\s*(\d{4})/);
     const singleMatch = line.match(/\b(\d{4})\b/);
 
     if (rangeMatch || singleMatch) {
@@ -108,7 +108,7 @@ export function extractEducation(text: string): EducationEntry[] {
         : singleMatch![1];
 
       const name = line
-        .replace(/\s*\d{4}\s*[–\-]\s*\d{4}.*$/, "")
+        .replace(/\s*\d{4}\s*[-\-]\s*\d{4}.*$/, "")
         .replace(/\s*\b\d{4}\b.*$/, "")
         .replace(/[,\s]+$/, "")
         .trim();
@@ -116,7 +116,7 @@ export function extractEducation(text: string): EducationEntry[] {
       if (name) entries.push({ name, batch });
     } else {
       const nextLine = lines[i + 1] ?? "";
-      const nextRange = nextLine.match(/^(\d{4})\s*[–\-]\s*(\d{4})$/);
+      const nextRange = nextLine.match(/^(\d{4})\s*[-\-]\s*(\d{4})$/);
       const nextSingle = nextLine.match(/^(\d{4})$/);
 
       if (nextRange || nextSingle) {

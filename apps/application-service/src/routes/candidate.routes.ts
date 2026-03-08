@@ -5,7 +5,6 @@ const candidateRouter: Router = express.Router();
 
 candidateRouter.get('/resume-status', authenticationMiddleware, CandidateController.getMyResumeStatus);
 candidateRouter.get('/parsed', authenticationMiddleware, CandidateController.getCandidateJSONData);
-candidateRouter.get('/parsed/filter/name', authenticationMiddleware, CandidateController.getCandidateDataFromName);
 candidateRouter.get('/parsed/userId', authenticationMiddleware, CandidateController.getCandidateDataFromUserId);
 candidateRouter.get('/parsed/resumeId', authenticationMiddleware, CandidateController.getCandidateDataFromResumeId);
 

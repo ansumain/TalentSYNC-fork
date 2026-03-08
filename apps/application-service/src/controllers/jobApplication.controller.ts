@@ -9,6 +9,7 @@ import {
     deleteExistingApplication,
     getRankedApplicantsByJobId
 } from '../services/jobApplication.service';
+import { parsePaginationParams } from '../utils/parsePaginationParams';
 
 export class JobApplicationController {
 
@@ -48,8 +49,16 @@ export class JobApplicationController {
     static async getMyApplications(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.userInfo.sub;
-            const applications = await getApplicationsByUserId(userId);
-            res.status(200).json({ applications });
+            const { page, limit, sortBy, sortOrder, search } = parsePaginationParams(req.query);
+
+            const result = await getApplicationsByUserId(userId, { page, limit, sortBy, sortOrder, search });
+            res.status(200).json({
+                applications: result.data,
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                totalPages: result.totalPages,
+            });
         } catch (e: any) {
             res.status(500).json({ error: e.message || 'Internal server error' });
         }
@@ -57,12 +66,16 @@ export class JobApplicationController {
 
     static async getAllApplications(req: Request, res: Response): Promise<void> {
         try {
-            const allApplications = await getAllApplications();
+            const { page, limit, sortBy, sortOrder, search } = parsePaginationParams(req.query);
 
-            if (allApplications) {
-                res.status(200).json({ allApplications });
-            }
-
+            const result = await getAllApplications({ page, limit, sortBy, sortOrder, search });
+            res.status(200).json({
+                allApplications: result.data,
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                totalPages: result.totalPages,
+            });
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
             res.status(500).json({ error: errorMessage });

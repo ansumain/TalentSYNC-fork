@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { addAJob, deleteExistingJob, getJobById, getAllJobs, updateExistingJob } from '../services/job.service';
 import { CreateJob } from '../types/Job.type';
+import { parsePaginationParams } from '../utils/parsePaginationParams';
 
 export class JobController {
 
@@ -57,12 +58,17 @@ export class JobController {
 
     static async getAllJobs(req: Request, res: Response): Promise<void> {
         try {
-            const currentJobs = await getAllJobs();
+            const { page, limit, sortBy, sortOrder, search } = parsePaginationParams(req.query);
 
-            if (currentJobs) {
-                res.status(200).json({ currentJobs });
-            }
+            const result = await getAllJobs({ page, limit, sortBy, sortOrder, search });
 
+            res.status(200).json({
+                currentJobs: result.data,
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                totalPages: result.totalPages,
+            });
         } catch (e: any) {
             const errorMessage = e.message || 'Internal server error';
             res.status(500).json({ error: errorMessage });

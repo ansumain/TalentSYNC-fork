@@ -1,5 +1,8 @@
 import { CreateJob } from "../types/Job.type";
 import { Job, JobSkill, Skill } from '@talentsync/models';
+import { Op } from 'sequelize';
+
+const JOB_SORT_FIELDS = new Set(['title', 'location', 'jobType', 'openings', 'createdAt', 'updatedAt']);
 
 const addJobRepository = async (job: CreateJob) => {
     try {
@@ -20,10 +23,37 @@ const addJobRepository = async (job: CreateJob) => {
     }
 };
 
-const getAllJobsRepository = async () => {
+const getAllJobsRepository = async (params: {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    search?: string;
+}) => {
     try {
-        const currentJobs = await Job.findAll();
-        return currentJobs;
+        const { page, limit, sortOrder, search } = params;
+        const sortBy = JOB_SORT_FIELDS.has(params.sortBy) ? params.sortBy : 'createdAt';
+        const offset = (page - 1) * limit;
+
+        const where: any = {};
+        if (search) {
+            where.title = { [Op.iLike]: `%${search}%` };
+        }
+
+        const { count, rows } = await Job.findAndCountAll({
+            where,
+            order: [[sortBy, sortOrder]],
+            limit,
+            offset,
+        });
+
+        return {
+            data: rows,
+            total: count as unknown as number,
+            page,
+            limit,
+            totalPages: Math.ceil((count as unknown as number) / limit),
+        };
     } catch (error: any) {
         throw error;
     }

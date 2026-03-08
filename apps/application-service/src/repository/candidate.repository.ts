@@ -1,45 +1,52 @@
 import { ResumeData } from "@talentsync/models";
 import { Op, Sequelize } from "sequelize";
 
-const getAllCandidatesParsedJSONRepository = async () => {
-    const candidateJSON = await ResumeData.findAll({
-        attributes: [
-            // [Sequelize.literal('DISTINCT ON ("userId") "userId"'), 'userId'],
-            'userId',
-            'id',
-            'parsedJSON',
-            'createdAt'
-        ],
-        order: [
-            ['userId', 'ASC'],
-            ['createdAt', 'DESC']
-        ],
-        raw: true
-    });
+type SortOrder = 'ASC' | 'DESC';
 
-    return candidateJSON;
+interface PaginationParams {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: SortOrder;
+    search?: string;
+}
+
+// Map frontend sortBy keys to Sequelize order expressions
+const CANDIDATE_JSON_SORT: Record<string, string> = {
+    name: `"parsedJSON"->>'name'`,
+    email: `"parsedJSON"->>'email'`,
+    phone: `"parsedJSON"->>'phone'`,
 };
 
-const getCandidateDataFromNameRepository = async (name: string) => {
-    const candidateData = await ResumeData.findAll({
-        attributes: [
-            [Sequelize.literal('DISTINCT ON ("userId") "userId"'), 'userId'],
-            'id',
-            'parsedJSON',
-            'createdAt'
-        ],
-        where: Sequelize.where(
-            Sequelize.literal(`"parsedJSON"->>'name'`),
-            { [Op.iLike]: `%${name}%` }
-        ),
-        order: [
-            ['userId', 'ASC'],
-            ['createdAt', 'DESC']
-        ],
-        raw: true
+const getAllCandidatesParsedJSONRepository = async ({ page, limit, sortBy, sortOrder, search }: PaginationParams) => {
+    const offset = (page - 1) * limit;
+    const order: any = CANDIDATE_JSON_SORT[sortBy]
+        ? [[Sequelize.literal(CANDIDATE_JSON_SORT[sortBy]), sortOrder]]
+        : [['createdAt', sortOrder]];
+
+    const where = search
+        ? Sequelize.where(
+              Sequelize.literal(`"parsedJSON"->>'name'`),
+              { [Op.iLike]: `%${search}%` }
+          )
+        : undefined;
+
+    const { count, rows } = await ResumeData.findAndCountAll({
+        attributes: ['userId', 'id', 'parsedJSON', 'createdAt'],
+        where,
+        order,
+        limit,
+        offset,
+        raw: true,
     });
 
-    return candidateData;
+    return {
+        data: rows,
+        total: count as unknown as number,
+        page,
+        limit,
+        totalPages: Math.ceil((count as unknown as number) / limit),
+    };
 };
 
 const getCandidateDataFromUserIdRepository = async (userId: string) => {
@@ -64,4 +71,9 @@ const getCandidateDataFromResumeIdRepository = async (resumeId: string) => {
     return resume;
 };
 
-export { getAllCandidatesParsedJSONRepository, getCandidateDataFromNameRepository, getCandidateDataFromUserIdRepository, getCandidateDataFromResumeIdRepository }
+const getMyResumeStatusRepository = async (userId: string): Promise<boolean> => {
+    const resume = await ResumeData.findOne({ where: { userId, status: 'completed' } });
+    return !!resume;
+};
+
+export { getAllCandidatesParsedJSONRepository, getCandidateDataFromUserIdRepository, getCandidateDataFromResumeIdRepository, getMyResumeStatusRepository };

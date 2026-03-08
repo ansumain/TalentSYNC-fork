@@ -35,7 +35,7 @@ const addApplicationRepository = async (application: Applicaiton) => {
         if (!resume) throw new Error('no resume found, please upload your resume before applying');
 
         // check existing application
-        const existingApplication = await JobApplication.findAll({ where: { ...application} });
+        const existingApplication = await JobApplication.findAll({ where: { ...application } });
         if (existingApplication.length > 0) throw new Error('application already exists');
         const newJob = await JobApplication.create(application);
         return newJob;
@@ -44,28 +44,79 @@ const addApplicationRepository = async (application: Applicaiton) => {
     }
 };
 
-const getAllApplicationsRepository = async (): Promise<EnrichedApplication[]> => {
+const getAllApplicationsRepository = async (params: {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    search?: string;
+}): Promise<{ data: EnrichedApplication[]; total: number; page: number; limit: number; totalPages: number }> => {
     try {
-        const allApplications = await JobApplication.findAll({ order: [['createdAt', 'DESC']] });
-        const enriched = await Promise.all(
-            allApplications.map(async (app: { userId: string; jobId: string; toJSON: () => Record<string, unknown> }) => {
-                const [job, resume] = await Promise.all([
-                    Job.findOne({ where: { jobId: app.jobId }, attributes: ['title'] }),
-                    ResumeData.findOne({
-                        where: { userId: app.userId, status: 'completed' },
-                        order: [['createdAt', 'DESC']],
-                        attributes: ['parsedJSON'],
-                    }),
-                ]);
-                const parsedJSON = resume?.parsedJSON as { name?: string } | null;
-                return {
-                    ...app.toJSON(),
-                    jobTitle: job ? (job.toJSON() as { title: string }).title : null,
-                    candidateName: parsedJSON?.name ?? null,
-                } as EnrichedApplication;
-            })
-        );
-        return enriched;
+        const { page, limit, sortOrder, sortBy, search } = params;
+        const isComputedSort = sortBy === 'candidateName' || sortBy === 'jobTitle';
+
+        const enrich = async (apps: any[]): Promise<EnrichedApplication[]> =>
+            Promise.all(
+                apps.map(async (app) => {
+                    const [job, resume] = await Promise.all([
+                        Job.findOne({ where: { jobId: app.jobId }, attributes: ['title'] }),
+                        ResumeData.findOne({
+                            where: { userId: app.userId, status: 'completed' },
+                            order: [['createdAt', 'DESC']],
+                            attributes: ['parsedJSON'],
+                        }),
+                    ]);
+                    const parsedJSON = resume?.parsedJSON as { name?: string } | null;
+                    return {
+                        ...app.toJSON(),
+                        jobTitle: job ? (job.toJSON() as { title: string }).title : null,
+                        candidateName: parsedJSON?.name ?? null,
+                    } as EnrichedApplication;
+                })
+            );
+
+        if (isComputedSort || search) {
+            const allRows = await JobApplication.findAll({ order: [['createdAt', 'DESC']] });
+            let enriched = await enrich(allRows);
+
+            if (search) {
+                const term = search.toLowerCase();
+                enriched = enriched.filter(
+                    (a) =>
+                        a.candidateName?.toLowerCase().includes(term) ||
+                        a.jobTitle?.toLowerCase().includes(term)
+                );
+            }
+
+            enriched.sort((a, b) => {
+                const aVal = (sortBy === 'candidateName' ? a.candidateName : a.jobTitle) ?? '';
+                const bVal = (sortBy === 'candidateName' ? b.candidateName : b.jobTitle) ?? '';
+                const cmp = aVal.localeCompare(bVal);
+                return sortOrder === 'ASC' ? cmp : -cmp;
+            });
+            const total = enriched.length;
+            const offset = (page - 1) * limit;
+            return { data: enriched.slice(offset, offset + limit), total, page, limit, totalPages: Math.ceil(total / limit) };
+        }
+
+        const DB_SORT_FIELDS = new Set(['createdAt', 'currentStatus', 'updatedAt']);
+        const dbSortBy = DB_SORT_FIELDS.has(sortBy) ? sortBy : 'createdAt';
+        const offset = (page - 1) * limit;
+
+        const { count, rows } = await JobApplication.findAndCountAll({
+            order: [[dbSortBy, sortOrder]],
+            limit,
+            offset,
+        });
+
+        const enriched = await enrich(rows as any[]);
+        return {
+            data: enriched,
+            total: count as unknown as number,
+            page,
+            limit,
+            totalPages: Math.ceil((count as unknown as number) / limit),
+        };
     } catch (error: any) {
         throw error;
     }
@@ -118,16 +169,68 @@ const deleteExistingApplicationRepository = async (applicationId: string) => {
 
 };
 
-const getApplicationsByUserIdRepository = async (userId: string): Promise<ApplicationWithJob[]> => {
+const getApplicationsByUserIdRepository = async (userId: string, params: {
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    search?: string;
+}): Promise<{ data: ApplicationWithJob[]; total: number; page: number; limit: number; totalPages: number }> => {
     try {
-        const applications = await JobApplication.findAll({ where: { userId }, order: [['createdAt', 'DESC']] });
-        const appWithJobs = await Promise.all(
-            applications.map(async (app: { jobId: string; toJSON: () => Record<string, unknown> }) => {
-                const job = await Job.findOne({ where: { jobId: app.jobId }, attributes: ['jobId', 'title', 'location', 'jobType'] });
-                return { ...app.toJSON(), job: job ? (job.toJSON() as ApplicationWithJob['job']) : null } as ApplicationWithJob;
-            })
-        );
-        return appWithJobs;
+        const { page, limit, sortOrder, sortBy, search } = params;
+        const isComputedSort = ['jobTitle', 'jobLocation', 'jobType'].includes(sortBy);
+
+        const enrich = async (apps: any[]): Promise<ApplicationWithJob[]> =>
+            Promise.all(
+                apps.map(async (app: { jobId: string; toJSON: () => Record<string, unknown> }) => {
+                    const job = await Job.findOne({ where: { jobId: app.jobId }, attributes: ['jobId', 'title', 'location', 'jobType'] });
+                    return { ...app.toJSON(), job: job ? (job.toJSON() as ApplicationWithJob['job']) : null } as ApplicationWithJob;
+                })
+            );
+
+        if (isComputedSort || search) {
+            const allRows = await JobApplication.findAll({ where: { userId }, order: [['createdAt', 'DESC']] });
+            let appWithJobs = await enrich(allRows);
+
+            if (search) {
+                const term = search.toLowerCase();
+                appWithJobs = appWithJobs.filter((a) =>
+                    a.job?.title?.toLowerCase().includes(term)
+                );
+            }
+
+            appWithJobs.sort((a, b) => {
+                let aVal = '', bVal = '';
+                if (sortBy === 'jobTitle') { aVal = a.job?.title ?? ''; bVal = b.job?.title ?? ''; }
+                else if (sortBy === 'jobLocation') { aVal = a.job?.location ?? ''; bVal = b.job?.location ?? ''; }
+                else if (sortBy === 'jobType') { aVal = a.job?.jobType ?? ''; bVal = b.job?.jobType ?? ''; }
+                const cmp = aVal.localeCompare(bVal);
+                return sortOrder === 'ASC' ? cmp : -cmp;
+            });
+            const total = appWithJobs.length;
+            const offset = (page - 1) * limit;
+            return { data: appWithJobs.slice(offset, offset + limit), total, page, limit, totalPages: Math.ceil(total / limit) };
+        }
+
+        const DB_SORT_FIELDS = new Set(['createdAt', 'currentStatus', 'updatedAt']);
+        const dbSortBy = DB_SORT_FIELDS.has(sortBy) ? sortBy : 'createdAt';
+        const offset = (page - 1) * limit;
+
+        const { count, rows } = await JobApplication.findAndCountAll({
+            where: { userId },
+            order: [[dbSortBy, sortOrder]],
+            limit,
+            offset,
+        });
+
+        const appWithJobs = await enrich(rows as any[]);
+        return {
+            data: appWithJobs,
+            total: count as unknown as number,
+            page,
+            limit,
+            totalPages: Math.ceil((count as unknown as number) / limit),
+        };
     } catch (error: any) {
         throw error;
     }
