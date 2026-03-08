@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { applicationService } from "@/lib/api/application.service";
 import type { JobApplication, ApplicationStatus } from "@/lib/api/application.service";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { SortableTh, TablePagination } from "@/components/ui/table-pagination";
 
 const ALL_STATUSES: ApplicationStatus[] = [
   "applied",
@@ -29,19 +31,43 @@ export default function ApplicationsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<Record<string, boolean>>({});
   const [deleting, setDeleting] = useState<Record<string, boolean>>({});
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  // Sorting
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  // Search
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
 
-  useEffect(() => {
-    fetchApplications();
-  }, []);
+  const handleSort = useCallback((column: string) => {
+    const newOrder = column === sortBy ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
+    setSortBy(column);
+    setSortOrder(newOrder);
+    setPage(1);
+  }, [sortBy, sortOrder]);
 
-  const fetchApplications = () => {
+  const fetchApplications = useCallback((
+    p = page, l = limit, sb = sortBy, so = sortOrder
+  ) => {
     setLoading(true);
     applicationService
-      .getAllApplications()
-      .then((res) => setApplications(res.allApplications))
+      .getAllApplications({ page: p, limit: l, sortBy: sb, sortOrder: so, search: search || undefined })
+      .then((res) => {
+        setApplications(res.allApplications);
+        setTotal(res.total);
+        setTotalPages(res.totalPages);
+      })
       .catch(() => toast.error("Failed to load applications"))
       .finally(() => setLoading(false));
-  };
+  }, [page, limit, sortBy, sortOrder]);
+
+  useEffect(() => {
+    fetchApplications(page, limit, sortBy, sortOrder);
+  }, [page, limit, sortBy, sortOrder, search]);
 
   const handleStatusChange = async (applicationId: string, newStatus: ApplicationStatus) => {
     setUpdating((prev) => ({ ...prev, [applicationId]: true }));
@@ -66,6 +92,7 @@ export default function ApplicationsAdminPage() {
     try {
       await applicationService.deleteApplication(applicationId);
       setApplications((prev) => prev.filter((a) => a.applicationId !== applicationId));
+      setTotal((t) => t - 1);
       toast.success('Application removed.');
     } catch {
       toast.error('Failed to remove application.');
@@ -83,17 +110,29 @@ export default function ApplicationsAdminPage() {
         </header>
 
         <div className="flex flex-col gap-4 p-4 pt-0">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Search by candidate or job title..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
+              className="max-w-sm"
+            />
+            <Button variant="outline" onClick={() => { setSearch(searchInput); setPage(1); }}>Search</Button>
+            {search && <Button variant="ghost" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}>Clear</Button>}
+          </div>
+
           {loading && <div className="text-center py-8 text-muted-foreground">Loading...</div>}
 
           {!loading && applications.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">No applications yet.</div>
           )}
 
-          {!loading && applications.length > 0 && (
+          {!loading && (total > 0 || applications.length > 0) && (
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base text-left">
-                  {applications.length} Application{applications.length !== 1 ? "s" : ""}
+                  {total} Application{total !== 1 ? "s" : ""}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -101,10 +140,10 @@ export default function ApplicationsAdminPage() {
                   <table className="w-full text-sm text-left">
                     <thead>
                       <tr className="border-b text-muted-foreground text-xs">
-                        <th className="py-2 pr-4 font-medium">Candidate</th>
-                        <th className="py-2 pr-4 font-medium">Job Title</th>
-                        <th className="py-2 pr-4 font-medium">Current Status</th>
-                        <th className="py-2 pr-4 font-medium">Applied On</th>
+                        <SortableTh column="candidateName" label="Candidate" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <SortableTh column="jobTitle" label="Job Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <SortableTh column="currentStatus" label="Current Status" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <SortableTh column="createdAt" label="Applied On" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <th className="py-2 pr-4 font-medium">Update Status</th>
                         <th className="py-2 font-medium"></th>
                       </tr>
@@ -161,6 +200,14 @@ export default function ApplicationsAdminPage() {
                     </tbody>
                   </table>
                 </div>
+                <TablePagination
+                  page={page}
+                  totalPages={totalPages}
+                  total={total}
+                  limit={limit}
+                  onPageChange={setPage}
+                  onLimitChange={(l) => { setLimit(l); setPage(1); }}
+                />
               </CardContent>
             </Card>
           )}

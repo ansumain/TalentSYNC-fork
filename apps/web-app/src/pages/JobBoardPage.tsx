@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { jobService, applicationService, candidateService } from "@/lib/api/application.service";
 import type { Job } from "@/lib/api/application.service";
 import { toast } from "sonner";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { TablePagination } from "@/components/ui/table-pagination";
+
+type SortField = "createdAt" | "title";
 
 export default function JobBoardPage() {
   const navigate = useNavigate();
@@ -16,19 +19,42 @@ export default function JobBoardPage() {
   const [applying, setApplying] = useState<Record<string, boolean>>({});
   const [applied, setApplied] = useState<Record<string, boolean>>({});
   const [hasResume, setHasResume] = useState<boolean | null>(null);
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  // Sorting
+  const [sortBy, setSortBy] = useState<SortField>("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const handleSort = (field: SortField) => {
+    const newOrder = field === sortBy ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
+    setSortBy(field);
+    setSortOrder(newOrder);
+    setPage(1);
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortBy !== field) return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    return sortOrder === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />;
+  };
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
-      jobService.getAllJobs(),
+      jobService.getAllJobs({ page, limit, sortBy, sortOrder }),
       candidateService.getMyResumeStatus(),
     ])
       .then(([jobsRes, resumeRes]) => {
         setJobs(jobsRes.currentJobs);
+        setTotal(jobsRes.total);
+        setTotalPages(jobsRes.totalPages);
         setHasResume(resumeRes.hasResume);
       })
       .catch(() => toast.error("Failed to load jobs"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [page, limit, sortBy, sortOrder]);
 
   const handleApply = async (jobId: string) => {
     setApplying((prev) => ({ ...prev, [jobId]: true }));
@@ -53,8 +79,23 @@ export default function JobBoardPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
           <h1 className="text-xl font-semibold">Open Jobs</h1>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Sort by:</span>
+            <button
+              className={`flex items-center gap-1 px-2 py-1 rounded hover:bg-muted ${sortBy === "createdAt" ? "font-medium text-foreground" : ""}`}
+              onClick={() => handleSort("createdAt")}
+            >
+              Date <SortIcon field="createdAt" />
+            </button>
+            <button
+              className={`flex items-center gap-1 px-2 py-1 rounded hover:bg-muted ${sortBy === "title" ? "font-medium text-foreground" : ""}`}
+              onClick={() => handleSort("title")}
+            >
+              Title <SortIcon field="title" />
+            </button>
+          </div>
         </header>
 
         <div className="flex flex-col gap-4 p-4 pt-0">
@@ -111,6 +152,16 @@ export default function JobBoardPage() {
                 </CardContent>
               </Card>
             ))}
+
+          {!loading && total > limit && (
+            <TablePagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              limit={limit}
+              onPageChange={setPage}
+            />
+          )}
         </div>
       </SidebarInset>
     </SidebarProvider>

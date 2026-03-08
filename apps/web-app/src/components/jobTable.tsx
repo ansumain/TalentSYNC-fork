@@ -11,11 +11,10 @@ import { toast } from "sonner";
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableHead, TablePagination } from "@/components/ui/table-pagination";
 
 export function JobTable() {
   const {
@@ -26,6 +25,15 @@ export function JobTable() {
     filterByTitle,
     clearFilter,
     deleteJob,
+    page,
+    limit,
+    total,
+    totalPages,
+    sortBy,
+    sortOrder,
+    setPage,
+    setSort,
+    setLimit,
   } = useJobStore();
 
   const navigate = useNavigate();
@@ -85,29 +93,31 @@ export function JobTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Job Type</TableHead>
-                <TableHead>Openings</TableHead>
-                <TableHead>Posted At</TableHead>
-                <TableHead></TableHead>
+                <SortableHead column="title" label="Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="location" label="Location" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="jobType" label="Job Type" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="openings" label="Openings" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="createdAt" label="Posted At" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <th></th>
               </TableRow>
             </TableHeader>
             <TableBody>
               {jobs.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="text-center py-8">No jobs found.</TableCell></TableRow>
+                <TableRow>
+                  <td colSpan={6} className="text-center py-8 text-muted-foreground">No jobs found.</td>
+                </TableRow>
               ) : jobs.map((job) => (
                 <TableRow
                   key={job.jobId}
                   className="border-b hover:bg-muted/50 cursor-pointer"
                   onClick={() => navigate(`/jobs/${job.jobId}`)}
                 >
-                  <TableCell className="text-left">{job.title}</TableCell>
-                  <TableCell className="text-left">{job.location}</TableCell>
-                  <TableCell className="text-left">{job.jobType}</TableCell>
-                  <TableCell className="text-left">{job.openings}</TableCell>
-                  <TableCell className="text-left text-xs">{new Date(job.createdAt).toLocaleString()}</TableCell>
-                  <TableCell className="text-right">
+                  <td className="px-4 py-3 text-left">{job.title}</td>
+                  <td className="px-4 py-3 text-left">{job.location}</td>
+                  <td className="px-4 py-3 text-left">{job.jobType}</td>
+                  <td className="px-4 py-3 text-left">{job.openings}</td>
+                  <td className="px-4 py-3 text-left text-xs">{new Date(job.createdAt).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-right">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -117,11 +127,19 @@ export function JobTable() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </TableCell>
+                  </td>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+          />
         </div>
       )}
     </Card>

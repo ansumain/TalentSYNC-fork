@@ -10,10 +10,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableHead, TablePagination } from "@/components/ui/table-pagination";
 
 export function CandidateTable() {
   const {
@@ -22,7 +22,16 @@ export function CandidateTable() {
     error,
     fetchAll,
     filterByName,
-    clearFilter
+    clearFilter,
+    page,
+    limit,
+    total,
+    totalPages,
+    sortBy,
+    sortOrder,
+    setPage,
+    setSort,
+    setLimit,
   } = useCandidateStore();
 
   const navigate = useNavigate();
@@ -62,29 +71,39 @@ export function CandidateTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Uploaded At</TableHead>
+                <SortableHead column="name" label="Name" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="email" label="Email" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="phone" label="Phone" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="createdAt" label="Uploaded At" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
               </TableRow>
             </TableHeader>
             <TableBody>
               {candidates.length === 0 ? (
-                <TableRow><TableCell colSpan={4} className="text-left text-center py-8">No Candidate Data Found.</TableCell></TableRow>
+                <TableRow>
+                  <td colSpan={4} className="text-center py-8 text-muted-foreground">No Candidate Data Found.</td>
+                </TableRow>
               ) : candidates.map((c) => (
                 <TableRow
                   key={c.id}
                   className="border-b hover:bg-muted/50 cursor-pointer"
                   onClick={() => navigate(`/candidates/${c.id}`, { state: { candidate: c } })}
                 >
-                  <TableCell className="text-left">{c.parsedJSON.name || <span className="text-muted-foreground">-</span>}</TableCell>
-                  <TableCell className="text-left">{c.parsedJSON.email || <span className="text-muted-foreground">-</span>}</TableCell>
-                  <TableCell className="text-left">{c.parsedJSON.phone || <span className="text-muted-foreground">-</span>}</TableCell>
-                  <TableCell className="text-left text-xs">{new Date(c.createdAt).toLocaleString()}</TableCell>
+                  <td className="px-4 py-3 text-left">{c.parsedJSON.name || <span className="text-muted-foreground">-</span>}</td>
+                  <td className="px-4 py-3 text-left">{c.parsedJSON.email || <span className="text-muted-foreground">-</span>}</td>
+                  <td className="px-4 py-3 text-left">{c.parsedJSON.phone || <span className="text-muted-foreground">-</span>}</td>
+                  <td className="px-4 py-3 text-left text-xs">{new Date(c.createdAt).toLocaleString()}</td>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+          />
         </div>
       )}
     </Card>

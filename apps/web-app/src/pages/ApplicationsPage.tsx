@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { applicationService } from "@/lib/api/application.service";
 import type { JobApplication } from "@/lib/api/application.service";
 import { toast } from "sonner";
+import { SortableTh, TablePagination } from "@/components/ui/table-pagination";
 
 const STATUS_COLORS: Record<string, string> = {
   applied: "bg-blue-100 text-blue-700",
@@ -17,14 +20,37 @@ const STATUS_COLORS: Record<string, string> = {
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  // Sorting
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  // Search
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+
+  const handleSort = useCallback((column: string) => {
+    const newOrder = column === sortBy ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
+    setSortBy(column);
+    setSortOrder(newOrder);
+    setPage(1);
+  }, [sortBy, sortOrder]);
 
   useEffect(() => {
+    setLoading(true);
     applicationService
-      .getMyApplications()
-      .then((res) => setApplications(res.applications))
+      .getMyApplications({ page, limit, sortBy, sortOrder, search: search || undefined })
+      .then((res) => {
+        setApplications(res.applications);
+        setTotal(res.total);
+        setTotalPages(res.totalPages);
+      })
       .catch(() => toast.error("Failed to load your applications"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [page, limit, sortBy, sortOrder, search]);
 
   return (
     <SidebarProvider>
@@ -35,19 +61,31 @@ export default function ApplicationsPage() {
         </header>
 
         <div className="flex flex-col gap-4 p-4 pt-0">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Search by job title..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
+              className="max-w-sm"
+            />
+            <Button variant="outline" onClick={() => { setSearch(searchInput); setPage(1); }}>Search</Button>
+            {search && <Button variant="ghost" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}>Clear</Button>}
+          </div>
+
           {loading && <div className="text-center py-8 text-muted-foreground">Loading...</div>}
 
-          {!loading && applications.length === 0 && (
+          {!loading && total === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               You haven't applied to any jobs yet.
             </div>
           )}
 
-          {!loading && applications.length > 0 && (
+          {!loading && (total > 0 || applications.length > 0) && (
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base text-left">
-                  {applications.length} Application{applications.length !== 1 ? "s" : ""}
+                  {total} Application{total !== 1 ? "s" : ""}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -55,11 +93,11 @@ export default function ApplicationsPage() {
                   <table className="w-full text-sm text-left">
                     <thead>
                       <tr className="border-b text-muted-foreground text-xs">
-                        <th className="py-2 pr-4 font-medium">Job Title</th>
-                        <th className="py-2 pr-4 font-medium">Location</th>
-                        <th className="py-2 pr-4 font-medium">Type</th>
-                        <th className="py-2 pr-4 font-medium">Status</th>
-                        <th className="py-2 font-medium">Applied On</th>
+                        <SortableTh column="jobTitle" label="Job Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <SortableTh column="jobLocation" label="Location" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <SortableTh column="jobType" label="Type" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <SortableTh column="currentStatus" label="Status" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <SortableTh column="createdAt" label="Applied On" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                       </tr>
                     </thead>
                     <tbody>
@@ -85,6 +123,14 @@ export default function ApplicationsPage() {
                     </tbody>
                   </table>
                 </div>
+                <TablePagination
+                  page={page}
+                  totalPages={totalPages}
+                  total={total}
+                  limit={limit}
+                  onPageChange={setPage}
+                  onLimitChange={(l) => { setLimit(l); setPage(1); }}
+                />
               </CardContent>
             </Card>
           )}

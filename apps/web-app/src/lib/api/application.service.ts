@@ -50,6 +50,25 @@
 import { apiClient } from './client';
 import { API_CONFIG, API_ENDPOINTS } from './config';
 
+// Shared pagination types
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  search?: string;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Candidate types
+
 export interface Candidate {
   userId: string;
   id: string;
@@ -72,17 +91,17 @@ export interface Candidate {
 }
 
 // Response types
-interface GetAllCandidatesResponse {
+interface GetAllCandidatesResponse extends PaginationMeta {
   candidateJSONData: Candidate[];
 }
-interface FilterCandidatesResponse {
+interface FilterCandidatesResponse extends PaginationMeta {
   candidateData: Candidate[];
 }
 
 export const candidateService = {
-  getAllCandidates: async (): Promise<GetAllCandidatesResponse> => {
+  getAllCandidates: async (params?: PaginationParams): Promise<GetAllCandidatesResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/parsed`;
-    return apiClient.get<GetAllCandidatesResponse>(url);
+    return apiClient.get<GetAllCandidatesResponse>(url, params as Record<string, any>);
   },
 
   getMyResumeStatus: async (): Promise<{ hasResume: boolean }> => {
@@ -90,19 +109,11 @@ export const candidateService = {
     return apiClient.get<{ hasResume: boolean }>(url);
   },
 
-  // POST filter by name
-  filterCandidatesByName: async (name: string): Promise<FilterCandidatesResponse> => {
-    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}${API_ENDPOINTS.CANDIDATE.FILTERBYNAME}`
-    return apiClient.get<FilterCandidatesResponse>(url, { name });
-  },
-
-  // POST filter by userId
   filterCandidatesByUserId: async (userId: string): Promise<FilterCandidatesResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/parsed/filter/userId`;
     return apiClient.post<FilterCandidatesResponse>(url, { userId });
   },
 
-  // POST filter by resumeId
   filterCandidatesByResumeId: async (resumeId: string): Promise<FilterCandidatesResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/parsed/filter/resumeId`;
     return apiClient.post<FilterCandidatesResponse>(url, { resumeId });
@@ -152,7 +163,7 @@ export interface RankedApplicant {
   rank: number;
 }
 
-interface GetAllJobsResponse {
+interface GetAllJobsResponse extends PaginationMeta {
   currentJobs: Job[];
 }
 
@@ -161,9 +172,9 @@ interface GetJobByIdResponse {
 }
 
 export const jobService = {
-  getAllJobs: async (): Promise<GetAllJobsResponse> => {
+  getAllJobs: async (params?: PaginationParams): Promise<GetAllJobsResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/jobs`;
-    return apiClient.get<GetAllJobsResponse>(url);
+    return apiClient.get<GetAllJobsResponse>(url, params as Record<string, any>);
   },
 
   getJobById: async (jobId: string): Promise<GetJobByIdResponse> => {
@@ -209,7 +220,7 @@ export const skillService = {
 
 // Application Service
 
-interface GetAllApplicationsResponse {
+interface GetAllApplicationsResponse extends PaginationMeta {
   allApplications: JobApplication[];
 }
 
@@ -217,7 +228,7 @@ interface GetApplicationsByJobIdResponse {
   applicationsByJobId: JobApplication[];
 }
 
-interface GetMyApplicationsResponse {
+interface GetMyApplicationsResponse extends PaginationMeta {
   applications: JobApplication[];
 }
 
@@ -227,14 +238,14 @@ export const applicationService = {
     return apiClient.post<JobApplication>(url, {});
   },
 
-  getMyApplications: async (): Promise<GetMyApplicationsResponse> => {
+  getMyApplications: async (params?: PaginationParams): Promise<GetMyApplicationsResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications/user/me`;
-    return apiClient.get<GetMyApplicationsResponse>(url);
+    return apiClient.get<GetMyApplicationsResponse>(url, params as Record<string, any>);
   },
 
-  getAllApplications: async (): Promise<GetAllApplicationsResponse> => {
+  getAllApplications: async (params?: PaginationParams): Promise<GetAllApplicationsResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/applications`;
-    return apiClient.get<GetAllApplicationsResponse>(url);
+    return apiClient.get<GetAllApplicationsResponse>(url, params as Record<string, any>);
   },
 
   getApplicationsByJobId: async (jobId: string): Promise<GetApplicationsByJobIdResponse> => {
