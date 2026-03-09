@@ -1,4 +1,8 @@
+import { User } from '@talentsync/models';
 import {
+    getAvailableInterviewersRepository,
+    getDatedInterviewCountRepository,
+    checkInterviewerEligibilityRepository,
     scheduleInterviewRepository,
     getAllInterviewsRepository,
     getInterviewByIdRepository,
@@ -7,6 +11,23 @@ import {
     deleteExistingInterviewRepository
 } from '../repository/interview.repository'
 import { CreateInterview } from '../types/CreateInterview.type';
+
+const getAvailableInterviewers = async (date: string, applicationId: string) => {
+    const allInterviewers = await getAvailableInterviewersRepository();
+
+    let availableInterviewers: Partial<User>[] = [];
+    for (const interviewer of allInterviewers) {
+        const interviewCount = await getDatedInterviewCountRepository(interviewer.id, date);
+        if (interviewCount > 10) continue;
+
+        console.log('interviewerId:', interviewer.id);
+
+        const isInterviewerEligible = await checkInterviewerEligibilityRepository(interviewer.id, applicationId);
+        if (isInterviewerEligible) availableInterviewers.push(interviewer);
+    }
+
+    return availableInterviewers;
+}
 
 const scheduleInterview = async (newInterviewData: CreateInterview) => {
     const newInterview = await scheduleInterviewRepository(newInterviewData);
@@ -39,6 +60,7 @@ const deleteExistingInterview = async (interviewId: string) => {
 }
 
 export {
+    getAvailableInterviewers,
     scheduleInterview,
     getAllInterviews,
     getInterviewById,

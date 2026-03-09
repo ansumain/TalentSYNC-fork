@@ -1,15 +1,31 @@
 import { Request, Response } from 'express';
 import {
+    getAvailableInterviewers,
     scheduleInterview,
-    getAllInterviews, 
-    getInterviewById, 
+    getAllInterviews,
+    getInterviewById,
     getInterviewsByJobId,
-    updateExistingInterview, 
-    deleteExistingInterview 
+    updateExistingInterview,
+    deleteExistingInterview
 } from '../services/interview.service';
 import { CreateInterview } from '../types/CreateInterview.type';
 
 export class InterviewController {
+
+    static async getAvailableInterviewers(req: Request, res: Response): Promise<void> {
+        try {
+            const { date, applicationId } = req.body;
+            const availableInterviewers = await getAvailableInterviewers(date, applicationId);
+
+            if (availableInterviewers) {
+                res.status(200).json({ availableInterviewers });
+            }
+
+        } catch (e: any) {
+            const errorMessage = e.message || 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
 
     static async scheduleInterview(req: Request, res: Response): Promise<void> {
         try {
@@ -54,7 +70,7 @@ export class InterviewController {
                 res.status(400).json({ error: errorMessage });
                 return;
             }
-            
+
             if (errorMessage.includes('invalid date')) {
                 res.status(400).json({ error: errorMessage });
                 return;
