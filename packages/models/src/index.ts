@@ -9,3 +9,4 @@ export { default as UserSkill } from './UserSkill';
 export { default as JobApplicationLifecycle } from './JobApplicationLifecycle';
 export { default as Skill } from './Skill';
 export { default as JobSkill } from './JobSkill';
+export { default as UserRole } from './UserRole';
