@@ -4,7 +4,9 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit'
+import path from 'path';
 import resumeRoutes from './routes/resume.routes'
+import { authenticationMiddleware } from './middlewares/authentication.middleware'
 // import { tusHandler } from './config/tus';
 // import { authenticationMiddleware } from './middlewares/authentication.middleware';
 
@@ -67,7 +69,17 @@ app.use('/api/resume', resumeRoutes);
 // app.all('/api/resume/upload', authenticationMiddleware, tusHandler);
 // app.all('/api/resume/upload/:id', authenticationMiddleware, tusHandler);
 
-app.use('/files', express.static('uploads'))
+app.get('/files/:filename', authenticationMiddleware, (req: Request, res: Response) => {
+    const filename = path.basename(req.params.filename as string);
+    if (!filename) {
+        res.status(400).json({ error: 'Invalid filename' });
+        return;
+    }
+    const filePath = path.resolve(process.cwd(), 'uploads', filename);
+    res.sendFile(filePath, (err) => {
+        if (err) res.status(404).json({ error: 'File not found' });
+    });
+});
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

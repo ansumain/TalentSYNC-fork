@@ -1,5 +1,6 @@
 import { ResumeData } from "@talentsync/models";
-import { Op, Sequelize } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
+import { sequelize } from "@talentsync/config";
 
 type SortOrder = 'ASC' | 'DESC';
 
@@ -20,38 +21,54 @@ const CANDIDATE_JSON_SORT: Record<string, string> = {
 
 const getAllCandidatesParsedJSONRepository = async ({ page, limit, sortBy, sortOrder, search }: PaginationParams) => {
     const offset = (page - 1) * limit;
-    const order: any = CANDIDATE_JSON_SORT[sortBy]
-        ? [[Sequelize.literal(CANDIDATE_JSON_SORT[sortBy]), sortOrder]]
-        : [['createdAt', sortOrder]];
 
-    const where = search
-        ? Sequelize.where(
-              Sequelize.literal(`"parsedJSON"->>'name'`),
-              { [Op.iLike]: `%${search}%` }
-          )
-        : undefined;
+    const searchClause = search ? `AND "parsedJSON"->>'name' ILIKE :search` : '';
 
-    const { count, rows } = await ResumeData.findAndCountAll({
-        attributes: ['userId', 'id', 'parsedJSON', 'createdAt'],
-        where,
-        order,
-        limit,
-        offset,
-        raw: true,
-    });
+    const outerSort = CANDIDATE_JSON_SORT[sortBy]
+        ? `${CANDIDATE_JSON_SORT[sortBy]} ${sortOrder}`
+        : `"createdAt" ${sortOrder}`;
+
+    const replacements: Record<string, any> = {};
+    if (search) replacements.search = `%${search}%`;
+
+    const [countResult] = await sequelize.query<{ count: string }>(
+        `SELECT COUNT(*) AS count
+         FROM (
+             SELECT DISTINCT ON ("userId") "userId"
+             FROM resume.resume_data
+             WHERE TRUE ${searchClause}
+             ORDER BY "userId", "createdAt" DESC
+         ) latest`,
+        { replacements, type: QueryTypes.SELECT }
+    );
+
+    const total = parseInt(countResult.count, 10);
+
+    const rows = await sequelize.query<Record<string, any>>(
+        `SELECT *
+         FROM (
+             SELECT DISTINCT ON ("userId") "userId", "id", "fileName", "fileURL", "status", "parsedJSON", "createdAt"
+             FROM resume.resume_data
+             WHERE TRUE ${searchClause}
+             ORDER BY "userId", "createdAt" DESC
+         ) latest
+         ORDER BY ${outerSort}
+         LIMIT :limit OFFSET :offset`,
+        { replacements: { ...replacements, limit, offset }, type: QueryTypes.SELECT }
+    );
 
     return {
         data: rows,
-        total: count as unknown as number,
+        total,
         page,
         limit,
-        totalPages: Math.ceil((count as unknown as number) / limit),
+        totalPages: Math.ceil(total / limit),
     };
 };
 
 const getCandidateDataFromUserIdRepository = async (userId: string) => {
     const candidate = await ResumeData.findAll({
-        attributes: ['id', 'userId', 'parsedJSON', 'createdAt'],
+        attributes: ['id', 'userId', 'fileName', 'fileURL', 'status', 'parsedJSON', 'createdAt'],
         where: { userId },
         order: [
             ['createdAt', 'DESC']
@@ -62,7 +79,7 @@ const getCandidateDataFromUserIdRepository = async (userId: string) => {
 
 const getCandidateDataFromResumeIdRepository = async (resumeId: string) => {
     const resume = await ResumeData.findAll({
-        attributes: ['id', 'userId', 'parsedJSON', 'createdAt'],
+        attributes: ['id', 'userId', 'fileName', 'fileURL', 'status', 'parsedJSON', 'createdAt'],
         where: { id: resumeId },
         order: [
             ['createdAt', 'DESC']

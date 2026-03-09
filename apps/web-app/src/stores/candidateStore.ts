@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { candidateService } from '@/lib/api/application.service';
+import { candidateService, type Candidate } from '@/lib/api/application.service';
 
 export interface EducationEntry {
   name: string;
@@ -14,20 +14,23 @@ export interface ExperienceEntry {
   durationMonths: number;
 }
 
-export interface Candidate {
-  userId: string;
-  id: string;
-  parsedJSON: {
-    name: string | null;
-    email: string | null;
-    phone: string | null;
-    education: EducationEntry[];
-    skills: string[];
-    experience: ExperienceEntry[];
-    totalExperience: number;
-  };
-  createdAt: string;
-}
+// export interface Candidate {
+//   userId: string;
+//   id: string;
+//   fileName: string | null;
+//   fileURL: string | null;
+//   status: string | null;
+//   parsedJSON: {
+//     name: string | null;
+//     email: string | null;
+//     phone: string | null;
+//     education: EducationEntry[];
+//     skills: string[];
+//     experience: ExperienceEntry[];
+//     totalExperience: number;
+//   };
+//   createdAt: string;
+// }
 
 export type CandidateFilterType = 'none' | 'name' | 'userId' | 'resumeId';
 

@@ -3,8 +3,9 @@ import { AppSidebar } from "@/components/home/appSideBar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import type { Candidate } from "@/stores/candidateStore";
+import { ChevronLeft, FileText } from "lucide-react";
+import type { Candidate } from "@/lib/api/application.service";
+import { API_CONFIG } from "@/lib/api/config";
 
 export default function CandidateProfilePage() {
   const location = useLocation();
@@ -29,7 +30,9 @@ export default function CandidateProfilePage() {
     );
   }
 
-  const { parsedJSON, createdAt } = candidate;
+  const { parsedJSON, createdAt, fileName, status } = candidate;
+
+  const fileViewUrl = fileName ? `${API_CONFIG.RESUME_SERVICE_URL}/files/${fileName}` : null;
 
   return (
     <SidebarProvider>
@@ -73,6 +76,33 @@ export default function CandidateProfilePage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Resume File */}
+          {fileViewUrl && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-left">Resume File</CardTitle>
+              </CardHeader>
+              <CardContent className="flex items-center gap-4 text-sm text-left">
+                <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
+                <span className="truncate text-muted-foreground">{fileName}</span>
+                {status && (
+                  <span className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full ${
+                    status === 'completed' ? 'bg-green-100 text-green-700' :
+                    status === 'failed' ? 'bg-red-100 text-red-700' :
+                    'bg-yellow-100 text-yellow-700'
+                  }`}>{status}</span>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(fileViewUrl, '_blank', 'noopener,noreferrer')}
+                >
+                  View
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Skills */}
           <Card>

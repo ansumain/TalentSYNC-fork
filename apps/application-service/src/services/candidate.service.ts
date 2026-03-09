@@ -24,4 +24,8 @@ const getMyResumeStatus = async (userId: string): Promise<boolean> => {
     return getMyResumeStatusRepository(userId);
 };
 
-export { getCandiateParsedData, getCandidateDataFromUserId, getCandidateDataFromResumeId, getMyResumeStatus };
+const getMyResumes = async (userId: string) => {
+    return getCandidateDataFromUserIdRepository(userId);
+};
+
+export { getCandiateParsedData, getCandidateDataFromUserId, getCandidateDataFromResumeId, getMyResumeStatus, getMyResumes };

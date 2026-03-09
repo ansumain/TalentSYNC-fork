@@ -72,6 +72,9 @@ export interface PaginationMeta {
 export interface Candidate {
   userId: string;
   id: string;
+  fileName: string | null;
+  fileURL: string | null;
+  status: string | null;
   parsedJSON: {
     name: string | null;
     email: string | null;
@@ -117,6 +120,11 @@ export const candidateService = {
   filterCandidatesByResumeId: async (resumeId: string): Promise<FilterCandidatesResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/parsed/filter/resumeId`;
     return apiClient.post<FilterCandidatesResponse>(url, { resumeId });
+  },
+
+  getMyResumes: async (): Promise<{ resumes: Candidate[] }> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/api/candidate/my-resumes`;
+    return apiClient.get<{ resumes: Candidate[] }>(url);
   },
 };
 

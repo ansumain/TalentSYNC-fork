@@ -18,6 +18,7 @@ import JobDetailPage from './pages/JobDetailPage';
 import JobBoardPage from './pages/JobBoardPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import AdminApplicationsPage from './pages/AdminApplicationsPage';
+import MyResumesPage from './pages/MyResumesPage';
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
         <Route path='/jobs/:jobId' element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>} />
         <Route path='/job-board' element={<ProtectedRoute><JobBoardPage /></ProtectedRoute>} />
         <Route path='/my-applications' element={<ProtectedRoute><ApplicationsPage /></ProtectedRoute>} />
+        <Route path='/my-resumes' element={<ProtectedRoute><MyResumesPage /></ProtectedRoute>} />
         <Route path='/applications' element={<ProtectedRoute><AdminApplicationsPage /></ProtectedRoute>} />
 
         <Route path='*' element={<Navigate to='/signin' replace />} />

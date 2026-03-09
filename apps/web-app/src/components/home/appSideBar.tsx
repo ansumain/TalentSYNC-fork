@@ -25,6 +25,10 @@ const navigationByRole = {
         {
           title: "Upload Resume",
           url: "/upload",
+        },
+        {
+          title: "My Resumes",
+          url: "/my-resumes",
         }
       ],
     },
