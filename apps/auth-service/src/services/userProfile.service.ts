@@ -4,6 +4,7 @@ import Role from '../models/Role';
 import { UserProfileInput } from '../types/UserProfileInput';
 import { UserProfileOutput } from '../types/UserProfileOutput';
 
+// get user profile service
 export const userProfile = async ({ userId }: UserProfileInput): Promise<UserProfileOutput> => {
   const user = await User.findOne({ where: { id: userId } });
   if (!user) {

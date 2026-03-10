@@ -3,6 +3,7 @@ import { refreshToken } from '../services/refreshToken.service';
 import { cookieOptions } from '../utils/cookieOptions';
 
 export class RefreshTokenController {
+  // get access token from refresh token
   static async getAccessToken(req: Request, res: Response): Promise<void> {
     try {
       const token = req.cookies.refresh_token;

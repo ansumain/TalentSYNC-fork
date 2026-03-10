@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { resetPassword } from '../services/resetPassword.service';
 
 export class ResetPasswordController {
+  // Reset Password using the received OTP via mail
   static async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body || !req.body.email || !req.body.otp || !req.body.newPassword)

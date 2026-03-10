@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { userProfile } from '../services/userProfile.service';
 
 export class UserProfileController {
+  // get user profile
   static async userProfile(req: Request, res: Response): Promise<void> {
     try {
       if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');

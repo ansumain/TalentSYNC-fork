@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 
 const JOB_SORT_FIELDS = new Set(['title', 'location', 'jobType', 'openings', 'createdAt', 'updatedAt']);
 
+// add job
 const addJobRepository = async (job: CreateJob) => {
     try {
         const { skillIds, ...jobData } = job;
@@ -23,6 +24,7 @@ const addJobRepository = async (job: CreateJob) => {
     }
 };
 
+// get all jobs
 const getAllJobsRepository = async (params: {
     page: number;
     limit: number;
@@ -59,6 +61,7 @@ const getAllJobsRepository = async (params: {
     }
 };
 
+// get job by jobId
 const getJobByIdRepository = async (jobId: string) => {
     try {
         const job = await Job.findOne({ where: { jobId } });
@@ -76,6 +79,7 @@ const getJobByIdRepository = async (jobId: string) => {
     }
 }
 
+// update job
 const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob>) => {
     try {
         const existingJob = await Job.findOne({ where: { jobId } });
@@ -89,6 +93,7 @@ const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob
     }
 };
 
+// delete job
 const deleteExistingJobRepository = async (jobId: string) => {
     try {
         const existingJob = await Job.findOne({ where: { jobId } });

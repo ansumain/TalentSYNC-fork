@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { requestPasswordReset } from '../services/requestPasswordReset.service';
 
 export class RequestPasswordResetController {
+  // Request OTP for Password Reset
   static async requestReset(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body || !req.body.email) throw new Error('Missing required field');

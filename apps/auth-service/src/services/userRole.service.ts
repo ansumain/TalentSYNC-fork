@@ -2,6 +2,7 @@ import UserRole from '../models/UserRole';
 import { User } from '@talentsync/models';
 import Role from '../models/Role';
 
+// assign role to user service
 const assignRoleToUser = async (userId: string, roleId: string): Promise<{ message: string }> => {
   if (!userId || !roleId) throw new Error('Missing required field');
 
@@ -21,6 +22,7 @@ const assignRoleToUser = async (userId: string, roleId: string): Promise<{ messa
   return { message: 'Assign Role to User, successful' };
 };
 
+// revoke role from user service
 const revokeRoleFromUser = async (userId: string, roleId: string): Promise<{ message: string }> => {
   if (!userId || !roleId) throw new Error('Missing required field');
 

@@ -25,8 +25,10 @@ import fs from 'fs';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
+// converts exec in a promise based function
 const execAsync = promisify(exec);
 
+// convert each pdf page to image.
 export const convertPDFToImages = async (pdfPath: string) => {
     const outputDir = path.join(process.cwd(), "temp", `${path.basename(pdfPath)}-images`);
 

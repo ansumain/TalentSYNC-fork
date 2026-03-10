@@ -3,6 +3,7 @@ import { User } from '@talentsync/models';
 import { UpdateUserProfileInput } from '../types/UpdateUserProfileInput';
 import { UpdateUserProfileOutput } from '../types/UpdateUserProfileOutput';
 
+// update user profile service
 export const updateUserProfile = async (
   toUpdate: Partial<UpdateUserProfileInput>
 ): Promise<UpdateUserProfileOutput> => {

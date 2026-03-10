@@ -3,6 +3,7 @@ import { updateUserProfile } from '../services/updateUserProfile.service';
 import { UpdateUserProfileInput } from '../types/UpdateUserProfileInput';
 
 export class UpdateUserProfileController {
+  // update user profile
   static async updateUserProfile(req: Request, res: Response): Promise<void> {
     try {
       if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');

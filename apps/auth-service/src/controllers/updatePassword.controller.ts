@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { updatePassword } from '../services/updatePassword.service';
 
 export class UpdatePasswordController {
+  // update user password
   static async updatePassword(req: Request, res: Response): Promise<void> {
     try {
       if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');

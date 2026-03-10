@@ -5,6 +5,7 @@ import { parsePaginationParams } from '../utils/parsePaginationParams';
 
 export class JobController {
 
+    // add job
     static async addAJob(req: Request, res: Response): Promise<void> {
         try {
 
@@ -56,6 +57,7 @@ export class JobController {
         }
     }
 
+    // get all jobs
     static async getAllJobs(req: Request, res: Response): Promise<void> {
         try {
             const { page, limit, sortBy, sortOrder, search } = parsePaginationParams(req.query);
@@ -75,6 +77,7 @@ export class JobController {
         }
     }
 
+    // get job by job Id
     static async getJobById(req: Request, res: Response): Promise<void> {
         try {
 
@@ -98,6 +101,7 @@ export class JobController {
         }
     }
 
+    // update job
     static async updateExistingJob(req: Request, res: Response): Promise<void> {
         try {
             if (!req.params.jobId) throw new Error('Missing required field');
@@ -145,6 +149,7 @@ export class JobController {
         }
     }
 
+    // delete job
     static async deleteExistingJob(req: Request, res: Response): Promise<void> {
         try {
 

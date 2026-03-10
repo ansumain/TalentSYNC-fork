@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { registerUser } from '../services/registerUser.service';
 
 export class RegisterUserController {
+  // register a new user
   static async register(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body) throw new Error('Missing body');

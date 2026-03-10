@@ -2,6 +2,7 @@ import { Interview, User, UserRole, JobApplication, JobSkill, Skill, UserSkill }
 import { CreateInterview } from "../types/CreateInterview.type";
 import { Op } from 'sequelize';
 
+// get all interviewers
 const getAvailableInterviewersRepository = async () => {
     try {
 
@@ -21,6 +22,7 @@ const getAvailableInterviewersRepository = async () => {
     }
 };
 
+// get number of interviews of an interviewer for a given day
 const getDatedInterviewCountRepository = async (interviewerId: string, date: string) => {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
@@ -32,6 +34,7 @@ const getDatedInterviewCountRepository = async (interviewerId: string, date: str
     return numberOfInterviews;
 }
 
+// check if the interviewer is eligible for the interview
 const checkInterviewerEligibilityRepository = async (interviewerId: string, applicationId: string) => {
 
     const { jobId } = (await JobApplication.findOne({ where: { applicationId }, attributes: ['jobId'], raw: true })) as { jobId: string };
@@ -74,6 +77,7 @@ const checkInterviewerEligibilityRepository = async (interviewerId: string, appl
     return false;
 }
 
+// add interview
 const scheduleInterviewRepository = async (newInterviewData: CreateInterview) => {
     try {
         const existingApplication = await JobApplication.findOne({ where: { applicationId: newInterviewData.applicationId } });
@@ -89,6 +93,7 @@ const scheduleInterviewRepository = async (newInterviewData: CreateInterview) =>
     }
 };
 
+// get all interivews
 const getAllInterviewsRepository = async () => {
     try {
         const scheduledInterviews = await Interview.findAll();
@@ -98,6 +103,7 @@ const getAllInterviewsRepository = async () => {
     }
 };
 
+// get interview by interviewId
 const getInterviewByIdRepository = async (interviewId: string) => {
     try {
         const interview = await Interview.findOne({ where: { interviewId } });
@@ -108,6 +114,7 @@ const getInterviewByIdRepository = async (interviewId: string) => {
     }
 }
 
+// get interviews by jobId
 const getInterviewsByJobIdRepository = async (jobId: string) => {
     try {
         const applicationIds = await JobApplication.findAll({ where: { jobId }, attributes: ['applicationId'], raw: true });
@@ -126,6 +133,7 @@ const getInterviewsByJobIdRepository = async (jobId: string) => {
     }
 }
 
+// update interview
 const updateExistingInterviewRepository = async (interviewId: string, newInterviewData: Partial<CreateInterview>) => {
     try {
         const existingInterview = await Interview.findOne({ where: { interviewId } });
@@ -139,6 +147,7 @@ const updateExistingInterviewRepository = async (interviewId: string, newIntervi
     }
 };
 
+// delete interview
 const deleteExistingInterviewRepository = async (interviewId: string) => {
     try {
         const existingInterview = await Interview.findOne({ where: { interviewId } });

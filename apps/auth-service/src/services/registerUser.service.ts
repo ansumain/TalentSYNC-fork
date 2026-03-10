@@ -6,6 +6,7 @@ import { Op } from 'sequelize';
 import Role from '../models/Role';
 import UserRole from '../models/UserRole';
 
+// register user service
 export const registerUser = async ({
   name,
   email,

@@ -3,6 +3,7 @@ import { uploadResume } from '../services/uploadResume.service';
 import { UploadedFileModel } from '../types/UploadedFile.type';
 
 export class ResumeUploaderController {
+    // upload resume controller
     static async uploadResume(req: Request, res: Response): Promise<void> {
         try {
             if (!req.files || (req.files as any).length === 0) throw new Error('No File Uploaded');

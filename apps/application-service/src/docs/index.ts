@@ -9,7 +9,6 @@ const mergedSpec = {
     info: {
         title: 'TalentSYNC',
         version: '1.0.0',
-        // description: 'Unified API documentation for all TalentSYNC services. Authentication uses HTTP-only cookies (access_token). Log in via POST /api/auth/login first, then all authenticated endpoints work automatically.',
     },
     servers: [
         { url: 'http://localhost', description: 'Nginx' }

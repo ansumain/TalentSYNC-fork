@@ -5,6 +5,7 @@ import { RequestPasswordResetOutput } from '../types/RequestPasswordResetOutput'
 import bcrypt from 'bcryptjs';
 import { sendOtpEmail } from '../utils/emailService';
 
+// request password reset service
 export const requestPasswordReset = async ({
   email,
 }: RequestPasswordResetInput): Promise<RequestPasswordResetOutput> => {

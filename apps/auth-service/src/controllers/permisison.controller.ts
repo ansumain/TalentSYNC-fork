@@ -9,6 +9,7 @@ import { getRolePermissions } from '../services/role.service';
 
 // [admin]
 export class PermissionController {
+  // get all permissions
   static async getAllPermissions(req: Request, res: Response): Promise<void> {
     try {
       const permisisons = await getAllPermission();
@@ -22,7 +23,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // get permissions by userID
   static async getPermissionByUserId(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');
@@ -53,7 +54,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // get permissions by roleID
   static async getPermissionByRoleId(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
@@ -84,7 +85,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // create a new permission
   static async createPermission(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body || !req.body.permission) throw new Error('Missing required field');
@@ -114,7 +115,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // delete a permission
   static async deletePermission(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.permissionId) throw new Error('Missing permission ID');

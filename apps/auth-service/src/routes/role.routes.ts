@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { authenticationMiddleware } from '../middlewares/authentication.middleware';
 import { requiredRole } from '../middlewares/authorization.middleware';
 import { RoleController } from '../controllers/role.controller';
-const roleRouter = express.Router();
+const roleRouter: Router = express.Router();
 
 roleRouter.get(
   '/roles',

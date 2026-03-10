@@ -3,20 +3,25 @@ import { config } from "../config/env";
 import { parseResume } from "../services/parseResume.service";
 import { getResumeByResumeId, updateAfterParsing, updateStatusByResumeId } from "../repository/resume.repository";
 
+// function to start the worker - resume parising worker
 const startWorker = async () => {
+    // connects to rabbitMQ
     await connectRabbitMQ().catch((err) => {
         console.log('Initial Connection Failed! Reconnecting...')
     });
 
     console.log('Worker starting consuming')
+    // starts the consumption of the messages from the queue
     await consumeQueue(config.queues.resumeParse, async ({ resumeId }) => {
         try {
             // update resume status to processing
             await updateStatusByResumeId(resumeId, 'processing');
 
+            // get the resume data from the consumed message - resumeId
             const resume = await getResumeByResumeId(resumeId);
             if (!resume) throw new Error(`Resume not found`);
 
+            // calls the parsing functions passing the resume path to parse the resumes
             const resumeData = await parseResume({ fileURL: resume.fileURL, mimeType: resume.mimeType });
             await updateAfterParsing(resumeId, resumeData);
             

@@ -2,6 +2,7 @@ import RolePermission from '../models/RolePermission';
 import Role from '../models/Role';
 import Permission from '../models/Permission';
 
+// assign permission to role service
 const assignPermissionToRole = async (
   roleId: string,
   permissionId: string
@@ -24,6 +25,7 @@ const assignPermissionToRole = async (
   return { message: 'Assign Permission to Role, successful' };
 };
 
+// revoke permission from role service
 const revokePermissionFromRole = async (
   roleId: string,
   permissionId: string

@@ -4,6 +4,7 @@ import { getUserRoles } from '../services/rbac.service';
 
 // [admin]
 export class RoleController {
+  // get all roles available
   static async getAllRoles(req: Request, res: Response): Promise<void> {
     try {
       const roles = await getAllRoles();
@@ -17,7 +18,7 @@ export class RoleController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // get user's roles
   static async getRoleByUserId(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');
@@ -49,6 +50,7 @@ export class RoleController {
     }
   }
 
+  // create a role
   static async createRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body || !req.body.role) throw new Error('Missing required field');
@@ -79,6 +81,7 @@ export class RoleController {
     }
   }
 
+  // delete a role
   static async deleteRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');

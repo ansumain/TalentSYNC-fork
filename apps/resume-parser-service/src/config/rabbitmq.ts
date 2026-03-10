@@ -24,6 +24,7 @@ const DLX_EXCHANGE = 'dlx.resume';
 const DLX_ROUTING_RETRY = 'retry';
 const DLX_ROUTING_FAILED = 'failed';
 
+// connect with the rabbitMQ
 const connectRabbitMQ = async (): Promise<void> => {
     if (isConnecting) {
         console.log('Connection already in progress');
@@ -75,6 +76,7 @@ const connectRabbitMQ = async (): Promise<void> => {
     }
 }
 
+// publish message to queue
 const publishToQueue = async (
     queue: string,
     message: any,
@@ -96,6 +98,7 @@ const publishToQueue = async (
     console.log(`Published to ${queue}:`, { message, retryCount });
 }
 
+// consume the message from queue
 const consumeQueue = async (
     queue: string,
     handler: (content: any) => Promise<void>,
@@ -186,6 +189,7 @@ const consumeQueue = async (
     );
 }
 
+// closes channels + connection
 const gracefulShutdown = async (signal: string): Promise<void> => {
     if (isShuttingDown) {
         console.log('Shutdown already in progress');
@@ -236,6 +240,7 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
     }
 }
 
+// setup the required queues
 const setupQueues = async (): Promise<void> => {
     if (!publishChannel) throw new Error('Publish channel not initialized');
 
@@ -259,6 +264,7 @@ const setupQueues = async (): Promise<void> => {
     });
 }
 
+// try to reconnect with a delay if failed to connect initially
 const attemptReconnect = async (): Promise<void> => {
     if (isShuttingDown) {
         console.log('Shutdown in progress, skipping reconnect');
@@ -281,10 +287,12 @@ const attemptReconnect = async (): Promise<void> => {
     }
 }
 
+// logs the error in console in case of connection error 
 const handleConnectionError = (error: Error): void => {
     console.error('RabbitMQ connection error:', error.message);
 }
 
+// tries to reconnect if rabbitMQ connection is shut unexpectedly
 const handleConnectionClose = (): void => {
     if (!isShuttingDown) {
         console.warn('RabbitMQ connection closed unexpectedly. Reconnecting');
@@ -298,12 +306,9 @@ const handleConnectionClose = (): void => {
     }
 }
 
+// checks whether connected or not
 const isConnected = (): boolean => {
     return connection !== null && publishChannel !== null && consumeChannel !== null;
-}
-
-const getInFlightCount = (): number => {
-    return inFlightMessages;
 }
 
 export {
@@ -311,6 +316,5 @@ export {
     publishToQueue,
     consumeQueue,
     gracefulShutdown,
-    isConnected,
-    getInFlightCount
+    isConnected
 }

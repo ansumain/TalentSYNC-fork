@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config/env';
 import { UserInfo } from '@talentsync/types';
 
+// check if the user is logged in
 const authenticationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies.access_token;

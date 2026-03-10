@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { assignRoleToUser, revokeRoleFromUser } from '../services/userRole.service';
 
 export class UserRoleController {
+  // assign role to user
   static async assignRoleToUser(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');
@@ -42,6 +43,7 @@ export class UserRoleController {
     }
   }
 
+  // revoke role from user
   static async revokeRoleFromUser(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');

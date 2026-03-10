@@ -1,26 +1,6 @@
-export interface EducationEntry {
-  name: string;
-  batch: string;
-}
+import type { EducationEntry, ExperienceEntry, ParsedResumeJson } from "../types/ExtractData.type";
 
-export interface ExperienceEntry {
-  company: string;
-  designation: string;
-  startDate: string;
-  endDate: string;
-  durationMonths: number;
-}
-
-export interface ParsedResumeJson {
-  name: string | null;
-  email: string | null;
-  phone: string | null;
-  education: EducationEntry[];
-  skills: string[];
-  experience: ExperienceEntry[];
-  totalExperience: number;
-}
-
+// mapping months with numbers
 const MONTHS: Record<string, number> = {
   jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
   jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
@@ -28,8 +8,10 @@ const MONTHS: Record<string, number> = {
   july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
 };
 
+// possible section headers
 const SECTION_HEADERS = /^(Profile|Education|Technologies|Experience)$/i;
 
+// normalize text - clean white space and break lines
 export function normalizeText(text: string): string {
   return text
     .replace(/\r/g, "")
@@ -38,6 +20,7 @@ export function normalizeText(text: string): string {
     .trim();
 }
 
+// Scans text for a specific section and returns content until the next header
 function extractSection(text: string, sectionName: string): string {
   const lines = text.split("\n");
   const startIdx = lines.findIndex(l => l.trim() === sectionName);
@@ -51,6 +34,7 @@ function extractSection(text: string, sectionName: string): string {
   return lines.slice(startIdx + 1, endIdx).join("\n");
 }
 
+// Converts date strings into Date objects
 function parseDate(dateStr: string): Date | null {
   const s = dateStr.trim().toLowerCase();
   if (s === "present") return new Date();
@@ -67,7 +51,7 @@ function parseDate(dateStr: string): Date | null {
 
   return null;
 }
-
+// helper
 function monthsDiff(start: Date, end: Date): number {
   return Math.max(
     0,
@@ -75,21 +59,25 @@ function monthsDiff(start: Date, end: Date): number {
   );
 }
 
+// Extracts name
 export function extractName(text: string): string | null {
   const firstLine = text.split("\n").map(l => l.trim()).find(Boolean) ?? null;
   return firstLine;
 }
 
+// Extracts email
 export function extractEmail(text: string): string | null {
   const match = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
   return match ? match[0] : null;
 }
 
+// Extracts phone
 export function extractPhone(text: string): string | null {
   const match = text.match(/\b[1-9]\d{9}\b/);
   return match ? match[0] : null;
 }
 
+// Extracts education
 export function extractEducation(text: string): EducationEntry[] {
   const section = extractSection(text, "Education");
   if (!section) return [];
@@ -133,6 +121,7 @@ export function extractEducation(text: string): EducationEntry[] {
   return entries;
 }
 
+// Extracts skills
 export function extractSkills(text: string): string[] {
   const section = extractSection(text, "Technologies");
   if (!section) return [];
@@ -150,6 +139,7 @@ export function extractSkills(text: string): string[] {
   return [...new Set(skills)];
 }
 
+// Extracts experience
 export function extractExperience(text: string): ExperienceEntry[] {
   const section = extractSection(text, "Experience") || extractSection(text, "EXPERIENCE");
   if (!section) return [];
@@ -208,6 +198,7 @@ export function extractExperience(text: string): ExperienceEntry[] {
   return entries;
 }
 
+// Extracts all details
 export function extractBasicDetails(rawText: string): ParsedResumeJson {
   const text = normalizeText(rawText);
   const experience = extractExperience(text);

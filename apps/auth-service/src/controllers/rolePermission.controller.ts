@@ -5,6 +5,7 @@ import {
 } from '../services/rolePermission.service';
 
 export class RolePermissionController {
+  // assign permission to a role
   static async assignPermissionToRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
@@ -48,6 +49,7 @@ export class RolePermissionController {
     }
   }
 
+  // revoke permission from a role
   static async revokePermissionFromRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');

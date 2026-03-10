@@ -1,33 +1,7 @@
 import { Applicaiton } from "../types/Application.type";
 import { JobApplication, Job, JobSkill, Skill, ResumeData } from '@talentsync/models';
-import type { JobAttributes, JobApplicationAttributes } from '@talentsync/models';
-
-export interface ApplicationWithJob extends JobApplicationAttributes {
-    createdAt: Date | string;
-    updatedAt: Date | string;
-    job: Pick<JobAttributes, 'jobId' | 'title' | 'location' | 'jobType'> | null;
-}
-
-export interface RankedApplicant {
-    applicationId: string;
-    userId: string;
-    currentStatus: string;
-    appliedAt: Date | string;
-    candidateName: string | null;
-    candidateSkills: string[];
-    matchedSkills: string[];
-    matchCount: number;
-    rank: number;
-}
-
-export interface EnrichedApplication extends JobApplicationAttributes {
-    createdAt: Date | string;
-    updatedAt: Date | string;
-    candidateName: string | null;
-    jobTitle: string | null;
-}
-
-
+import { ApplicationWithJob, EnrichedApplication, RankedApplicant } from "../types/JobApplication.type";
+// add job application
 const addApplicationRepository = async (application: Applicaiton) => {
     try {
         // Check if user has a completed resume before allowing application
@@ -44,6 +18,7 @@ const addApplicationRepository = async (application: Applicaiton) => {
     }
 };
 
+// get all job applicatios
 const getAllApplicationsRepository = async (params: {
     page: number;
     limit: number;
@@ -122,6 +97,7 @@ const getAllApplicationsRepository = async (params: {
     }
 };
 
+// get application by Id
 const getApplicationByIdRepository = async (applicationId: string) => {
     try {
         const applicaiton = await JobApplication.findOne({ where: { applicationId } });
@@ -132,6 +108,7 @@ const getApplicationByIdRepository = async (applicationId: string) => {
     }
 }
 
+// get applications by job Id
 const getApplicationsByJobIdRepository = async (jobId: string) => {
     try {
         const applications = await JobApplication.findAll({ where: { jobId } });
@@ -142,6 +119,7 @@ const getApplicationsByJobIdRepository = async (jobId: string) => {
     }
 }
 
+// update application current status
 const updateApplicationCurrentStatusRepository = async (applicationId: string, currentStatus: string) => {
     try {
         const existingApplication = await JobApplication.findOne({ where: { applicationId } });
@@ -155,6 +133,7 @@ const updateApplicationCurrentStatusRepository = async (applicationId: string, c
     }
 };
 
+// delete application
 const deleteExistingApplicationRepository = async (applicationId: string) => {
     try {
         const existingApplication = await JobApplication.findOne({ where: { applicationId } });
@@ -169,6 +148,7 @@ const deleteExistingApplicationRepository = async (applicationId: string) => {
 
 };
 
+// get applications by userId
 const getApplicationsByUserIdRepository = async (userId: string, params: {
     page: number;
     limit: number;
@@ -236,6 +216,7 @@ const getApplicationsByUserIdRepository = async (userId: string, params: {
     }
 };
 
+// get ranked applicant by jobId
 const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<RankedApplicant[]> => {
     try {
         const jobSkillRows = await JobSkill.findAll({

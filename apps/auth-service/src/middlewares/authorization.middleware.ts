@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { getUserPermissions } from '../services/rbac.service';
 
+// check if the user has the required permission
 const requiredPermission = (permission: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -14,6 +15,7 @@ const requiredPermission = (permission: string) => {
   };
 };
 
+// check if the user has the required role
 const requiredRole = (role: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -29,6 +31,7 @@ const requiredRole = (role: string) => {
   };
 };
 
+// check if the user has any role from an array of roles
 const requiredAnyRole = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -44,6 +47,7 @@ const requiredAnyRole = () => {
   };
 };
 
+// check if the user has any permissions from an array of permissions
 const requiredAnyPermission = (permissions: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -59,6 +63,7 @@ const requiredAnyPermission = (permissions: string[]) => {
   };
 };
 
+// check if the user has all permissions from an array of permissions
 const requiredAllPermission = (permissions: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {

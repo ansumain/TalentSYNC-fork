@@ -3,6 +3,7 @@ import { getCandiateParsedData, getCandidateDataFromResumeId, getCandidateDataFr
 import { parsePaginationParams } from '../utils/parsePaginationParams';
 
 export class CandidateController {
+    // check whether resume is present or not for the user
     static async getMyResumeStatus(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.userInfo.sub;
@@ -13,6 +14,7 @@ export class CandidateController {
         }
     }
 
+    // get candidate parsed formatted JSON data
     static async getCandidateJSONData(req: Request, res: Response): Promise<void> {
         try {
             const params = parsePaginationParams(req.query);
@@ -29,6 +31,7 @@ export class CandidateController {
         }
     }
 
+    // get candidate parsed formatted JSON data by userId
     static async getCandidateDataFromUserId(req: Request, res: Response): Promise<void> {
         try {
             const roleName = req.userInfo.role.name;
@@ -55,6 +58,7 @@ export class CandidateController {
         }
     }
 
+    // get user's resumes
     static async getMyResumes(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.userInfo.sub;
@@ -65,6 +69,7 @@ export class CandidateController {
         }
     }
 
+    // get candidate parsed formatted JSON data by resumeId
     static async getCandidateDataFromResumeId(req: Request, res: Response): Promise<void> {
         try {
             const { resumeId } = req.body;

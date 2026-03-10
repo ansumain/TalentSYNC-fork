@@ -8,6 +8,7 @@ import RefreshToken from '../models/RefreshToken';
 import UserRole from '../models/UserRole';
 import Role from '../models/Role';
 
+// login user service
 export const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUserOutput> => {
   // required fields must not be null
   if (!email || !password) throw new Error('Missing required field');

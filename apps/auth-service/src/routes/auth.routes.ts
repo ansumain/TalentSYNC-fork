@@ -1,5 +1,5 @@
-import express from 'express';
-const authRouter = express.Router();
+import express, { Router } from 'express';
+const authRouter: Router = express.Router();
 import { RegisterUserController } from '../controllers/registerUser.controller';
 import { LoginUserController } from '../controllers/loginUser.controller';
 import { LogoutUserController } from '../controllers/logoutUser.controller';

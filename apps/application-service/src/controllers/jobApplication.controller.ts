@@ -13,6 +13,7 @@ import { parsePaginationParams } from '../utils/parsePaginationParams';
 
 export class JobApplicationController {
 
+    // add job application
     static async addApplication(req: Request, res: Response): Promise<void> {
         try {
 
@@ -46,6 +47,7 @@ export class JobApplicationController {
         }
     }
 
+    // get all user's applications
     static async getMyApplications(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.userInfo.sub;
@@ -64,6 +66,7 @@ export class JobApplicationController {
         }
     }
 
+    // get all applications
     static async getAllApplications(req: Request, res: Response): Promise<void> {
         try {
             const { page, limit, sortBy, sortOrder, search } = parsePaginationParams(req.query);
@@ -82,6 +85,7 @@ export class JobApplicationController {
         }
     }
 
+    // get application by applicationId
     static async getApplicationById(req: Request, res: Response): Promise<void> {
         try {
 
@@ -110,6 +114,7 @@ export class JobApplicationController {
         }
     }
 
+    // get applications by jobId
     static async getApplicationsByJobId(req: Request, res: Response): Promise<void> {
         try {
 
@@ -138,6 +143,7 @@ export class JobApplicationController {
         }
     }
 
+    // update application currect status - applied | shortlisted | interviewing | hired/rejected 
     static async updateApplicationCurrentStatus(req: Request, res: Response): Promise<void> {
         try {
             if (!req.params.applicationId) throw new Error('missing required field');
@@ -174,6 +180,7 @@ export class JobApplicationController {
         }
     }
 
+    // delete application
     static async deleteExistingApplication(req: Request, res: Response): Promise<void> {
         try {
 
@@ -200,6 +207,7 @@ export class JobApplicationController {
         }
     }
 
+    // rank candidates according to job skill requirements
     static async getRankedApplicantsByJobId(req: Request, res: Response): Promise<void> {
         try {
             if (!req.params.jobId) throw new Error('missing required field');

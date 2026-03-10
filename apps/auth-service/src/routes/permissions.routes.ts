@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { authenticationMiddleware } from '../middlewares/authentication.middleware';
 import { requiredRole } from '../middlewares/authorization.middleware';
 import { PermissionController } from '../controllers/permisison.controller';
-const permisisonRouter = express.Router();
+const permisisonRouter: Router = express.Router();
 
 permisisonRouter.get(
   '/permissions',

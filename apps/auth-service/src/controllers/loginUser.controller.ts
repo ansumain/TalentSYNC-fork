@@ -3,6 +3,7 @@ import { loginUser } from '../services/loginUser.service';
 import { cookieOptions } from '../utils/cookieOptions';
 
 export class LoginUserController {
+  // Login User
   static async login(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body) throw new Error('Missing body');

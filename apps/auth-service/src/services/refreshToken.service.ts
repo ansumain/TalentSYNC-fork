@@ -8,6 +8,7 @@ import { User } from '@talentsync/models';
 import UserRole from '../models/UserRole';
 import Role from '../models/Role';
 
+// get access token from refresh token
 export const refreshToken = async ({ token }: RefreshTokenInput): Promise<RefreshTokenOutput> => {
   // required fields must not be null
   if (!token) throw new Error('Missing required field');

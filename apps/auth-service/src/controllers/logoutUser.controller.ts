@@ -3,6 +3,7 @@ import { logoutUser } from '../services/logoutUser.service';
 import { cookieOptions } from '../utils/cookieOptions';
 
 export class LogoutUserController {
+  // Logout User
   static async logout(req: Request, res: Response): Promise<void> {
     try {
       if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');

@@ -4,6 +4,7 @@ import RolePermission from '../models/RolePermission';
 import UserRole from '../models/UserRole';
 import { User } from '@talentsync/models';
 
+// get user roles service
 const getUserRoles = async (userId: string): Promise<string[]> => {
   if (!userId) throw new Error('Missing user ID');
 
@@ -23,6 +24,7 @@ const getUserRoles = async (userId: string): Promise<string[]> => {
   return userRoles;
 };
 
+// check if user has a given role 
 const userHasRole = async (userId: string, role: string): Promise<boolean> => {
   if (!userId || !role) throw new Error('Missing required field');
 
@@ -31,6 +33,7 @@ const userHasRole = async (userId: string, role: string): Promise<boolean> => {
   return false;
 };
 
+// get user permissions service
 const getUserPermissions = async (userId: string): Promise<string[]> => {
   if (!userId) throw new Error('Missing user ID');
 
@@ -56,6 +59,7 @@ const getUserPermissions = async (userId: string): Promise<string[]> => {
   return userPermissions;
 };
 
+// check if user has a given permission
 const userHasPermissions = async (userId: string, permission: string): Promise<boolean> => {
   if (!userId || !permission) throw new Error('Missing required field');
 

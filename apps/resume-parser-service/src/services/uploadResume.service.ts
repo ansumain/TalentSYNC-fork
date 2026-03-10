@@ -5,6 +5,7 @@ import { ResumeModel } from "../types/ResumeModel.type";
 import { UploadedFileModel } from "../types/UploadedFile.type";
 import path from 'node:path';
 
+// upload resume service
 const uploadResume = async (files: UploadedFileModel[], userId: string, roleName: string): Promise<boolean> => {
     try {
         if (roleName === 'candidate' && files.length > 1) {

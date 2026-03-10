@@ -12,6 +12,7 @@ import { CreateInterview } from '../types/CreateInterview.type';
 
 export class InterviewController {
 
+    // get all available interviewrs for scheduling an interview
     static async getAvailableInterviewers(req: Request, res: Response): Promise<void> {
         try {
             const { date, applicationId } = req.body;
@@ -27,6 +28,7 @@ export class InterviewController {
         }
     }
 
+    // schedule an interview
     static async scheduleInterview(req: Request, res: Response): Promise<void> {
         try {
 
@@ -85,6 +87,7 @@ export class InterviewController {
         }
     }
 
+    // get all scheduled interviews
     static async getAllInterviews(req: Request, res: Response): Promise<void> {
         try {
             const scheduledInterviews = await getAllInterviews();
@@ -99,6 +102,7 @@ export class InterviewController {
         }
     }
 
+    // get interview by id
     static async getInterviewById(req: Request, res: Response): Promise<void> {
         try {
 
@@ -126,6 +130,7 @@ export class InterviewController {
         }
     }
 
+    // get all interivews by job Id
     static async getInterviewsByJobId(req: Request, res: Response): Promise<void> {
         try {
 
@@ -153,6 +158,7 @@ export class InterviewController {
         }
     }
 
+    // update interview
     static async updateExistingInterview(req: Request, res: Response): Promise<void> {
         try {
             if (!req.params.interviewId) throw new Error('missing required field');
@@ -193,6 +199,7 @@ export class InterviewController {
         }
     }
 
+    // delete interview
     static async deleteExistingInterview(req: Request, res: Response): Promise<void> {
         try {
 

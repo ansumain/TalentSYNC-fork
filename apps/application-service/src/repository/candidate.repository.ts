@@ -1,16 +1,7 @@
 import { ResumeData } from "@talentsync/models";
 import { Op, QueryTypes } from "sequelize";
 import { sequelize } from "@talentsync/config";
-
-type SortOrder = 'ASC' | 'DESC';
-
-interface PaginationParams {
-    page: number;
-    limit: number;
-    sortBy: string;
-    sortOrder: SortOrder;
-    search?: string;
-}
+import { PaginationParams } from "../types/PaginationParams.type";
 
 // Map frontend sortBy keys to Sequelize order expressions
 const CANDIDATE_JSON_SORT: Record<string, string> = {
@@ -19,6 +10,7 @@ const CANDIDATE_JSON_SORT: Record<string, string> = {
     phone: `"parsedJSON"->>'phone'`,
 };
 
+// get all candidate parsed data
 const getAllCandidatesParsedJSONRepository = async ({ page, limit, sortBy, sortOrder, search }: PaginationParams) => {
     const offset = (page - 1) * limit;
 
@@ -66,6 +58,7 @@ const getAllCandidatesParsedJSONRepository = async ({ page, limit, sortBy, sortO
     };
 };
 
+// get candidate parsed data by userId
 const getCandidateDataFromUserIdRepository = async (userId: string) => {
     const candidate = await ResumeData.findAll({
         attributes: ['id', 'userId', 'fileName', 'fileURL', 'status', 'parsedJSON', 'createdAt'],
@@ -77,6 +70,7 @@ const getCandidateDataFromUserIdRepository = async (userId: string) => {
     return candidate;
 };
 
+// get candidate data from resumeId
 const getCandidateDataFromResumeIdRepository = async (resumeId: string) => {
     const resume = await ResumeData.findAll({
         attributes: ['id', 'userId', 'fileName', 'fileURL', 'status', 'parsedJSON', 'createdAt'],
@@ -88,6 +82,7 @@ const getCandidateDataFromResumeIdRepository = async (resumeId: string) => {
     return resume;
 };
 
+// get resume status - queued | completed | failed
 const getMyResumeStatusRepository = async (userId: string): Promise<boolean> => {
     const count = await ResumeData.count({ where: { userId, status: { [Op.ne]: 'failed' } } });
     return count > 0;
