@@ -8,6 +8,8 @@ import { ChevronLeft, Medal } from "lucide-react";
 import { jobService, applicationService } from "@/lib/api/application.service";
 import type { Job, RankedApplicant } from "@/lib/api/application.service";
 import { useAuthStore } from "@/stores/authStore";
+import { JOB } from "@/constants/job";
+import { COMMON_MESSAGE } from "@/constants/common";
 
 const STATUS_COLORS: Record<string, string> = {
   applied: "bg-blue-100 text-blue-700",
@@ -62,13 +64,13 @@ export default function JobDetailPage() {
         <header className="flex h-16 shrink-0 items-center gap-2 px-4">
           <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")}>
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Back
+            {COMMON_MESSAGE.BACK}
           </Button>
           <h1 className="text-xl font-semibold">{job ? job.title : "Job Details"}</h1>
         </header>
 
         <div className="flex flex-col gap-4 p-4 pt-0">
-          {loading && <div className="text-center py-8">Loading...</div>}
+          {loading && <div className="text-center py-8">{COMMON_MESSAGE.LOADING}</div>}
           {error && <div className="text-center text-red-500 py-8">{error}</div>}
 
           {!loading && !error && job && (
@@ -76,31 +78,31 @@ export default function JobDetailPage() {
               {/* Overview */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base text-left">Job Overview</CardTitle>
+                  <CardTitle className="text-base text-left">{JOB.JOB_DETAIL.JOB_OVERVIEW}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-left">
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Title</p>
+                    <p className="text-muted-foreground text-xs mb-1">{JOB.JOB_DETAIL.TITLE}</p>
                     <p className="font-medium">{job.title}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Location</p>
+                    <p className="text-muted-foreground text-xs mb-1">{JOB.JOB_DETAIL.LOCATION}</p>
                     <p>{job.location}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Job Type</p>
+                    <p className="text-muted-foreground text-xs mb-1">{JOB.JOB_DETAIL.JOB_TYPE}</p>
                     <span className="inline-flex items-center rounded-full bg-secondary text-secondary-foreground px-2.5 py-0.5 text-xs font-medium">{job.jobType}</span>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Openings</p>
+                    <p className="text-muted-foreground text-xs mb-1">{JOB.JOB_DETAIL.OPENINGS}</p>
                     <p>{job.openings}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Posted At</p>
+                    <p className="text-muted-foreground text-xs mb-1">{JOB.JOB_DETAIL.POSTED_AT}</p>
                     <p>{new Date(job.createdAt).toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Last Updated</p>
+                    <p className="text-muted-foreground text-xs mb-1">{JOB.JOB_DETAIL.LAST_UPDATED}</p>
                     <p>{new Date(job.updatedAt).toLocaleString()}</p>
                   </div>
                 </CardContent>
@@ -110,7 +112,7 @@ export default function JobDetailPage() {
               {job.skills && job.skills.length > 0 && (
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base text-left">Required Skills</CardTitle>
+                    <CardTitle className="text-base text-left">{JOB.JOB_DETAIL.REQUIRED_SKILLS}</CardTitle>
                   </CardHeader>
                   <CardContent className="text-left">
                     <div className="flex flex-wrap gap-2">
@@ -130,7 +132,7 @@ export default function JobDetailPage() {
               {/* Description */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base text-left">Description</CardTitle>
+                  <CardTitle className="text-base text-left">{JOB.JOB_DETAIL.DESCRIPTION}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-left">
                   <p className="text-sm whitespace-pre-wrap">{job.description}</p>
@@ -143,15 +145,15 @@ export default function JobDetailPage() {
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-2 text-left">
                       <Medal className="h-4 w-4 text-muted-foreground" />
-                      <CardTitle className="text-base">Applicant Ranking</CardTitle>
+                      <CardTitle className="text-base">{JOB.JOB_DETAIL.RANKING}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
                     {rankedLoading && (
-                      <p className="text-sm text-muted-foreground py-2">Loading applicants...</p>
+                      <p className="text-sm text-muted-foreground py-2">{JOB.JOB_DETAIL.LOADING_APPLICANTS}</p>
                     )}
                     {!rankedLoading && rankedApplicants.length === 0 && (
-                      <p className="text-sm text-muted-foreground py-2">No applicants yet.</p>
+                      <p className="text-sm text-muted-foreground py-2">{JOB.JOB_DETAIL.NO_APPLICANTS}</p>
                     )}
                     {!rankedLoading && rankedApplicants.length > 0 && (
                       <div className="space-y-3">
@@ -171,20 +173,20 @@ export default function JobDetailPage() {
                               <div className="flex-1 space-y-3 text-left">
                                 <div className="flex flex-wrap items-center gap-4">
                                   <span className="font-medium text-sm">
-                                    {applicant.candidateName ?? <span className="italic text-muted-foreground">Unknown</span>}
+                                    {applicant.candidateName ?? <span className="italic text-muted-foreground">{JOB.JOB_DETAIL.UNKNOWN}</span>}
                                   </span>
                                   <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_COLORS[applicant.currentStatus] ?? "bg-secondary text-secondary-foreground"}`}>
                                     {applicant.currentStatus}
                                   </span>
                                   <span className="text-xs text-muted-foreground">
-                                    Applied {new Date(applicant.appliedAt).toLocaleDateString()}
+                                    {JOB.JOB_DETAIL.APPLIED} {new Date(applicant.appliedAt).toLocaleDateString()}
                                   </span>
                                 </div>
 
                                 {/* Match score */}
                                 <p className="text-xs text-muted-foreground">
                                   <span className="font-semibold text-foreground">{applicant.matchCount}</span>
-                                  {totalRequired > 0 ? `/${totalRequired}` : ""} required skill{applicant.matchCount !== 1 ? "s" : ""} matched
+                                  {totalRequired > 0 ? `/${totalRequired}` : ""} {JOB.JOB_DETAIL.REQUIRED_SKILL}{applicant.matchCount !== 1 ? "s" : ""} {JOB.JOB_DETAIL.MATCHED}
                                 </p>
 
                                 {/* Matched skills */}

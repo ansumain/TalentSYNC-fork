@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import { candidateService, type Candidate } from "@/lib/api/application.service";
 import { API_CONFIG } from "@/lib/api/config";
+import { JOB } from "@/constants/job";
 
 export default function MyResumesPage() {
   const [resumes, setResumes] = useState<Candidate[]>([]);
@@ -25,7 +26,7 @@ export default function MyResumesPage() {
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <h1 className="text-xl font-semibold">My Resumes</h1>
+          <h1 className="text-xl font-semibold">{JOB.RESUME_PAGE.MY_RESUMES}</h1>
         </header>
 
         <div className="flex flex-col gap-4 p-4 pt-0">
@@ -33,7 +34,7 @@ export default function MyResumesPage() {
           {error && <div className="text-center text-red-500 py-8">{error}</div>}
           {!loading && !error && resumes.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
-              No resumes uploaded yet.
+              {JOB.RESUME_PAGE.NO_RESUME}
             </div>
           )}
           {!loading && !error && resumes.map((resume) => {
@@ -48,7 +49,7 @@ export default function MyResumesPage() {
                   <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                     <span className="font-medium truncate">{resume.fileName ?? "Unknown file"}</span>
                     <span className="text-xs text-muted-foreground">
-                      Uploaded {new Date(resume.createdAt).toLocaleString()}
+                      {JOB.RESUME_PAGE.UPLOADED} {new Date(resume.createdAt).toLocaleString()}
                     </span>
                   </div>
                   {resume.status && (
@@ -70,7 +71,7 @@ export default function MyResumesPage() {
                       size="sm"
                       onClick={() => window.open(fileViewUrl, "_blank", "noopener,noreferrer")}
                     >
-                      View
+                      {JOB.RESUME_PAGE.VIEW}
                     </Button>
                   )}
                 </CardContent>

@@ -9,6 +9,7 @@ import type { Job } from "@/lib/api/application.service";
 import { toast } from "sonner";
 import { AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { TablePagination } from "@/components/ui/table-pagination";
+import { JOB } from "@/constants/job";
 
 type SortField = "createdAt" | "title";
 
@@ -80,20 +81,20 @@ export default function JobBoardPage() {
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
-          <h1 className="text-xl font-semibold">Open Jobs</h1>
+          <h1 className="text-xl font-semibold">{JOB.JOB_BOARD.OPEN_JOBS}</h1>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Sort by:</span>
+            <span>{JOB.JOB_BOARD.SORT_BY}</span>
             <button
               className={`flex items-center gap-1 px-2 py-1 rounded hover:bg-muted ${sortBy === "createdAt" ? "font-medium text-foreground" : ""}`}
               onClick={() => handleSort("createdAt")}
             >
-              Date <SortIcon field="createdAt" />
+              {JOB.JOB_BOARD.DATE} <SortIcon field="createdAt" />
             </button>
             <button
               className={`flex items-center gap-1 px-2 py-1 rounded hover:bg-muted ${sortBy === "title" ? "font-medium text-foreground" : ""}`}
               onClick={() => handleSort("title")}
             >
-              Title <SortIcon field="title" />
+              {JOB.JOB_BOARD.TITLE} <SortIcon field="title" />
             </button>
           </div>
         </header>
@@ -103,21 +104,21 @@ export default function JobBoardPage() {
             <div className="flex items-center gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>
-                You need to upload a resume before you can apply for jobs.{" "}
+                {JOB.JOB_BOARD.APPLY_CONSTRAINT}{" "}
                 <button
                   className="font-semibold underline hover:text-amber-900"
                   onClick={() => navigate("/upload")}
                 >
-                  Go to Upload →
+                  {JOB.JOB_BOARD.GO_TO_UPLOAD}
                 </button>
               </span>
             </div>
           )}
 
-          {loading && <div className="text-center py-8 text-muted-foreground">Loading jobs...</div>}
+          {loading && <div className="text-center py-8 text-muted-foreground">{JOB.JOB_BOARD.LOADING_JOBS}</div>}
 
           {!loading && jobs.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">No open jobs available at the moment.</div>
+            <div className="text-center py-8 text-muted-foreground">{JOB.JOB_BOARD.NO_JOBS}</div>
           )}
 
           {!loading &&
@@ -139,15 +140,15 @@ export default function JobBoardPage() {
                       disabled={hasResume === false || applied[job.jobId] || applying[job.jobId]}
                       onClick={() => handleApply(job.jobId)}
                     >
-                      {applying[job.jobId] ? "Applying..." : applied[job.jobId] ? "Applied" : "Apply"}
+                      {applying[job.jobId] ? JOB.JOB_BOARD.APPLYING : applied[job.jobId] ? JOB.JOB_BOARD.APPLIED : JOB.JOB_BOARD.APPLY}
                     </Button>
                   </div>
                 </CardContent>
                 <CardContent className="text-left text-sm text-muted-foreground space-y-3">
                   <p className="line-clamp-3">{job.description}</p>
                   <div className="flex items-center gap-4 text-xs">
-                    <span>{job.openings} opening{job.openings !== 1 ? "s" : ""}</span>
-                    <span>Posted {new Date(job.createdAt).toLocaleDateString()}</span>
+                    <span>{job.openings} {JOB.JOB_BOARD.OPENING}{job.openings !== 1 ? "s" : ""}</span>
+                    <span>{JOB.JOB_BOARD.POSTED} {new Date(job.createdAt).toLocaleDateString()}</span>
                   </div>
                 </CardContent>
               </Card>

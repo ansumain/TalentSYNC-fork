@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useJobStore } from "@/stores/jobStore";
 import { skillService, type Skill } from "@/lib/api/application.service";
+import { JOB } from "@/constants/job";
 
 const JOB_TYPES = ["Remote", "On-site", "Hybrid"] as const;
 
@@ -78,20 +79,20 @@ export function AddJobDialog() {
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          Add Job
+          {JOB.NEW_JOB.ADD}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Job</DialogTitle>
+          <DialogTitle>{JOB.NEW_JOB.ADD_NEW}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
 
           {/* Title */}
           <div className="flex flex-col gap-1.5">
-            <Label>Title <span className="text-red-500">*</span></Label>
+            <Label>{JOB.NEW_JOB.TITLE} <span className="text-red-500">*</span></Label>
             <Input
               placeholder="e.g. Backend Developer"
               value={form.title}
@@ -101,7 +102,7 @@ export function AddJobDialog() {
 
           {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <Label>Description <span className="text-red-500">*</span></Label>
+            <Label>{JOB.NEW_JOB.DESCRIPTION} <span className="text-red-500">*</span></Label>
             <textarea
               className="min-h-[90px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
               placeholder="Describe the role and responsibilities..."
@@ -112,7 +113,7 @@ export function AddJobDialog() {
 
           {/* Location */}
           <div className="flex flex-col gap-1.5">
-            <Label>Location <span className="text-red-500">*</span></Label>
+            <Label>{JOB.NEW_JOB.LOCATION} <span className="text-red-500">*</span></Label>
             <Input
               placeholder="e.g. Bhubaneswar, India"
               value={form.location}
@@ -123,13 +124,13 @@ export function AddJobDialog() {
           {/* Job Type + Openings */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label>Job Type <span className="text-red-500">*</span></Label>
+              <Label>{JOB.NEW_JOB.JOB_TYPE} <span className="text-red-500">*</span></Label>
               <select
                 className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 value={form.jobType}
                 onChange={e => setForm(prev => ({ ...prev, jobType: e.target.value }))}
               >
-                <option value="">Select type</option>
+                <option value="">{JOB.NEW_JOB.SELECT_TYPE}</option>
                 {JOB_TYPES.map(t => (
                   <option key={t} value={t}>{t}</option>
                 ))}
@@ -137,22 +138,22 @@ export function AddJobDialog() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Openings <span className="text-red-500">*</span></Label>
+              <Label>{JOB.NEW_JOB.OPENINGS} <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 min={1}
                 value={form.openings}
-                onChange={e => setForm(prev => ({ ...prev, openings: parseInt(e.target.value)}))}
+                onChange={e => setForm(prev => ({ ...prev, openings: parseInt(e.target.value) }))}
               />
             </div>
           </div>
 
           {/* Required Skills */}
           <div className="flex flex-col gap-1.5">
-            <Label>Required Skills</Label>
+            <Label>{JOB.NEW_JOB.REQ_SKILLS}</Label>
             <div className="border border-input rounded-md p-3 max-h-40 overflow-y-auto grid grid-cols-2 gap-2">
               {skills.length === 0 ? (
-                <p className="text-muted-foreground text-xs col-span-2">Loading skills...</p>
+                <p className="text-muted-foreground text-xs col-span-2">{JOB.NEW_JOB.LOADING_SKILLS}</p>
               ) : skills.map(skill => (
                 <label
                   key={skill.skillId}
@@ -175,10 +176,10 @@ export function AddJobDialog() {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>
-            Cancel
+            {JOB.NEW_JOB.CANCEL}
           </Button>
           <Button onClick={handleSubmit} disabled={submitting}>
-            {submitting ? "Creating..." : "Create Job"}
+            {submitting ? JOB.NEW_JOB.CREATING_JOB : JOB.NEW_JOB.CREATE_JOB}
           </Button>
         </DialogFooter>
       </DialogContent>

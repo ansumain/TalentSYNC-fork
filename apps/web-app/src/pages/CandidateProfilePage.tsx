@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, FileText } from "lucide-react";
 import type { Candidate } from "@/lib/api/application.service";
 import { API_CONFIG } from "@/lib/api/config";
+import { CANDIDATE } from "@/constants/candidate";
+import { COMMON_MESSAGE } from "@/constants/common";
 
 export default function CandidateProfilePage() {
   const location = useLocation();
@@ -19,9 +21,9 @@ export default function CandidateProfilePage() {
         <SidebarInset>
           <div className="flex flex-1 items-center justify-center p-8">
             <div className="text-center">
-              <p className="text-muted-foreground mb-4">Candidate data not found.</p>
+              <p className="text-muted-foreground mb-4">{CANDIDATE.CANDIDATE_TABLE.NO_DATA}</p>
               <Button variant="outline" onClick={() => navigate("/candidates")}>
-                Back to Candidates
+                {CANDIDATE.CANDIDATE_PROFILE.BACK_TO_CANDIDATES}
               </Button>
             </div>
           </div>
@@ -41,7 +43,7 @@ export default function CandidateProfilePage() {
         <header className="flex h-16 shrink-0 items-center gap-2 px-4">
           <Button variant="ghost" size="sm" onClick={() => navigate("/candidates")}>
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Back
+            {COMMON_MESSAGE.BACK}
           </Button>
           <h1 className="text-xl font-semibold">{parsedJSON.name || "Candidate Profile"}</h1>
         </header>
@@ -51,27 +53,27 @@ export default function CandidateProfilePage() {
           {/* Basic Info */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base text-left">Basic Information</CardTitle>
+              <CardTitle className="text-base text-left">{CANDIDATE.CANDIDATE_PROFILE.BASIC_INFO}</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-left">
               <div>
-                <p className="text-muted-foreground text-xs mb-1">Name</p>
+                <p className="text-muted-foreground text-xs mb-1">{CANDIDATE.CANDIDATE_TABLE.NAME}</p>
                 <p>{parsedJSON.name || <span className="text-muted-foreground">-</span>}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-xs mb-1">Email</p>
+                <p className="text-muted-foreground text-xs mb-1">{CANDIDATE.CANDIDATE_TABLE.EMAIL}</p>
                 <p>{parsedJSON.email || <span className="text-muted-foreground">-</span>}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-xs mb-1">Phone</p>
+                <p className="text-muted-foreground text-xs mb-1">{CANDIDATE.CANDIDATE_TABLE.PHONE}</p>
                 <p>{parsedJSON.phone || <span className="text-muted-foreground">-</span>}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-xs mb-1">Total Experience</p>
+                <p className="text-muted-foreground text-xs mb-1">{CANDIDATE.CANDIDATE_PROFILE.TOTAL_EXP}</p>
                 <p>{parsedJSON.totalExperience != null ? `${parsedJSON.totalExperience} months` : <span className="text-muted-foreground">-</span>}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-xs mb-1">Uploaded At</p>
+                <p className="text-muted-foreground text-xs mb-1">{CANDIDATE.CANDIDATE_TABLE.UPLOADED_AT}</p>
                 <p>{new Date(createdAt).toLocaleString()}</p>
               </div>
             </CardContent>
@@ -81,7 +83,7 @@ export default function CandidateProfilePage() {
           {fileViewUrl && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base text-left">Resume File</CardTitle>
+                <CardTitle className="text-base text-left">{CANDIDATE.CANDIDATE_PROFILE.RESUME_FILE}</CardTitle>
               </CardHeader>
               <CardContent className="flex items-center gap-4 text-sm text-left">
                 <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
@@ -98,7 +100,7 @@ export default function CandidateProfilePage() {
                   size="sm"
                   onClick={() => window.open(fileViewUrl, '_blank', 'noopener,noreferrer')}
                 >
-                  View
+                  {CANDIDATE.CANDIDATE_PROFILE.VIEW}
                 </Button>
               </CardContent>
             </Card>
@@ -107,7 +109,7 @@ export default function CandidateProfilePage() {
           {/* Skills */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base text-left">Skills</CardTitle>
+              <CardTitle className="text-base text-left">{CANDIDATE.CANDIDATE_PROFILE.SKILLS}</CardTitle>
             </CardHeader>
             <CardContent className="text-left">
               {parsedJSON.skills?.length > 0 ? (
@@ -117,7 +119,7 @@ export default function CandidateProfilePage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground text-sm">No skills found.</p>
+                <p className="text-muted-foreground text-sm">{CANDIDATE.CANDIDATE_PROFILE.NO_SKILLS}</p>
               )}
             </CardContent>
           </Card>
@@ -128,7 +130,7 @@ export default function CandidateProfilePage() {
             {/* Education */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base text-left">Education</CardTitle>
+                <CardTitle className="text-base text-left">{CANDIDATE.CANDIDATE_PROFILE.EDUCATION}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-3 text-left">
                 {parsedJSON.education?.length > 0 ? parsedJSON.education.map((edu, i) => (
@@ -137,7 +139,7 @@ export default function CandidateProfilePage() {
                     <p className="text-muted-foreground text-xs">{edu.batch}</p>
                   </div>
                 )) : (
-                  <p className="text-muted-foreground text-sm">No education data found.</p>
+                  <p className="text-muted-foreground text-sm">{CANDIDATE.CANDIDATE_PROFILE.NO_EDUCATION}</p>
                 )}
               </CardContent>
             </Card>
@@ -145,7 +147,7 @@ export default function CandidateProfilePage() {
             {/* Work Experience */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base text-left">Work Experience</CardTitle>
+                <CardTitle className="text-base text-left">{CANDIDATE.CANDIDATE_PROFILE.WORK_EXP}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-3 text-left">
                 {parsedJSON.experience?.length > 0 ? parsedJSON.experience.map((exp, i) => (
@@ -158,7 +160,7 @@ export default function CandidateProfilePage() {
                     </p>
                   </div>
                 )) : (
-                  <p className="text-muted-foreground text-sm">No experience data found.</p>
+                  <p className="text-muted-foreground text-sm">{CANDIDATE.CANDIDATE_PROFILE.NO_WORK_EXP}</p>
                 )}
               </CardContent>
             </Card>

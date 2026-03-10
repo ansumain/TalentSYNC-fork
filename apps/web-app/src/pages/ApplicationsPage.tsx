@@ -8,6 +8,7 @@ import { applicationService } from "@/lib/api/application.service";
 import type { JobApplication } from "@/lib/api/application.service";
 import { toast } from "sonner";
 import { SortableTh, TablePagination } from "@/components/ui/table-pagination";
+import { JOB } from "@/constants/job";
 
 const STATUS_COLORS: Record<string, string> = {
   applied: "bg-blue-100 text-blue-700",
@@ -48,7 +49,7 @@ export default function ApplicationsPage() {
         setTotal(res.total);
         setTotalPages(res.totalPages);
       })
-      .catch(() => toast.error("Failed to load your applications"))
+      .catch(() => toast.error(JOB.APPLICATION_PAGE.FAILED_TO_LOAD_APPLICATIONS))
       .finally(() => setLoading(false));
   }, [page, limit, sortBy, sortOrder, search]);
 
@@ -57,7 +58,7 @@ export default function ApplicationsPage() {
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <h1 className="text-xl font-semibold">My Applications</h1>
+          <h1 className="text-xl font-semibold">{JOB.APPLICATION_PAGE.MY_APPLICATIONS}</h1>
         </header>
 
         <div className="flex flex-col gap-4 p-4 pt-0">
@@ -77,7 +78,7 @@ export default function ApplicationsPage() {
 
           {!loading && total === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              You haven't applied to any jobs yet.
+              {JOB.APPLICATION_PAGE.NO_JOB_APPLICATIONS}
             </div>
           )}
 
@@ -85,7 +86,7 @@ export default function ApplicationsPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base text-left">
-                  {total} Application{total !== 1 ? "s" : ""}
+                  {total} {JOB.APPLICATION_PAGE.APPLICATION}{total !== 1 ? "s" : ""}
                 </CardTitle>
               </CardHeader>
               <CardContent>

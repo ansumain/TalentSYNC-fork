@@ -13,6 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SortableHead, TablePagination } from "@/components/ui/table-pagination";
+import { CANDIDATE } from "@/constants/candidate";
+import { COMMON_MESSAGE } from "@/constants/common";
 
 export function CandidateTable() {
   const {
@@ -53,33 +55,33 @@ export function CandidateTable() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <div className="flex gap-2 w-full sm:w-auto">
           <Input
-            placeholder="Search by name..."
+            placeholder={CANDIDATE.CANDIDATE_TABLE.SEARCH_BY_NAME}
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleSearch(); }}
             className="w-64"
           />
-          <Button onClick={handleSearch} variant="outline">Search</Button>
-          <Button onClick={() => { setSearch(""); clearFilter(); fetchAll(); }} variant="ghost">Clear</Button>
+          <Button onClick={handleSearch} variant="outline">{COMMON_MESSAGE.SEARCH}</Button>
+          <Button onClick={() => { setSearch(""); clearFilter(); fetchAll(); }} variant="ghost">{COMMON_MESSAGE.CLEAR}</Button>
         </div>
       </div>
-      {loading && <div className="text-center py-8">Loading...</div>}
+      {loading && <div className="text-center py-8">{COMMON_MESSAGE.LOADING}</div>}
       {error && <div className="text-center text-red-500 py-8">{error}</div>}
       {!loading && !error && (
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <SortableHead column="name" label="Name" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="email" label="Email" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="phone" label="Phone" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="createdAt" label="Uploaded At" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="name" label={CANDIDATE.CANDIDATE_TABLE.NAME} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="email" label={CANDIDATE.CANDIDATE_TABLE.EMAIL} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="phone" label={CANDIDATE.CANDIDATE_TABLE.PHONE} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="createdAt" label={CANDIDATE.CANDIDATE_TABLE.UPLOADED_AT} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
               </TableRow>
             </TableHeader>
             <TableBody>
               {candidates.length === 0 ? (
                 <TableRow>
-                  <td colSpan={4} className="text-center py-8 text-muted-foreground">No Candidate Data Found.</td>
+                  <td colSpan={4} className="text-center py-8 text-muted-foreground">{CANDIDATE.CANDIDATE_TABLE.NO_DATA}</td>
                 </TableRow>
               ) : candidates.map((c) => (
                 <TableRow

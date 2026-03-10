@@ -1,0 +1,240 @@
+import { SquareTerminal } from "lucide-react"
+
+const navigationByRole = {
+    candidate: [
+        {
+            title: "Resume",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Upload Resume",
+                    url: "/upload",
+                },
+                {
+                    title: "My Resumes",
+                    url: "/my-resumes",
+                }
+            ],
+        },
+        {
+            title: "Jobs",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Open",
+                    url: "/job-board",
+                },
+                {
+                    title: "Applied",
+                    url: "/my-applications",
+                }
+            ],
+        },
+        {
+            title: "Interviews",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Scheduled",
+                    url: "#",
+                },
+                {
+                    title: "Completed",
+                    url: "#",
+                }
+            ],
+        }
+    ],
+    interviewer: [
+        {
+            title: "Interviews",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Assigned",
+                    url: "#",
+                },
+                {
+                    title: "Scheduled",
+                    url: "#",
+                },
+                {
+                    title: "Completed",
+                    url: "#",
+                },
+                {
+                    title: "Feedback Pending",
+                    url: "#",
+                },
+            ],
+        },
+        {
+            title: "Candidates",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "My Candidates",
+                    url: "#",
+                }
+            ],
+        }
+    ],
+    manager: [
+        // {
+        //   title: "Interviews",
+        //   url: "#",
+        //   icon: SquareTerminal,
+        //   isActive: true,
+        //   items: [
+        //     {
+        //       title: "Assigned",
+        //       url: "#",
+        //     },
+        //     {
+        //       title: "Schedule",
+        //       url: "#",
+        //     },
+        //     {
+        //       title: "Completed",
+        //       url: "#",
+        //     },
+        //     {
+        //       title: "Pending Feedback",
+        //       url: "#",
+        //     }
+        //   ],
+        // },
+        {
+            title: "Candidates",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Add Resumes",
+                    url: "/upload",
+                },
+                {
+                    title: "Candidates",
+                    url: "/candidates",
+                }
+            ],
+        },
+        {
+            title: "Manage",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Jobs",
+                    url: "/jobs",
+                },
+                {
+                    title: "Applications",
+                    url: "/applications",
+                },
+            ]
+        }
+    ],
+    admin: [
+        // {
+        //   title: "Interviews",
+        //   url: "#",
+        //   icon: SquareTerminal,
+        //   isActive: true,
+        //   items: [
+        //     {
+        //       title: "Assigned",
+        //       url: "#",
+        //     },
+        //     {
+        //       title: "Schedule",
+        //       url: "#",
+        //     },
+        //     {
+        //       title: "Completed",
+        //       url: "#",
+        //     },
+        //     {
+        //       title: "Pending Feedback",
+        //       url: "#",
+        //     }
+        //   ],
+        // },
+        {
+            title: "Candidates",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Add Resume",
+                    url: "/upload",
+                },
+                {
+                    title: "Candidates",
+                    url: "/candidates",
+                }
+            ],
+        },
+        {
+            title: "Manage",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Jobs",
+                    url: "/jobs",
+                },
+                {
+                    title: "Applications",
+                    url: "/applications",
+                },
+                // {
+                //   title: "Roles",
+                //   url: "#",
+                // },
+                // {
+                //   title: "Permissions",
+                //   url: "#",
+                // }
+            ],
+        },
+        {
+            title: "Analytics",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Interview Report",
+                    url: "#",
+                },
+                {
+                    title: "Candidate Report",
+                    url: "#",
+                },
+                {
+                    title: "Hiring Summary",
+                    url: "#",
+                },
+            ],
+        }
+    ]
+}
+
+const SIDEBAR_TITLE = 'TalentSYNC';
+
+export { navigationByRole, SIDEBAR_TITLE };

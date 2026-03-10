@@ -1,0 +1,67 @@
+const AUTH = {
+    LOGIN: {
+        WELCOME: 'Welcome back',
+        EMAIL: 'Email',
+        PASSWORD: 'Password',
+        FORGOT_PASSWORD: 'Forgot your password?',
+        NO_ACCOUNT: "Don't have an account?",
+        SIGNUP: 'Sign Up',
+        LOGGEDIN: 'Login successful!',
+        NOT_LOGGEDIN: 'Login failed! Please try again!',
+        ENTER_EMAIL: 'Enter you email',
+        ENTER_PASSWORD: 'Enter your password',
+        SIGNING_IN: 'Signing In...',
+        SIGN_IN: 'Sign In',
+        HEADING: 'TalentSYNC - Recruitment Solutions',
+    },
+    SIGNUP: {
+        CREATE: 'Create your account',
+        NAME: 'Name',
+        EMAIL: 'Email',
+        PHONE: 'Phone',
+        PASSWORD: 'Password',
+        CONFIRM_PASSWORD: 'Confirm Password',
+        HAVE_ACCOUNT: 'Already have an account?',
+        SIGNIN: 'Sign in',
+        ACCOUNT_CREATED: 'Account created successfully! \nWelcome,',
+        REG_FAILED: 'Registration failed. Please try again.',
+        ENTER_NAME: 'Enter your full name',
+        ENTER_EMAIL: 'Enter your email',
+        ENTER_PHONE: 'Enter your phone number',
+        CREATE_PASSWORD: 'Create password',
+        CREATE_CONFIRM_PASSWORD: 'Confirm password',
+        CREATING_ACC: 'Creating account...',
+        CREATE_ACC: 'Create account',
+        HEADING: 'TalentSYNC'
+    },
+    FORGOT_PASSWORD: {
+        FORGOT_PASSWORD: 'Forgot Password',
+        ENTER_EMAIL: "Enter your email and we'll send you an OTP to reset your password",
+        EMAIL: 'Email',
+        REMEMBER_PASSWORD: 'Remember your password?',
+        SIGNIN: 'Sign In',
+        OTP_SENT: 'OTP sent to your email!',
+        OTP_FAILED: 'Failed to send OTP. Please try again.',
+        ENTER_EMAIL_PLACEHOLDER: 'Enter your email',
+        SENDING_OTP: 'Sending OTP...',
+        HEADING: 'TalentSYNC'
+    },
+    RESET_PASSWORD: {
+        RESET: 'Reset Password',
+        OTP_SENT: 'OTP sent to your registered mail',
+        EMAIL: 'Email',
+        OTP: 'OTP',
+        NEW_PASSWORD: 'New Password',
+        REMEMBER_PASSWORD: 'Remember your password?',
+        SIGNIN: 'Sign In',
+        PASSWORD_RESET: 'Password reset successfully!',
+        PASSWORD_RESET_FAILED: 'Failed to reset password. Please try again.',
+        ENTER_OTP: 'Enter OTP from registered mail',
+        CREATE_NEW_PASSWORD: 'Create new password',
+        RESETTING_PASSWORD: 'Resetting password...',
+        RESET_PASSWORD: 'Reset Password',
+        HEADING: 'TalentSYNC'
+    }
+}
+
+export { AUTH };

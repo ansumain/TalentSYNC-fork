@@ -22,6 +22,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/api/auth.service";
 import { forgotPasswordSchema, type ForgotPasswordFormData } from "@/lib/validations/auth.schema";
+import { AUTH } from "@/constants/auth";
+import { COMMON_MESSAGE } from "@/constants/common";
 
 export function ForgotPassword() {
   const navigate = useNavigate();
@@ -40,12 +42,12 @@ export function ForgotPassword() {
 
     try {
       const response = await authService.forgotPassword(data);
-      toast.success(response.message || 'OTP sent to your email!');
+      toast.success(response.message || AUTH.FORGOT_PASSWORD.OTP_SENT);
       // Navigate to reset password page with email in state
       navigate('/reset-password', { state: { email: data.email } });
     } catch (error) {
       const err = error as { message: string };
-      toast.error(err.message || 'Failed to send OTP. Please try again.');
+      toast.error(err.message || AUTH.FORGOT_PASSWORD.OTP_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -55,19 +57,19 @@ export function ForgotPassword() {
     <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Forgot Password</CardTitle>
+          <CardTitle className="text-xl">{AUTH.FORGOT_PASSWORD.FORGOT_PASSWORD}</CardTitle>
           <CardDescription>
-            Enter your email and we'll send you an OTP to reset your password
+            {AUTH.FORGOT_PASSWORD.ENTER_EMAIL}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">{AUTH.FORGOT_PASSWORD.EMAIL}</FieldLabel>
                 <Input
                   id="email"
-                  placeholder="Enter your email"
+                  placeholder={AUTH.FORGOT_PASSWORD.ENTER_EMAIL}
                   {...register("email")}
                   disabled={isLoading}
                 />
@@ -77,11 +79,11 @@ export function ForgotPassword() {
               </Field>
               <Field>
                 <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? 'Sending OTP...' : 'Continue'}
+                  {isLoading ? AUTH.FORGOT_PASSWORD.SENDING_OTP : COMMON_MESSAGE.CONTINUE}
                 </Button>
                 <FieldDescription className="text-center">
-                  Remember your password?{" "}
-                  <Link to="/signin" className="underline">Sign In</Link>
+                  {AUTH.FORGOT_PASSWORD.REMEMBER_PASSWORD}{" "}
+                  <Link to="/signin" className="underline">{AUTH.FORGOT_PASSWORD.SIGNIN}</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

@@ -9,6 +9,7 @@ import type { JobApplication, ApplicationStatus } from "@/lib/api/application.se
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { SortableTh, TablePagination } from "@/components/ui/table-pagination";
+import { JOB } from "@/constants/job";
 
 const ALL_STATUSES: ApplicationStatus[] = [
   "applied",
@@ -78,24 +79,24 @@ export default function ApplicationsAdminPage() {
           app.applicationId === applicationId ? { ...app, currentStatus: newStatus } : app
         )
       );
-      toast.success("Status updated.");
+      toast.success(JOB.ADMIN_APPLICATION_PAGE.STATUS_UPDATED);
     } catch {
-      toast.error("Failed to update status.");
+      toast.error(JOB.ADMIN_APPLICATION_PAGE.FAILED_UPDATE_STATUS);
     } finally {
       setUpdating((prev) => ({ ...prev, [applicationId]: false }));
     }
   };
 
   const handleDelete = async (applicationId: string) => {
-    if (!window.confirm('Remove this application? This cannot be undone.')) return;
+    if (!window.confirm(JOB.ADMIN_APPLICATION_PAGE.REMOVE_APPLICATION)) return;
     setDeleting((prev) => ({ ...prev, [applicationId]: true }));
     try {
       await applicationService.deleteApplication(applicationId);
       setApplications((prev) => prev.filter((a) => a.applicationId !== applicationId));
       setTotal((t) => t - 1);
-      toast.success('Application removed.');
+      toast.success(JOB.ADMIN_APPLICATION_PAGE.APPLICATION_REMOVED);
     } catch {
-      toast.error('Failed to remove application.');
+      toast.error(JOB.ADMIN_APPLICATION_PAGE.FAILED_REMOVE_APPLICATION);
     } finally {
       setDeleting((prev) => ({ ...prev, [applicationId]: false }));
     }
@@ -112,7 +113,7 @@ export default function ApplicationsAdminPage() {
         <div className="flex flex-col gap-4 p-4 pt-0">
           <div className="flex gap-2">
             <Input
-              placeholder="Search by candidate or job title..."
+              placeholder={JOB.ADMIN_APPLICATION_PAGE.SEARCH_CANDIDATE_TITLE}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
@@ -125,14 +126,14 @@ export default function ApplicationsAdminPage() {
           {loading && <div className="text-center py-8 text-muted-foreground">Loading...</div>}
 
           {!loading && applications.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">No applications yet.</div>
+            <div className="text-center py-8 text-muted-foreground">{JOB.ADMIN_APPLICATION_PAGE.NO_APPLICATIONS}</div>
           )}
 
           {!loading && (total > 0 || applications.length > 0) && (
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base text-left">
-                  {total} Application{total !== 1 ? "s" : ""}
+                  {total} {JOB.ADMIN_APPLICATION_PAGE.APPLICATION}{total !== 1 ? "s" : ""}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -144,7 +145,7 @@ export default function ApplicationsAdminPage() {
                         <SortableTh column="jobTitle" label="Job Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <SortableTh column="currentStatus" label="Current Status" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <SortableTh column="createdAt" label="Applied On" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                        <th className="py-2 pr-4 font-medium">Update Status</th>
+                        <th className="py-2 pr-4 font-medium">{JOB.ADMIN_APPLICATION_PAGE.UPDATE_STATUS}</th>
                         <th className="py-2 font-medium"></th>
                       </tr>
                     </thead>
@@ -152,10 +153,10 @@ export default function ApplicationsAdminPage() {
                       {applications.map((app) => (
                         <tr key={app.applicationId} className="border-b last:border-0 hover:bg-muted/40">
                           <td className="py-3 pr-4 font-medium">
-                            {app.candidateName ?? <span className="text-muted-foreground italic">Unknown</span>}
+                            {app.candidateName ?? <span className="text-muted-foreground italic">{JOB.ADMIN_APPLICATION_PAGE.UNKNOWN}</span>}
                           </td>
                           <td className="py-3 pr-4 text-muted-foreground">
-                            {app.jobTitle ?? <span className="italic">Unknown</span>}
+                            {app.jobTitle ?? <span className="italic">{JOB.ADMIN_APPLICATION_PAGE.UNKNOWN}</span>}
                           </td>
                           <td className="py-3 pr-4">
                             <span

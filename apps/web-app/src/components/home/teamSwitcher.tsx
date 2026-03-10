@@ -4,8 +4,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem
-} from "@/components/ui/sidebar"
-import { GalleryVerticalEnd } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { GalleryVerticalEnd } from "lucide-react";
+import { SIDEBAR_TITLE } from "@/constants/sidebar";
 
 export function TeamSwitcher() {
 
@@ -20,7 +21,7 @@ export function TeamSwitcher() {
             <GalleryVerticalEnd className="size-4" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">TalentSYNC</span>
+            <span className="truncate font-medium">{SIDEBAR_TITLE}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>

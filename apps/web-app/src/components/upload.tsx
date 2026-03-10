@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useUploadStore } from "@/stores/uploadStore";
+import { UPLOAD } from "@/constants/upload";
+import { COMMON_MESSAGE } from "@/constants/common";
 
 export function FileUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,14 +53,14 @@ export function FileUpload() {
     // Candidates may only upload one file at a time
     if (isCandidate) {
       if (filesArray.length > 1) {
-        toast.error('You can only upload one resume at a time.', {
+        toast.error(UPLOAD.UPLOAD_COMPONENT.ONE_UPLOAD, {
           position: "bottom-right",
           duration: 3000,
         });
         return;
       }
       if (files.length >= 1) {
-        toast.error('Remove the current file before adding a new one.', {
+        toast.error(UPLOAD.UPLOAD_COMPONENT.REMOVE_CURRENT, {
           position: "bottom-right",
           duration: 3000,
         });
@@ -113,18 +115,18 @@ export function FileUpload() {
       const currentState = useUploadStore.getState();
 
       if (currentState.failedCount === 0) {
-        toast.success("All resumes uploaded successfully!", {
+        toast.success(UPLOAD.UPLOAD_COMPONENT.ALL_RES_UPLOADED, {
           position: "bottom-right",
           duration: 2000,
         });
       } else {
-        toast.error(`${currentState.failedCount} file(s) failed to upload`, {
+        toast.error(`${currentState.failedCount} ${UPLOAD.UPLOAD_COMPONENT.FAILED_UPLOAD}`, {
           position: "bottom-right",
           duration: 3000,
         });
       }
     } catch (error) {
-      toast.error("Upload failed. Please try again.", {
+      toast.error(UPLOAD.UPLOAD_COMPONENT.UPLOAD_FAILED, {
         position: "bottom-right",
         duration: 3000,
       });
@@ -190,12 +192,12 @@ export function FileUpload() {
             />
             <div className="mt-4 flex flex-col gap-2 text-sm leading-6 text-muted-foreground">
               <div className="flex justify-center items-center gap-1">
-                <p>Drag and drop or</p>
+                <p>{UPLOAD.UPLOAD_COMPONENT.DRAG_DROP}</p>
                 <label
                   htmlFor="file-upload"
                   className="relative cursor-pointer rounded-sm font-medium text-primary hover:underline hover:underline-offset-4"
                 >
-                  <span>{isCandidate ? 'choose file' : 'choose files'}</span>
+                  <span>{isCandidate ? UPLOAD.UPLOAD_COMPONENT.CHOOSE_FILE : UPLOAD.UPLOAD_COMPONENT.CHOOSE_FILES}</span>
                   <input
                     id="file-upload"
                     name="file-upload"
@@ -208,7 +210,7 @@ export function FileUpload() {
                     disabled={status === 'uploading'}
                   />
                 </label>
-                <p>to upload</p>
+                <p>{UPLOAD.UPLOAD_COMPONENT.TO_UPLOAD}</p>
               </div>
             </div>
           </div>
@@ -216,9 +218,9 @@ export function FileUpload() {
 
         <p className="text-pretty mt-2 text-xs leading-5 text-muted-foreground sm:flex sm:items-center sm:justify-between">
           <span>
-            Accepted file types: JPEG, PNG, PDF or DOCX files.
+            {UPLOAD.UPLOAD_COMPONENT.ACCEPTED_FILE}
           </span>
-          <span className="pl-1 sm:pl-0">Max. size: 10MB per file</span>
+          <span className="pl-1 sm:pl-0">{UPLOAD.UPLOAD_COMPONENT.MAX_SIZE}</span>
         </p>
 
         {totalFiles > 0 && (
@@ -245,7 +247,7 @@ export function FileUpload() {
                   onClick={reset}
                   className="text-xs"
                 >
-                  Clear All
+                  {UPLOAD.UPLOAD_COMPONENT.CLEAR_ALL}
                 </Button>
               )}
             </div>
@@ -314,7 +316,7 @@ export function FileUpload() {
               variant="outline"
               onClick={retryFailed}
             >
-              Retry Failed ({failedCount})
+              {UPLOAD.UPLOAD_COMPONENT.RETRY_FAILED} ({failedCount})
             </Button>
           )}
 
@@ -327,7 +329,7 @@ export function FileUpload() {
                 fileInputRef.current?.click();
               }}
             >
-              Upload More
+              {UPLOAD.UPLOAD_COMPONENT.UPLOAD_MORE}
             </Button>
           )}
 
@@ -339,7 +341,7 @@ export function FileUpload() {
                 onClick={reset}
                 disabled={status === 'uploading' || totalFiles === 0}
               >
-                Cancel
+                {COMMON_MESSAGE.CANCEL}
               </Button>
               <Button
                 type="button"
@@ -350,7 +352,7 @@ export function FileUpload() {
                 {status === 'uploading' ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Uploading...
+                    {UPLOAD.UPLOAD_COMPONENT.UPLOADING}
                   </>
                 ) :
                   `Upload ${pendingFiles > 0 ? `(${pendingFiles})` : ''}`

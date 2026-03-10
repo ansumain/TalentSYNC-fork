@@ -23,6 +23,8 @@ import { Button } from "./ui/button"
 import { toast } from "sonner"
 import { apiClient } from "@/lib/api/client"
 import { API_ENDPOINTS } from "@/lib/api/config"
+import { SETTINGS } from "@/constants/settings"
+import { COMMON_MESSAGE } from "@/constants/common"
 
 
 const data = {
@@ -73,7 +75,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       setProfile(res.data)
     } catch (error) {
       const err = error as { message: string }
-      toast.error(err.message || "Failed to load profile")
+      toast.error(err.message || SETTINGS.DIALOG.LOAD_PROFILE_FAILED)
     } finally {
       setLoading(false)
     }
@@ -82,23 +84,23 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const handleUpdateProfile = async () => {
     try {
       await apiClient.put(API_ENDPOINTS.USER.UPDATE_PROFILE, profile)
-      toast.success("Profile updated")
+      toast.success(SETTINGS.DIALOG.PROFILE_UPDATED)
       setIsEditing(false)
     } catch (error) {
       const err = error as { message: string }
-      toast.error(err.message || "Profile update failed")
+      toast.error(err.message || SETTINGS.DIALOG.PROFILE_UPDATE_FAILED)
     }
   }
 
   const handleUpdatePassword = async () => {
     try {
       await apiClient.patch(API_ENDPOINTS.USER.UPDATE_PASSWORD, password)
-      toast.success("Password updated")
+      toast.success(SETTINGS.DIALOG.PASSWORD_UPDATED)
       setShowPassword(false)
       setPassword({ oldPassword: "", newPassword: "" })
     } catch (error) {
       const err = error as { message: string }
-      toast.error(err.message || "Password update failed")
+      toast.error(err.message || SETTINGS.DIALOG.PASSWORD_UPDATE_FAILED)
     }
   }
 
@@ -138,7 +140,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             </header>
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
               {loading ? (
-                <p>Loading...</p>
+                <p>{COMMON_MESSAGE.LOADING}</p>
               ) : (
                 <div className="space-y-4 max-w-xl">
                   <Input
@@ -171,18 +173,18 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
                   {!isEditing ? (
                     <Button onClick={() => setIsEditing(true)}>
-                      Edit Profile
+                      {SETTINGS.DIALOG.EDIT_PROFILE}
                     </Button>
                   ) : (
                     <div className="flex gap-2">
                       <Button onClick={handleUpdateProfile}>
-                        Save
+                        {COMMON_MESSAGE.SAVE}
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => setIsEditing(false)}
                       >
-                        Cancel
+                        {COMMON_MESSAGE.CANCEL}
                       </Button>
                     </div>
                   )}
@@ -191,7 +193,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     variant="secondary"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    Update Password
+                    {SETTINGS.DIALOG.UPDATE_PASSWORD}
                   </Button>
 
                   {showPassword && (
@@ -221,7 +223,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       />
 
                       <Button onClick={handleUpdatePassword}>
-                        Update Password
+                        {SETTINGS.DIALOG.UPDATE_PASSWORD}
                       </Button>
                     </div>
                   )}

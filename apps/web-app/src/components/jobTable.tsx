@@ -15,6 +15,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SortableHead, TablePagination } from "@/components/ui/table-pagination";
+import { JOB } from "@/constants/job";
+import { COMMON_MESSAGE } from "@/constants/common";
 
 export function JobTable() {
   const {
@@ -76,28 +78,28 @@ export function JobTable() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <div className="flex gap-2 w-full sm:w-auto">
           <Input
-            placeholder="Search by title..."
+            placeholder={JOB.JOB_TABLE.SEARCH_BY_TITLE}
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleSearch(); }}
             className="w-64"
           />
-          <Button onClick={handleSearch} variant="outline">Search</Button>
-          <Button onClick={handleClear} variant="ghost">Clear</Button>
+          <Button onClick={handleSearch} variant="outline">{COMMON_MESSAGE.SEARCH}</Button>
+          <Button onClick={handleClear} variant="ghost">{COMMON_MESSAGE.CLEAR}</Button>
         </div>
       </div>
-      {loading && <div className="text-center py-8">Loading...</div>}
+      {loading && <div className="text-center py-8">{COMMON_MESSAGE.LOADING}</div>}
       {error && <div className="text-center text-red-500 py-8">{error}</div>}
       {!loading && !error && (
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <SortableHead column="title" label="Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="location" label="Location" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="jobType" label="Job Type" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="openings" label="Openings" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="createdAt" label="Posted At" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="title" label={JOB.JOB_TABLE.TITLE} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="location" label={JOB.JOB_TABLE.LOCATION} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="jobType" label={JOB.JOB_TABLE.JOB_TYPE} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="openings" label={JOB.JOB_TABLE.OPENINGS} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <SortableHead column="createdAt" label={JOB.JOB_TABLE.POSTED_AT} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
                 <th></th>
               </TableRow>
             </TableHeader>
