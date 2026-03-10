@@ -42,7 +42,12 @@ ENV CI=true
 COPY . .
  
 RUN pnpm install
+
+RUN pnpm --filter @talentsync/types build && \
+    pnpm --filter @talentsync/config build && \
+    pnpm --filter @talentsync/models build && \
+    pnpm --filter @talentsync/application-service build
  
 EXPOSE 4003
  
-CMD ["pnpm", "--filter", "application-service", "dev"]
+CMD ["pnpm", "--filter", "@talentsync/application-service", "start"]

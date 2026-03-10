@@ -1,5 +1,5 @@
 services:
-  postgres: 
+  postgres:
     image: postgres:15-alpine
     container_name: TalentSYNC-postgres
     restart: unless-stopped
@@ -10,11 +10,11 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data   
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - TalentSYNC-networks
-    healthcheck:   
-      test: ["CMD-SHELL", "pg_isready -U rms_user"]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U rms_user -d rms_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,12 +39,32 @@ services:
       timeout: 10s
       retries: 3
 
+  db-migrate:
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    container_name: TalentSYNC-db-migrate
+    restart: "no"
+    command: [ "npx", "sequelize-cli", "db:migrate" ]
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - TalentSYNC-networks
+
   auth-service:
-    build: 
+    build:
       context: .
       dockerfile: ./apps/auth-service/Dockerfile
     container_name: TalentSYNC-auth-service
-    restart: unless-stopped  
+    restart: unless-stopped
     ports:
       - "4001:4001"
     environment:
@@ -60,18 +80,20 @@ services:
       EMAIL_SERVICE: gmail
       EMAIL_USER: mfsi.ansuman@gmail.com
       EMAIL_PASSWORD: "uqvt jjlk djxl pqtq"
-      EMAIL_FROM: "TalentSYNC <mfsi.ansuman@gmail.com>" 
-      FRONTEND_URL: http://localhost:5173
+      EMAIL_FROM: "TalentSYNC <mfsi.ansuman@gmail.com>"
+      FRONTEND_URL: http://localhost
       NODE_ENV: development
-    depends_on:    
+    depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
-    healthcheck:   
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4001/health"]
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4001/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -87,6 +109,8 @@ services:
       - "4002:4002"
     environment:
       PORT: 4002
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: rms_user
@@ -105,10 +129,12 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4002/health"]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4002/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -121,6 +147,8 @@ services:
     container_name: TalentSYNC-resume-parser-worker
     restart: unless-stopped
     environment:
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: rms_user
@@ -139,9 +167,11 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
-    command: ["pnpm", "--filter", "resume-parser-service", "worker:dev"]
+    command: [ "pnpm", "--filter", "@talentsync/resume-parser-service", "worker:start" ]
 
   application-service:
     build:
@@ -153,6 +183,8 @@ services:
       - "4003:4003"
     environment:
       PORT: 4003
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: rms_user
@@ -162,10 +194,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4003/health"]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4003/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -176,19 +210,19 @@ services:
     build:
       context: .
       dockerfile: ./apps/web-app/Dockerfile
-    restart: unless-stopped 
+    restart: unless-stopped
     ports:
       - "5173:5173"
     depends_on:
       auth-service:
-        condition: service_healthy 
+        condition: service_healthy
     networks:
       - TalentSYNC-networks
 
   nginx:
     image: nginx:alpine
     container_name: TalentSYNC-nginx
-    restart: unless-stopped 
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
@@ -202,7 +236,7 @@ services:
       - TalentSYNC-networks
 
 volumes:
-  postgres_data:    
+  postgres_data:
     driver: local
   rabbitmq_data:
     driver: local
@@ -211,6 +245,6 @@ volumes:
   resume_temp:
     driver: local
 
-networks:  
+networks:
   TalentSYNC-networks:
     driver: bridge

@@ -1,15 +1,18 @@
 FROM node:20-alpine
- 
+
 WORKDIR /app
- 
+
 RUN npm install -g pnpm
 ENV CI=true
- 
+
 COPY . .
- 
+
 RUN pnpm install
- 
+
+RUN pnpm --filter @talentsync/web-app build
+
 EXPOSE 5173
 
-CMD ["pnpm", "--filter", "web-app", "dev", "--", "--host","0.0.0.0"]
+CMD ["pnpm", "--filter", "@talentsync/web-app", "preview:docker"]
+
  

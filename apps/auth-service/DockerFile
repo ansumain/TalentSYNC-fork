@@ -1,14 +1,19 @@
 FROM node:20-alpine
- 
+
 WORKDIR /app
- 
+
 RUN npm install -g pnpm
 ENV CI=true
- 
+
 COPY . .
- 
+
 RUN pnpm install
- 
+
+RUN pnpm --filter @talentsync/types build && \
+    pnpm --filter @talentsync/config build && \
+    pnpm --filter @talentsync/models build && \
+    pnpm --filter @talentsync/auth-service build
+
 EXPOSE 4001
- 
-CMD ["pnpm", "--filter", "auth-service", "dev"]
+
+CMD ["pnpm", "--filter", "@talentsync/auth-service", "start"]

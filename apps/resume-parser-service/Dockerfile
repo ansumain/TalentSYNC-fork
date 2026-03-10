@@ -46,6 +46,8 @@
 FROM node:20-alpine
  
 WORKDIR /app
+
+RUN apk add --no-cache tesseract-ocr tesseract-ocr-data-eng poppler-utils
  
 RUN npm install -g pnpm
 ENV CI=true
@@ -53,7 +55,13 @@ ENV CI=true
 COPY . .
  
 RUN pnpm install
+
+RUN pnpm --filter @talentsync/types build && \
+    pnpm --filter @talentsync/config build && \
+    pnpm --filter @talentsync/models build && \
+    pnpm --filter @talentsync/resume-parser-service build && \
+    pnpm --filter @talentsync/resume-parser-service worker:build
  
 EXPOSE 4002
  
-CMD ["pnpm", "--filter", "resume-parser-service", "dev"]
+CMD ["pnpm", "--filter", "@talentsync/resume-parser-service", "start"]
