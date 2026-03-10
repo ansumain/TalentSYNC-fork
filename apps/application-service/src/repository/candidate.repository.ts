@@ -36,7 +36,7 @@ const getAllCandidatesParsedJSONRepository = async ({ page, limit, sortBy, sortO
          FROM (
              SELECT DISTINCT ON ("userId") "userId"
              FROM resume.resume_data
-             WHERE TRUE ${searchClause}
+             WHERE "parsedJSON" IS NOT NULL AND "status" = 'completed' ${searchClause}
              ORDER BY "userId", "createdAt" DESC
          ) latest`,
         { replacements, type: QueryTypes.SELECT }
@@ -49,7 +49,7 @@ const getAllCandidatesParsedJSONRepository = async ({ page, limit, sortBy, sortO
          FROM (
              SELECT DISTINCT ON ("userId") "userId", "id", "fileName", "fileURL", "status", "parsedJSON", "createdAt"
              FROM resume.resume_data
-             WHERE TRUE ${searchClause}
+             WHERE "parsedJSON" IS NOT NULL AND "status" = 'completed' ${searchClause}
              ORDER BY "userId", "createdAt" DESC
          ) latest
          ORDER BY ${outerSort}

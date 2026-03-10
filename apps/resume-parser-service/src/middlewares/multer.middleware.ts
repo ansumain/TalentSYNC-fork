@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { allowedMimeTypes } from '@talentsync/config';
 
-const uploadDir = 'uploads/';
+const uploadDir = '/data/uploads/';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true })
 }

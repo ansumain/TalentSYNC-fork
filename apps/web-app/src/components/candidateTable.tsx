@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -88,9 +87,9 @@ export function CandidateTable() {
                   className="border-b hover:bg-muted/50 cursor-pointer"
                   onClick={() => navigate(`/candidates/${c.id}`, { state: { candidate: c } })}
                 >
-                  <td className="px-4 py-3 text-left">{c.parsedJSON.name || <span className="text-muted-foreground">-</span>}</td>
-                  <td className="px-4 py-3 text-left">{c.parsedJSON.email || <span className="text-muted-foreground">-</span>}</td>
-                  <td className="px-4 py-3 text-left">{c.parsedJSON.phone || <span className="text-muted-foreground">-</span>}</td>
+                  <td className="px-4 py-3 text-left">{c.parsedJSON?.name || <span className="text-muted-foreground">-</span>}</td>
+                  <td className="px-4 py-3 text-left">{c.parsedJSON?.email || <span className="text-muted-foreground">-</span>}</td>
+                  <td className="px-4 py-3 text-left">{c.parsedJSON?.phone || <span className="text-muted-foreground">-</span>}</td>
                   <td className="px-4 py-3 text-left text-xs">{new Date(c.createdAt).toLocaleString()}</td>
                 </TableRow>
               ))}

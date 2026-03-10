@@ -3,6 +3,7 @@ import { publishToQueue } from "../config/rabbitmq";
 import { addToResumeData } from "../repository/resume.repository";
 import { ResumeModel } from "../types/ResumeModel.type";
 import { UploadedFileModel } from "../types/UploadedFile.type";
+import path from 'node:path';
 
 const uploadResume = async (files: UploadedFileModel[], userId: string, roleName: string): Promise<boolean> => {
     try {
@@ -15,7 +16,7 @@ const uploadResume = async (files: UploadedFileModel[], userId: string, roleName
                 userId,
                 fileName: file.filename,
                 mimeType: file.mimetype,
-                fileURL: file.path,
+                fileURL: path.isAbsolute(file.path) ? file.path : path.join('/data', file.path),
                 status: 'queued'
             } as ResumeModel
             const resumeId = await addToResumeData(resumeData);

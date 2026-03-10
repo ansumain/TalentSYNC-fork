@@ -4,17 +4,22 @@ import { parseResume } from "../services/parseResume.service";
 import { getResumeByResumeId, updateAfterParsing, updateStatusByResumeId } from "../repository/resume.repository";
 
 const startWorker = async () => {
-    await connectRabbitMQ();
+    await connectRabbitMQ().catch((err) => {
+        console.log('Initial Connection Failed! Reconnecting...')
+    });
 
     console.log('Worker starting consuming')
     await consumeQueue(config.queues.resumeParse, async ({ resumeId }) => {
         try {
             // update resume status to processing
             await updateStatusByResumeId(resumeId, 'processing');
+
             const resume = await getResumeByResumeId(resumeId);
-            if (!resume) throw new Error(`Resume not found`)
+            if (!resume) throw new Error(`Resume not found`);
+
             const resumeData = await parseResume({ fileURL: resume.fileURL, mimeType: resume.mimeType });
             await updateAfterParsing(resumeId, resumeData);
+            
             // update resume status to completed
             await updateStatusByResumeId(resumeId, 'completed');
         } catch (e: any) {
