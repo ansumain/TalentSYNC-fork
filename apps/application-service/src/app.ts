@@ -6,26 +6,37 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import candidateRoutes from './routes/candidate.routes';
 import jobRoutes from './routes/job.routes';
-import interviewRoutes from './routes/interview.routes'
-import jobApplicationRoutes from './routes/jobApplication.routes'
-import skillRoutes from './routes/skill.routes'
+import interviewRoutes from './routes/interview.routes';
+import jobApplicationRoutes from './routes/jobApplication.routes';
+import skillRoutes from './routes/skill.routes';
+import docsRouter from './docs/index';
 
 const app: Application = express();
 
 app.use(helmet());
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 150,
-  message: 'Too many requests! Please try again after some time',
-  standardHeaders: true,
-  legacyHeaders: false
+    windowMs: 15 * 60 * 1000,
+    max: 150,
+    message: 'Too many requests! Please try again after some time',
+    standardHeaders: true,
+    legacyHeaders: false
 })
 
 app.use(limiter);
 
+const allowedOrigins = [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    'http://localhost:4003',
+    'http://localhost',
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    // origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        if(!origin || allowedOrigins.includes(origin)) callback(null, true);
+        else callback(new Error('not allowed by CORS'));
+    },
     credentials: true
 }));
 
@@ -44,6 +55,10 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/applications', jobApplicationRoutes);
 app.use('/api/skills', skillRoutes);
+
+if (process.env.NODE_ENV !== 'production') {
+    app.use('/docs', docsRouter);
+}
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

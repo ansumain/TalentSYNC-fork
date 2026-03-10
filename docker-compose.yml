@@ -122,8 +122,8 @@ services:
       RABBIT_MQ_PASSWORD: password
       NODE_ENV: development
     volumes:
-      - resume_uploads:/app/uploads
-      - resume_temp:/app/temp
+      - resume_uploads:/data/uploads
+      - resume_temp:/data/temp
     depends_on:
       postgres:
         condition: service_healthy
@@ -160,8 +160,8 @@ services:
       RABBIT_MQ_PASSWORD: password
       NODE_ENV: development
     volumes:
-      - resume_uploads:/app/uploads
-      - resume_temp:/app/temp
+      - resume_uploads:/data/uploads
+      - resume_temp:/data/temp
     depends_on:
       postgres:
         condition: service_healthy
