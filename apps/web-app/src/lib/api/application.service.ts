@@ -103,10 +103,10 @@
 //   currentStatus: ApplicationStatus;
 //   createdAt: string;
 //   updatedAt: string;
-  
+
 //   candidateName?: string | null;
 //   jobTitle?: string | null;
-  
+
 //   job?: Pick<Job, 'jobId' | 'title' | 'location' | 'jobType'>;
 // }
 
@@ -231,58 +231,42 @@
 
 import { apiClient } from './client';
 import { API_CONFIG } from './config';
+import type {
+  PaginationParams,
+  Candidate,
+  GetAllCandidatesResponse,
+  FilterCandidatesResponse,
+  GetAllSkillsResponse,
+  JobApplication,
+  GetMyApplicationsResponse,
+  GetAllApplicationsResponse,
+  GetApplicationsByJobIdResponse,
+  Job,
+  RankedApplicant,
+  ApplicationStatus,
+  GetAllJobsResponse,
+  GetJobByIdResponse
+} from '../types/index';
 
-// Shared pagination types
+export type {
+  PaginationParams,
+  Candidate,
+  GetAllCandidatesResponse,
+  FilterCandidatesResponse,
+  GetAllSkillsResponse,
+  Skill,
+  JobApplication,
+  GetMyApplicationsResponse,
+  GetAllApplicationsResponse,
+  GetApplicationsByJobIdResponse,
+  Job,
+  RankedApplicant,
+  ApplicationStatus,
+  GetAllJobsResponse,
+  GetJobByIdResponse
+} from '../types/index';
 
-export interface PaginationParams {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  search?: string;
-}
-
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-// Candidate types
-
-export interface Candidate {
-  userId: string;
-  id: string;
-  fileName: string | null;
-  fileURL: string | null;
-  status: string | null;
-  parsedJSON: {
-    name: string | null;
-    email: string | null;
-    phone: string | null;
-    education: { name: string; batch: string }[];
-    skills: string[];
-    experience: {
-      company: string;
-      designation: string;
-      startDate: string;
-      endDate: string;
-      durationMonths: number;
-    }[];
-    totalExperience: number;
-  };
-  createdAt: string;
-}
-
-// Response types
-interface GetAllCandidatesResponse extends PaginationMeta {
-  candidateJSONData: Candidate[];
-}
-interface FilterCandidatesResponse extends PaginationMeta {
-  candidateData: Candidate[];
-}
-
+// Candidate Service
 export const candidateService = {
   getAllCandidates: async (params?: PaginationParams): Promise<GetAllCandidatesResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/candidate/parsed`;
@@ -311,56 +295,6 @@ export const candidateService = {
 };
 
 // Job Service 
-
-export interface Job {
-  jobId: string;
-  title: string;
-  description: string;
-  location: string;
-  jobType: string;
-  openings: number;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  skills?: Skill[];
-}
-
-export type ApplicationStatus = 'applied' | 'shortlisted' | 'interviewing' | 'hired' | 'rejected';
-
-export interface JobApplication {
-  applicationId: string;
-  userId: string;
-  jobId: string;
-  currentStatus: ApplicationStatus;
-  createdAt: string;
-  updatedAt: string;
-  
-  candidateName?: string | null;
-  jobTitle?: string | null;
-  
-  job?: Pick<Job, 'jobId' | 'title' | 'location' | 'jobType'>;
-}
-
-export interface RankedApplicant {
-  applicationId: string;
-  userId: string;
-  currentStatus: ApplicationStatus;
-  appliedAt: string;
-  candidateName: string | null;
-  candidateSkills: string[];
-  matchedSkills: string[];
-  matchCount: number;
-  rank: number;
-}
-
-interface GetAllJobsResponse extends PaginationMeta {
-  currentJobs: Job[];
-}
-
-interface GetJobByIdResponse {
-  job: Job;
-}
-
 export const jobService = {
   getAllJobs: async (params?: PaginationParams): Promise<GetAllJobsResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/jobs`;
@@ -391,16 +325,6 @@ export const jobService = {
 };
 
 // Skill Service
-
-export interface Skill {
-  skillId: string;
-  skillName: string;
-}
-
-interface GetAllSkillsResponse {
-  skills: Skill[];
-}
-
 export const skillService = {
   getAllSkills: async (): Promise<GetAllSkillsResponse> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/skills`;
@@ -409,19 +333,6 @@ export const skillService = {
 };
 
 // Application Service
-
-interface GetAllApplicationsResponse extends PaginationMeta {
-  allApplications: JobApplication[];
-}
-
-interface GetApplicationsByJobIdResponse {
-  applicationsByJobId: JobApplication[];
-}
-
-interface GetMyApplicationsResponse extends PaginationMeta {
-  applications: JobApplication[];
-}
-
 export const applicationService = {
   applyToJob: async (jobId: string): Promise<JobApplication> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/applications/${jobId}`;
