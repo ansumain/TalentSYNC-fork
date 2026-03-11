@@ -145,6 +145,18 @@ importers:
         specifier: ^8.55.0
         version: 8.56.1(eslint@10.0.2(jiti@2.6.1))(typescript@5.9.3)
 
+  apps/analytics-service:
+    dependencies:
+      '@talentsync/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@talentsync/models':
+        specifier: workspace:*
+        version: link:../../packages/models
+      '@talentsync/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+
   apps/application-service:
     dependencies:
       '@talentsync/config':
