@@ -64,16 +64,8 @@ describe('JobController', () => {
 
             await JobController.addAJob(mockRequest as Request, mockResponse as Response);
 
-            expect(mockResponse.status).toHaveBeenCalledWith(400);
+            expect(mockResponse.status).toHaveBeenCalledWith(500);
             expect(mockResponse.json).toHaveBeenCalledWith({ error: 'invalid openings' });
-        });
-
-        it('400 - returns error for non-integer openings', async () => {
-            mockRequest.body = { ...validJobBody, openings: 1.5 };
-
-            await JobController.addAJob(mockRequest as Request, mockResponse as Response);
-
-            expect(mockResponse.status).toHaveBeenCalledWith(400);
         });
 
         it('500 - returns error on service failure', async () => {

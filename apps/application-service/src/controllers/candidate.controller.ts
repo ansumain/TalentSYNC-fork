@@ -6,7 +6,7 @@ export class CandidateController {
     // check whether resume is present or not for the user
     static async getMyResumeStatus(req: Request, res: Response): Promise<void> {
         try {
-            const userId = req.userInfo.sub;
+            const userId = req.userInfo.sub as string;
             const hasResume = await getMyResumeStatus(userId);
             res.status(200).json({ hasResume });
         } catch (e: unknown) {
@@ -61,7 +61,7 @@ export class CandidateController {
     // get user's resumes
     static async getMyResumes(req: Request, res: Response): Promise<void> {
         try {
-            const userId = req.userInfo.sub;
+            const userId = req.userInfo.sub as string;
             const resumes = await getMyResumes(userId);
             res.status(200).json({ resumes });
         } catch (e: unknown) {

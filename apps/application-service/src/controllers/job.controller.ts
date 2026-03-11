@@ -16,7 +16,7 @@ export class JobController {
                 !req.body.jobType
             ) throw new Error('missing required field');
 
-            const userId = req.userInfo.sub;
+            const userId = req.userInfo.sub as string;
 
             const { title, description, location, jobType, openings, skillIds } = req.body;
 

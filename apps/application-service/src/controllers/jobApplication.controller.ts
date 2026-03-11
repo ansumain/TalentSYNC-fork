@@ -19,7 +19,7 @@ export class JobApplicationController {
 
             if (!req.params.jobId) throw new Error('missing required field');
             const jobId = req.params.jobId as string;
-            const userId = req.userInfo.sub;
+            const userId = req.userInfo.sub as string;
 
             const newApplication = await addApplication({ userId, jobId });
 
@@ -50,7 +50,7 @@ export class JobApplicationController {
     // get all user's applications
     static async getMyApplications(req: Request, res: Response): Promise<void> {
         try {
-            const userId = req.userInfo.sub;
+            const userId = req.userInfo.sub as string;
             const { page, limit, sortBy, sortOrder, search } = parsePaginationParams(req.query);
 
             const result = await getApplicationsByUserId(userId, { page, limit, sortBy, sortOrder, search });
