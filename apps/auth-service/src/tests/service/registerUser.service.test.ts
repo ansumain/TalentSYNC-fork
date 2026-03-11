@@ -1,9 +1,13 @@
 import { registerUser } from '../../services/registerUser.service';
 import { User } from '@talentsync/models';
+import UserRole from '../../models/UserRole';
+import Role from '../../models/Role';
 import bcrypt from 'bcryptjs';
 import { RegisterUserOutput } from '../../types/RegisterUserOutput';
 
-jest.mock('../../models/User');
+jest.mock('@talentsync/models');
+jest.mock('../../models/UserRole');
+jest.mock('../../models/Role');
 jest.mock('bcryptjs');
 
 describe('Authentication - Register', () => {
@@ -143,6 +147,9 @@ describe('Authentication - Register', () => {
       phone: '8877665544',
       hashedPassword: 'hashedPassword',
     } as RegisterUserOutput);
+
+    (Role.findOne as jest.Mock).mockResolvedValue({ id: 'role-candidate', role: 'candidate' });
+    (UserRole.create as jest.Mock).mockResolvedValue({});
 
     const result = await registerUser({
       name: 'Ansuman',

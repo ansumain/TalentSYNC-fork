@@ -1,5 +1,5 @@
 import { updateUserProfile } from '../../services/updateUserProfile.service';
-import User from '@talentsync/models';
+import { User } from '@talentsync/models';
 
 jest.mock('@talentsync/models');
 

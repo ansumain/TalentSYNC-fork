@@ -14,6 +14,7 @@ module.exports = {
     '^@talentsync/config$': '<rootDir>/../../packages/config/src/index.ts',
     '^@talentsync/types$': '<rootDir>/../../packages/types/src/index.ts',
   },
+  testPathIgnorePatterns: ['/node_modules/', '/src/docs/'],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   collectCoverageFrom: [
