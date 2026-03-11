@@ -32,4 +32,8 @@ const getActiveResumeCountByUserId = async (userId: string): Promise<number> => 
     return ResumeData.count({ where: { userId, status: { [Op.ne]: 'failed' } } });
 };
 
-export { addToResumeData, getResumeByResumeId, updateStatusByResumeId, updateAfterParsing, getActiveResumeCountByUserId };
+const updateUserIdByResumeId = async (resumeId: string, userId: string): Promise<void> => {
+    await ResumeData.update({ userId }, { where: { id: resumeId } });
+};
+
+export { addToResumeData, getResumeByResumeId, updateStatusByResumeId, updateAfterParsing, getActiveResumeCountByUserId, updateUserIdByResumeId };

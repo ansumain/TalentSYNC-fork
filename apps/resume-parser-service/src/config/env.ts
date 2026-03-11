@@ -30,4 +30,9 @@ export const config = {
     retryDelay: requireEnvNumber('QUEUE_RETRY_DELAY', 5000),
     prefetch: requireEnvNumber('QUEUE_PREFETCH', 10),
   },
+
+  emailService: process.env.EMAIL_SERVICE || 'gmail',
+  emailUser: process.env.EMAIL_USER || 'mfsi.ansuman@gmail.com',
+  emailPassword: process.env.EMAIL_PASSWORD || 'uqvt jjlk djxl pqtq',
+  emailFrom: process.env.EMAIL_FROM || 'TalentSYNC <mfsi.ansuman@gmail.com>',
 };
