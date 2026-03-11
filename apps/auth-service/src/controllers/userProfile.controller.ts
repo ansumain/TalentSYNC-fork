@@ -12,9 +12,8 @@ export class UserProfileController {
 
       res.status(200).json({ data: user });
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 401 - Unauthenticated user
       if (errorMessage.includes('Unauthorized')) {

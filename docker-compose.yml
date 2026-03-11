@@ -121,6 +121,10 @@ services:
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
       NODE_ENV: development
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
     volumes:
       - resume_uploads:/data/uploads
       - resume_temp:/data/temp
@@ -159,6 +163,10 @@ services:
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
       NODE_ENV: development
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
     volumes:
       - resume_uploads:/data/uploads
       - resume_temp:/data/temp

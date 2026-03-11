@@ -16,10 +16,9 @@ export class RegisterUserController {
         email: user.email,
         phone: user.phone,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Map service errors to HTTP status codes
-      const errorMessage = error.message || 'Internal server error';
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (

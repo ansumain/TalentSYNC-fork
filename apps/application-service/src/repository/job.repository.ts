@@ -19,7 +19,7 @@ const addJobRepository = async (job: CreateJob) => {
         }
 
         return newJob;
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };
@@ -56,7 +56,7 @@ const getAllJobsRepository = async (params: {
             limit,
             totalPages: Math.ceil((count as unknown as number) / limit),
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };
@@ -74,7 +74,7 @@ const getJobByIdRepository = async (jobId: string) => {
 
         const skills = jobSkills.map((js: any) => js.skill);
         return { ...job.toJSON(), skills };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 }
@@ -88,7 +88,7 @@ const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob
         await Job.update({ ...job }, { where: { jobId } });
 
         return { message: 'updated' };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };
@@ -102,7 +102,7 @@ const deleteExistingJobRepository = async (jobId: string) => {
         await Job.destroy({ where: { jobId } });
 
         return { message: 'deleted' };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 

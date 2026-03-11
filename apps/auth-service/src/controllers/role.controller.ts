@@ -29,9 +29,8 @@ export class RoleController {
         message: 'Role fetched sucessfully',
         roles,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing user ID')) {
@@ -60,9 +59,8 @@ export class RoleController {
       res.status(201).json({
         message: 'Role created successfully',
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {
@@ -91,9 +89,8 @@ export class RoleController {
       res.status(200).json({
         message: 'Role deleted sucessfully',
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing role ID')) {

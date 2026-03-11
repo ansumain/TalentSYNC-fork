@@ -5,7 +5,7 @@ const getAllSkillsRepository = async () => {
     try {
         const skills = await Skill.findAll({ order: [['skillName', 'ASC']] });
         return skills;
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };

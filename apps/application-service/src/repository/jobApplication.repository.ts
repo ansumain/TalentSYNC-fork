@@ -13,7 +13,7 @@ const addApplicationRepository = async (application: Applicaiton) => {
         if (existingApplication.length > 0) throw new Error('application already exists');
         const newJob = await JobApplication.create(application);
         return newJob;
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };
@@ -92,7 +92,7 @@ const getAllApplicationsRepository = async (params: {
             limit,
             totalPages: Math.ceil((count as unknown as number) / limit),
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };
@@ -103,7 +103,7 @@ const getApplicationByIdRepository = async (applicationId: string) => {
         const applicaiton = await JobApplication.findOne({ where: { applicationId } });
         if (!applicaiton) throw new Error('application not found');
         return applicaiton;
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 }
@@ -114,7 +114,7 @@ const getApplicationsByJobIdRepository = async (jobId: string) => {
         const applications = await JobApplication.findAll({ where: { jobId } });
         if (!applications) throw new Error('applications not found');
         return applications;
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 }
@@ -128,7 +128,7 @@ const updateApplicationCurrentStatusRepository = async (applicationId: string, c
         await JobApplication.update({ currentStatus }, { where: { applicationId } });
 
         return { message: 'updated' };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };
@@ -142,7 +142,7 @@ const deleteExistingApplicationRepository = async (applicationId: string) => {
         await JobApplication.destroy({ where: { applicationId } });
 
         return { message: 'deleted' };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 
@@ -211,7 +211,7 @@ const getApplicationsByUserIdRepository = async (userId: string, params: {
             limit,
             totalPages: Math.ceil((count as unknown as number) / limit),
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };
@@ -246,9 +246,12 @@ const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<Rank
                     );
                 });
 
+                const resumeId: string | null = resume? (resume.toJSON() as any).id ?? null: null;
+
                 return {
                     applicationId: appData.applicationId as string,
                     userId: appData.userId as string,
+                    resumeId,
                     currentStatus: appData.currentStatus as string,
                     appliedAt: appData.createdAt as Date | string,
                     candidateName,
@@ -264,7 +267,7 @@ const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<Rank
         enriched.forEach((r, i) => { r.rank = i + 1; });
 
         return enriched as RankedApplicant[];
-    } catch (error: any) {
+    } catch (error: unknown) {
         throw error;
     }
 };

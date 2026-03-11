@@ -16,9 +16,8 @@ export class UserRoleController {
         message: 'Role assigned successfully',
         roleAssigned,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {
@@ -57,9 +56,8 @@ export class UserRoleController {
         message: 'Role revoked successfully',
         roleRevoked,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {

@@ -12,9 +12,8 @@ export class ResetPasswordController {
       const result = await resetPassword({ email, otp, newPassword });
 
       res.status(200).json(result);
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (

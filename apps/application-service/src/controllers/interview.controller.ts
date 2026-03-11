@@ -22,8 +22,8 @@ export class InterviewController {
                 res.status(200).json({ availableInterviewers });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -65,8 +65,8 @@ export class InterviewController {
                 res.status(201).json(newInterviewScheduled);
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
@@ -96,8 +96,8 @@ export class InterviewController {
                 res.status(200).json({ scheduledInterviews });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -115,8 +115,8 @@ export class InterviewController {
                 res.status(200).json({ interview });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
@@ -143,8 +143,8 @@ export class InterviewController {
                 res.status(200).json({ interviews });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
@@ -178,8 +178,8 @@ export class InterviewController {
                 res.status(200).json(updatedInterview);
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('no input')) {
                 res.status(400).json({ error: errorMessage });
@@ -209,8 +209,8 @@ export class InterviewController {
             const deleteInterview = await deleteExistingInterview(interviewId);
             if (deleteInterview) res.status(204).send();
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });

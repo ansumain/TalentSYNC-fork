@@ -27,8 +27,8 @@ export class JobApplicationController {
                 res.status(201).json(newApplication);
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('no resume found')) {
                 res.status(403).json({ error: errorMessage });
@@ -61,8 +61,8 @@ export class JobApplicationController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: any) {
-            res.status(500).json({ error: e.message || 'Internal server error' });
+        } catch (e: unknown) {
+            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
         }
     }
 
@@ -79,8 +79,8 @@ export class JobApplicationController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -98,8 +98,8 @@ export class JobApplicationController {
                 res.status(200).json({ application });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
@@ -127,8 +127,8 @@ export class JobApplicationController {
                 res.status(200).json({ applicationsByJobId });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
@@ -159,8 +159,8 @@ export class JobApplicationController {
                 res.status(200).json(updatedApplication);
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('no input')) {
                 res.status(400).json({ error: errorMessage });
@@ -190,8 +190,8 @@ export class JobApplicationController {
             const deleteApplication = await deleteExistingApplication(applicationId);
             if (deleteApplication) res.status(204).send();
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
@@ -214,8 +214,8 @@ export class JobApplicationController {
             const jobId = req.params.jobId as string;
             const rankedApplicants = await getRankedApplicantsByJobId(jobId);
             res.status(200).json({ rankedApplicants });
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             if (errorMessage.includes('missing required field')) {
                 res.status(400).json({ error: errorMessage });
                 return;

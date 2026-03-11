@@ -75,7 +75,7 @@ app.get('/files/:filename', authenticationMiddleware, (req: Request, res: Respon
         res.status(400).json({ error: 'Invalid filename' });
         return;
     }
-    const filePath = path.resolve(process.cwd(), 'uploads', filename);
+    const filePath = path.resolve('/data/uploads', filename);
     res.sendFile(filePath, (err) => {
         if (err) res.status(404).json({ error: 'File not found' });
     });

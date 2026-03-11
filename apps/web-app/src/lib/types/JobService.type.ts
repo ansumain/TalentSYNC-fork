@@ -33,6 +33,7 @@ interface JobApplication {
 interface RankedApplicant {
     applicationId: string;
     userId: string;
+    resumeId: string | null;
     currentStatus: ApplicationStatus;
     appliedAt: string;
     candidateName: string | null;

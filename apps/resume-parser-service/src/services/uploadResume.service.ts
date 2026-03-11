@@ -27,8 +27,8 @@ const uploadResume = async (files: UploadedFileModel[], userId: string, roleName
 
         return true;
 
-    } catch (e: any) {
-        throw new Error('Error uploading file(s):', e);
+    } catch (e: unknown) {
+        throw new Error('Error uploading file(s):', { cause: e });
     }
 }
 

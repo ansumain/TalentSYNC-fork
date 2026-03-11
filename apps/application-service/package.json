@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "tsx --watch src/server.ts",
     "build": "esbuild src/server.ts --bundle --platform=node --format=esm --outdir=dist --packages=external",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@talentsync/config": "workspace:*",

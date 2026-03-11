@@ -9,6 +9,7 @@ interface ApplicationWithJob extends JobApplicationAttributes {
 interface RankedApplicant {
     applicationId: string;
     userId: string;
+    resumeId: string | null;
     currentStatus: string;
     appliedAt: Date | string;
     candidateName: string | null;

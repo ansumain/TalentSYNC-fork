@@ -9,8 +9,8 @@ export class CandidateController {
             const userId = req.userInfo.sub;
             const hasResume = await getMyResumeStatus(userId);
             res.status(200).json({ hasResume });
-        } catch (e: any) {
-            res.status(500).json({ error: e.message || 'Internal server error' });
+        } catch (e: unknown) {
+            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
         }
     }
 
@@ -26,8 +26,8 @@ export class CandidateController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: any) {
-            res.status(500).json({ error: e.message || 'Internal server error' });
+        } catch (e: unknown) {
+            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
         }
     }
 
@@ -52,8 +52,8 @@ export class CandidateController {
                 });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -64,8 +64,8 @@ export class CandidateController {
             const userId = req.userInfo.sub;
             const resumes = await getMyResumes(userId);
             res.status(200).json({ resumes });
-        } catch (e: any) {
-            res.status(500).json({ error: e.message || 'Internal server error' });
+        } catch (e: unknown) {
+            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
         }
     }
 
@@ -81,8 +81,8 @@ export class CandidateController {
                 });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }

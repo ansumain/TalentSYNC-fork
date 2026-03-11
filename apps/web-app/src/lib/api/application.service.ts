@@ -279,13 +279,13 @@ export const candidateService = {
   },
 
   filterCandidatesByUserId: async (userId: string): Promise<FilterCandidatesResponse> => {
-    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/candidate/parsed/filter/userId`;
-    return apiClient.post<FilterCandidatesResponse>(url, { userId });
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/candidate/parsed/userId`;
+    return apiClient.get<FilterCandidatesResponse>(url, { userId });
   },
 
   filterCandidatesByResumeId: async (resumeId: string): Promise<FilterCandidatesResponse> => {
-    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/candidate/parsed/filter/resumeId`;
-    return apiClient.post<FilterCandidatesResponse>(url, { resumeId });
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/candidate/parsed/resumeId`;
+    return apiClient.get<FilterCandidatesResponse>(url, { resumeId });
   },
 
   getMyResumes: async (): Promise<{ resumes: Candidate[] }> => {

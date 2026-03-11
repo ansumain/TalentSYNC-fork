@@ -7,8 +7,8 @@ export class SkillController {
         try {
             const skills = await getAllSkills();
             res.status(200).json({ skills });
-        } catch (e: any) {
-            res.status(500).json({ error: e.message || 'Internal server error' });
+        } catch (e: unknown) {
+            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
         }
     }
 }

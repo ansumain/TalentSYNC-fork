@@ -14,7 +14,7 @@ export class JobController {
                 req.body.openings === undefined ||
                 !req.body.location ||
                 !req.body.jobType
-            ) throw new Error('Missing required field');
+            ) throw new Error('missing required field');
 
             const userId = req.userInfo.sub;
 
@@ -41,14 +41,10 @@ export class JobController {
                 res.status(201).json(newJobCreated);
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('missing required field')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-            if (errorMessage.includes('invalid openings')) {
                 res.status(400).json({ error: errorMessage });
                 return;
             }
@@ -71,8 +67,8 @@ export class JobController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }
@@ -90,8 +86,8 @@ export class JobController {
                 res.status(200).json({ job });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('job not found')) {
                 res.status(404).json({ error: errorMessage });
@@ -128,8 +124,8 @@ export class JobController {
                 res.status(200).json(updatedJob);
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('no input')) {
                 res.status(400).json({ error: errorMessage });
@@ -159,8 +155,8 @@ export class JobController {
             const deleteJob = await deleteExistingJob(jobId);
             if (deleteJob) res.status(204).send();
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
             if (errorMessage.includes('job not found')) {
                 res.status(404).json({ error: errorMessage });
