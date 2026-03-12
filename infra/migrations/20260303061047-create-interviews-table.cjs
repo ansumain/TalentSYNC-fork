@@ -3,6 +3,11 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "management"."enum_interviews_status";');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "management"."enum_interviews_result";');
+    await queryInterface.sequelize.query('CREATE TYPE "management"."enum_interviews_status" AS ENUM(\'scheduled\', \'completed\', \'cancelled\', \'noshow\');');
+    await queryInterface.sequelize.query('CREATE TYPE "management"."enum_interviews_result" AS ENUM(\'passed\', \'failed\');');
+
     await queryInterface.createTable(
       { tableName: 'interviews', schema: 'management' },
       {
@@ -56,9 +61,14 @@ module.exports = {
           onUpdate: 'CASCADE'
         },
         status: {
-          type: Sequelize.ENUM('scheduled', 'completed', 'failed', 'cancelled'),
+          type: Sequelize.ENUM('scheduled', 'completed', 'cancelled', 'noshow'),
           allowNull: false,
           defaultValue: 'scheduled'
+        },
+        result: {
+          type: Sequelize.ENUM('passed', 'failed'),
+          allowNull: true,
+          defaultValue: null
         },
         createdAt: {
           type: Sequelize.DATE,
@@ -71,11 +81,11 @@ module.exports = {
       }
     );
 
-    // Create composite unique constraint to prevent duplicate interviews for same applicationId
+    // Unique constraint: one interview per application
     await queryInterface.addConstraint(
       { tableName: 'interviews', schema: 'management' },
       {
-        fields: ['applicationId', 'interviewerId'],
+        fields: ['applicationId'],
         type: 'unique',
         name: 'interview_unique_constraint'
       }
@@ -87,7 +97,8 @@ module.exports = {
       tableName: 'interviews',
       schema: 'management',
     });
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_management_interviews_status";');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "management"."enum_interviews_status";');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "management"."enum_interviews_result";');
   }
 };
 

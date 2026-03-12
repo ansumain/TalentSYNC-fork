@@ -17,6 +17,7 @@ UserSkill.init(
         userId: {
             type: DataTypes.UUID,
             allowNull: false,
+            primaryKey: true,
             references: {
                 model: { tableName: 'users', schema: 'auth' },
                 key: 'id',
@@ -25,6 +26,7 @@ UserSkill.init(
         skillId: {
             type: DataTypes.UUID,
             allowNull: false,
+            primaryKey: true,
             references: {
                 model: { tableName: 'skills', schema: 'management' },
                 key: 'skillId',

@@ -43,7 +43,7 @@ JobApplication.init(
             },
         },
         currentStatus: {
-            type: DataTypes.ENUM('applied', 'shortlisted', 'interviewing', 'hired', 'rejected'),
+            type: DataTypes.ENUM('applied', 'shortlisted', 'interviewing', 'selected', 'rejected', 'hired', 'offerRejected'),
             allowNull: false,
             defaultValue: 'applied'
         }

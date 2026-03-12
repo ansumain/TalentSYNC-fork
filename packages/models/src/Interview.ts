@@ -9,9 +9,10 @@ interface InterviewAttributes {
     scheduledAt: Date;
     scheduledBy: string;
     status: string;
+    result: string | null;
 }
 
-type InterviewCreationAttributes = Optional<InterviewAttributes, 'interviewId' | 'status'>;
+type InterviewCreationAttributes = Optional<InterviewAttributes, 'interviewId' | 'status' | 'result'>;
 
 class Interview
     extends Model<InterviewAttributes, InterviewCreationAttributes>
@@ -23,6 +24,7 @@ class Interview
     declare scheduledAt: Date;
     declare scheduledBy: string;
     declare status: string;
+    declare result: string | null;
 }
 
 Interview.init(
@@ -70,9 +72,14 @@ Interview.init(
             },
         },
         status: {
-            type: DataTypes.ENUM('scheduled', 'completed', 'failed', 'cancelled'),
+            type: DataTypes.ENUM('scheduled', 'completed', 'cancelled', 'noShow'),
             allowNull: false,
             defaultValue: 'scheduled'
+        },
+        result: {
+            type: DataTypes.ENUM('passed', 'failed'),
+            allowNull: true,
+            defaultValue: null
         }
     },
     {

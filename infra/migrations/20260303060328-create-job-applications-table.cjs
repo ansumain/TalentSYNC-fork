@@ -35,7 +35,7 @@ module.exports = {
           onUpdate: 'CASCADE'
         },
         currentStatus: {
-          type: Sequelize.ENUM('applied', 'shortlisted', 'interviewing', 'hired', 'rejected'),
+          type: Sequelize.ENUM('applied', 'shortlisted', 'interviewing', 'selected', 'rejected', 'hired', 'offerRejected'),
           allowNull: false,
           defaultValue: 'applied'
         },
