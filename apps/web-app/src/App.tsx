@@ -1,4 +1,3 @@
-
 import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
@@ -19,6 +18,9 @@ import JobBoardPage from './pages/JobBoardPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import AdminApplicationsPage from './pages/AdminApplicationsPage';
 import MyResumesPage from './pages/MyResumesPage';
+import InterviewsPage from './pages/InterviewsPage';
+import MyInterviewsPage from './pages/MyInterviewsPage';
+import CandidateInterviewsPage from './pages/CandidateInterviewsPage';
 
 
 function App() {
@@ -45,6 +47,9 @@ function App() {
         <Route path='/my-applications' element={<ProtectedRoute><ApplicationsPage /></ProtectedRoute>} />
         <Route path='/my-resumes' element={<ProtectedRoute><MyResumesPage /></ProtectedRoute>} />
         <Route path='/applications' element={<ProtectedRoute><AdminApplicationsPage /></ProtectedRoute>} />
+        <Route path='/interviews' element={<ProtectedRoute><InterviewsPage /></ProtectedRoute>} />
+        <Route path='/my-interviews' element={<ProtectedRoute><MyInterviewsPage /></ProtectedRoute>} />
+        <Route path='/candidate-interviews' element={<ProtectedRoute><CandidateInterviewsPage /></ProtectedRoute>} />
 
         <Route path='*' element={<Navigate to='/signin' replace />} />
       </Routes>

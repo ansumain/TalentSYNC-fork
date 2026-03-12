@@ -330,6 +330,21 @@ export const skillService = {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/skills`;
     return apiClient.get<GetAllSkillsResponse>(url);
   },
+
+  getMySkills: async (): Promise<GetAllSkillsResponse> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/skills/me`;
+    return apiClient.get<GetAllSkillsResponse>(url);
+  },
+
+  addMySkill: async (skillId: string): Promise<{ message: string }> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/skills/me`;
+    return apiClient.post<{ message: string }>(url, { skillId });
+  },
+
+  removeMySkill: async (skillId: string): Promise<{ message: string }> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/skills/me/${skillId}`;
+    return apiClient.delete<{ message: string }>(url);
+  },
 };
 
 // Application Service
@@ -367,5 +382,10 @@ export const applicationService = {
   getRankedApplicants: async (jobId: string): Promise<{ rankedApplicants: RankedApplicant[] }> => {
     const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/applications/job/${jobId}/ranked`;
     return apiClient.get<{ rankedApplicants: RankedApplicant[] }>(url);
+  },
+
+  acceptOrRejectOffer: async (applicationId: string, action: 'accept' | 'reject'): Promise<void> => {
+    const url = `${API_CONFIG.APPLICATION_SERVICE_URL}/applications/${applicationId}/offer`;
+    return apiClient.patch<void>(url, { action });
   },
 };

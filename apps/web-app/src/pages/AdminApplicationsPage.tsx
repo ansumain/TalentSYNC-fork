@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,21 +10,23 @@ import type { JobApplication, ApplicationStatus } from "@/lib/api/application.se
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { SortableTh, TablePagination } from "@/components/ui/table-pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { JOB } from "@/constants/job";
-
-const ALL_STATUSES: ApplicationStatus[] = [
-  "applied",
-  "shortlisted",
-  "interviewing",
-  "hired",
-  "rejected",
-];
 
 const STATUS_COLORS: Record<string, string> = {
   applied: "bg-blue-100 text-blue-700",
   shortlisted: "bg-yellow-100 text-yellow-700",
   interviewing: "bg-purple-100 text-purple-700",
+  selected: "bg-emerald-100 text-emerald-700",
   hired: "bg-green-100 text-green-700",
+  offerRejected: "bg-orange-100 text-orange-700",
   rejected: "bg-red-100 text-red-700",
 };
 
@@ -71,11 +74,11 @@ export default function ApplicationsAdminPage() {
   }, [page, limit, sortBy, sortOrder, search]);
 
   const handleStatusChange = async (applicationId: string, newStatus: ApplicationStatus) => {
-    setUpdating((prev) => ({ ...prev, [applicationId]: true }));
+    setUpdating((prev: Record<string, boolean>) => ({ ...prev, [applicationId]: true }));
     try {
       await applicationService.updateApplicationStatus(applicationId, newStatus);
-      setApplications((prev) =>
-        prev.map((app) =>
+      setApplications((prev: JobApplication[]) =>
+        prev.map((app: JobApplication) =>
           app.applicationId === applicationId ? { ...app, currentStatus: newStatus } : app
         )
       );
@@ -83,22 +86,22 @@ export default function ApplicationsAdminPage() {
     } catch {
       toast.error(JOB.ADMIN_APPLICATION_PAGE.FAILED_UPDATE_STATUS);
     } finally {
-      setUpdating((prev) => ({ ...prev, [applicationId]: false }));
+      setUpdating((prev: Record<string, boolean>) => ({ ...prev, [applicationId]: false }));
     }
   };
 
   const handleDelete = async (applicationId: string) => {
     if (!window.confirm(JOB.ADMIN_APPLICATION_PAGE.REMOVE_APPLICATION)) return;
-    setDeleting((prev) => ({ ...prev, [applicationId]: true }));
+    setDeleting((prev: Record<string, boolean>) => ({ ...prev, [applicationId]: true }));
     try {
       await applicationService.deleteApplication(applicationId);
-      setApplications((prev) => prev.filter((a) => a.applicationId !== applicationId));
-      setTotal((t) => t - 1);
+      setApplications((prev: JobApplication[]) => prev.filter((a: JobApplication) => a.applicationId !== applicationId));
+      setTotal((t: number) => t - 1);
       toast.success(JOB.ADMIN_APPLICATION_PAGE.APPLICATION_REMOVED);
     } catch {
       toast.error(JOB.ADMIN_APPLICATION_PAGE.FAILED_REMOVE_APPLICATION);
     } finally {
-      setDeleting((prev) => ({ ...prev, [applicationId]: false }));
+      setDeleting((prev: Record<string, boolean>) => ({ ...prev, [applicationId]: false }));
     }
   };
 
@@ -115,8 +118,8 @@ export default function ApplicationsAdminPage() {
             <Input
               placeholder={JOB.ADMIN_APPLICATION_PAGE.SEARCH_CANDIDATE_TITLE}
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
+              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
               className="max-w-sm"
             />
             <Button variant="outline" onClick={() => { setSearch(searchInput); setPage(1); }}>Search</Button>
@@ -138,54 +141,52 @@ export default function ApplicationsAdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead>
-                      <tr className="border-b text-muted-foreground text-xs">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="text-muted-foreground text-xs">
                         <SortableTh column="candidateName" label="Candidate" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <SortableTh column="jobTitle" label="Job Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <SortableTh column="currentStatus" label="Current Status" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <SortableTh column="createdAt" label="Applied On" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                        <th className="py-2 pr-4 font-medium">{JOB.ADMIN_APPLICATION_PAGE.UPDATE_STATUS}</th>
-                        <th className="py-2 font-medium"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {applications.map((app) => (
-                        <tr key={app.applicationId} className="border-b last:border-0 hover:bg-muted/40">
-                          <td className="py-3 pr-4 font-medium">
+                        <TableHead className="font-medium">Action</TableHead>
+                        <TableHead />
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {applications.map((app: JobApplication) => (
+                        <TableRow key={app.applicationId}>
+                          <TableCell className="font-medium">
                             {app.candidateName ?? <span className="text-muted-foreground italic">{JOB.ADMIN_APPLICATION_PAGE.UNKNOWN}</span>}
-                          </td>
-                          <td className="py-3 pr-4 text-muted-foreground">
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
                             {app.jobTitle ?? <span className="italic">{JOB.ADMIN_APPLICATION_PAGE.UNKNOWN}</span>}
-                          </td>
-                          <td className="py-3 pr-4">
+                          </TableCell>
+                          <TableCell>
                             <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_COLORS[app.currentStatus] ?? "bg-secondary text-secondary-foreground"
-                                }`}
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_COLORS[app.currentStatus] ?? "bg-secondary text-secondary-foreground"}`}
                             >
                               {app.currentStatus}
                             </span>
-                          </td>
-                          <td className="py-3 pr-4 text-muted-foreground">
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
                             {new Date(app.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="py-3 pr-4">
-                            <select
-                              className="text-xs border rounded-md px-2 py-1 bg-background disabled:opacity-50"
-                              value={app.currentStatus}
-                              disabled={updating[app.applicationId]}
-                              onChange={(e) =>
-                                handleStatusChange(app.applicationId, e.target.value as ApplicationStatus)
-                              }
-                            >
-                              {ALL_STATUSES.map((s) => (
-                                <option key={s} value={s}>
-                                  {s.charAt(0).toUpperCase() + s.slice(1)}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td className="py-3">
+                          </TableCell>
+                          <TableCell>
+                            {app.currentStatus === "applied" ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2 text-xs"
+                                disabled={updating[app.applicationId]}
+                                onClick={() => handleStatusChange(app.applicationId, "shortlisted")}
+                              >
+                                Shortlist
+                              </Button>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -195,11 +196,11 @@ export default function ApplicationsAdminPage() {
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
                 <TablePagination
                   page={page}

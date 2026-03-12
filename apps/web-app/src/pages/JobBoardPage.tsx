@@ -4,22 +4,30 @@ import { AppSidebar } from "@/components/home/appSideBar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { jobService, applicationService, candidateService } from "@/lib/api/application.service";
-import type { Job } from "@/lib/api/application.service";
+import { jobService, applicationService, candidateService, skillService } from "@/lib/api/application.service";
+import type { Job, Skill } from "@/lib/api/application.service";
 import { toast } from "sonner";
 import { AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { TablePagination } from "@/components/ui/table-pagination";
 import { JOB } from "@/constants/job";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { useAuthStore } from "@/stores/authStore";
+import { COMMON_MESSAGE } from "@/constants/common";
 
 type SortField = "createdAt" | "title";
 
 export default function JobBoardPage() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState<Record<string, boolean>>({});
   const [applied, setApplied] = useState<Record<string, boolean>>({});
   const [hasResume, setHasResume] = useState<boolean | null>(null);
+  // Confirm apply dialog
+  const [confirmJob, setConfirmJob] = useState<Job | null>(null);
+  const [confirmSkills, setConfirmSkills] = useState<Skill[]>([]);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   // Pagination
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
@@ -74,6 +82,26 @@ export default function JobBoardPage() {
     } finally {
       setApplying((prev) => ({ ...prev, [jobId]: false }));
     }
+  };
+
+  const handleApplyClick = async (job: Job) => {
+    setConfirmJob(job);
+    setConfirmLoading(true);
+    try {
+      const res = await skillService.getMySkills();
+      setConfirmSkills(res.skills);
+    } catch {
+      setConfirmSkills([]);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  const handleConfirmApply = async () => {
+    if (!confirmJob) return;
+    const jobId = confirmJob.jobId;
+    setConfirmJob(null);
+    await handleApply(jobId);
   };
 
   return (
@@ -138,7 +166,7 @@ export default function JobBoardPage() {
                     <Button
                       size="sm"
                       disabled={hasResume === false || applied[job.jobId] || applying[job.jobId]}
-                      onClick={() => handleApply(job.jobId)}
+                      onClick={() => handleApplyClick(job)}
                     >
                       {applying[job.jobId] ? JOB.JOB_BOARD.APPLYING : applied[job.jobId] ? JOB.JOB_BOARD.APPLIED : JOB.JOB_BOARD.APPLY}
                     </Button>
@@ -164,6 +192,64 @@ export default function JobBoardPage() {
             />
           )}
         </div>
+
+        {/* Apply Confirmation Dialog */}
+        <Dialog open={!!confirmJob} onOpenChange={(open) => { if (!open) setConfirmJob(null); }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{JOB.JOB_BOARD.CONFIRM_APPLICATION}</DialogTitle>
+              <DialogDescription>
+                {JOB.JOB_BOARD.REVIEW}
+              </DialogDescription>
+            </DialogHeader>
+
+            {confirmJob && (
+              <div className="space-y-4 py-2">
+                <div className="rounded-md border bg-muted/40 px-4 py-3 space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{JOB.JOB_BOARD.JOB}</p>
+                  <p className="font-semibold">{confirmJob.title}</p>
+                  <p className="text-sm text-muted-foreground">{confirmJob.location} &middot; {confirmJob.jobType}</p>
+                </div>
+
+                <div className="rounded-md border bg-muted/40 px-4 py-3 space-y-2">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{JOB.JOB_BOARD.PROFILE}</p>
+                  <div className="text-sm space-y-1">
+                    <p><span className="text-muted-foreground">{JOB.JOB_BOARD.NAME}</span> {user?.name}</p>
+                    <p><span className="text-muted-foreground">{JOB.JOB_BOARD.EMAIL}</span> {user?.email}</p>
+                    <p><span className="text-muted-foreground">{JOB.JOB_BOARD.PHONE}</span> {user?.phone || <span className="italic text-muted-foreground">{JOB.JOB_BOARD.NOT_SET}</span>}</p>
+                    <p><span className="text-muted-foreground">{JOB.JOB_BOARD.RESUME}</span> {hasResume ? <span className="text-green-600">{JOB.JOB_BOARD.UPLOADED}</span> : <span className="text-amber-600">{JOB.JOB_BOARD.NOT_UPLOADED}</span>}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-md border bg-muted/40 px-4 py-3 space-y-2">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{JOB.JOB_BOARD.YOUR_SKILLS}</p>
+                  {confirmLoading ? (
+                    <p className="text-sm text-muted-foreground">{COMMON_MESSAGE.LOADING}</p>
+                  ) : confirmSkills.length === 0 ? (
+                    <p className="text-sm text-muted-foreground italic">{JOB.JOB_BOARD.NO_SKILLS_ADDED}</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {confirmSkills.map(s => (
+                        <span key={s.skillId} className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">{s.skillName}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  {JOB.JOB_BOARD.IS_PROFILE_UPDATE_REQUIRED}
+                </p>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setConfirmJob(null)}>{COMMON_MESSAGE.CANCEL}</Button>
+              <Button onClick={handleConfirmApply} disabled={confirmLoading}>
+                {COMMON_MESSAGE.CONFIRM} &amp; {COMMON_MESSAGE.APPLY}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </SidebarInset>
     </SidebarProvider>
   );
