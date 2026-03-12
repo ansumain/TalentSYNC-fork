@@ -1,6 +1,42 @@
 import { Applicaiton } from "../types/Application.type";
-import { JobApplication, Job, JobSkill, Skill, ResumeData } from '@talentsync/models';
+import { JobApplication, Job, JobSkill, Skill, UserSkill, ResumeData } from '@talentsync/models';
 import { ApplicationWithJob, EnrichedApplication, RankedApplicant } from "../types/JobApplication.type";
+
+// checks and updates jobApplication status to 'shortlisted' 
+// when candidate skills match against job required skills
+const updateInitialStatusForApplication = async (userId: string, jobId: string): Promise<string> => {
+    const jobSkillRows = await JobSkill.findAll({ where: { jobId }, attributes: ['skillId'], raw: true });
+    const jobSkillIds = (jobSkillRows as { skillId: string }[]).map((r) => r.skillId);
+
+    if (jobSkillIds.length === 0) return 'applied';
+
+    const jobSkillNames: string[] = [];
+    for (const skillId of jobSkillIds) {
+        const skill = await Skill.findOne({ where: { skillId }, attributes: ['skillName'] });
+        if (skill) jobSkillNames.push((skill.toJSON() as { skillName: string }).skillName);
+    }
+
+    const candidateSkillRows = await UserSkill.findAll({ where: { userId }, attributes: ['skillId'], raw: true });
+    const candidateSkillIds = (candidateSkillRows as { skillId: string }[]).map((r) => r.skillId);
+
+    if (candidateSkillRows.length === 0) return 'applied';
+
+    const candidateSkillNames: string[] = [];
+    for (const skillId of candidateSkillIds) {
+        const skill = await Skill.findOne({ where: { skillId }, attributes: ['skillName'] });
+        if (skill) candidateSkillNames.push((skill.toJSON() as { skillName: string }).skillName);
+    }
+
+    const requiredToMatch = Math.floor(jobSkillNames.length / 2);
+    let matchCount = 0;
+    jobSkillNames.forEach(jobSkill => {
+        if (candidateSkillNames.includes(jobSkill)) matchCount++;
+    });
+
+    const newStatus = matchCount >= requiredToMatch ? 'shortlisted' : 'applied';
+    return newStatus;
+};
+
 // add job application
 const addApplicationRepository = async (application: Applicaiton) => {
     try {
@@ -11,7 +47,10 @@ const addApplicationRepository = async (application: Applicaiton) => {
         // check existing application
         const existingApplication = await JobApplication.findAll({ where: { ...application } });
         if (existingApplication.length > 0) throw new Error('application already exists');
-        const newJob = await JobApplication.create(application);
+
+        // run skill matching to determine initial status : shortlisted or applied
+        const initialStatus = await updateInitialStatusForApplication(application.userId, application.jobId);
+        const newJob = await JobApplication.create({ ...application, currentStatus: initialStatus });
         return newJob;
     } catch (error: unknown) {
         throw error;
@@ -246,7 +285,7 @@ const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<Rank
                     );
                 });
 
-                const resumeId: string | null = resume? (resume.toJSON() as any).id ?? null: null;
+                const resumeId: string | null = resume ? (resume.toJSON() as any).id ?? null : null;
 
                 return {
                     applicationId: appData.applicationId as string,
@@ -272,6 +311,25 @@ const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<Rank
     }
 };
 
+// candidate accepts or rejects a job offer (only allowed when application status is 'selected')
+const acceptOrRejectOfferRepository = async (applicationId: string, userId: string, action: 'accept' | 'reject') => {
+    try {
+        const application = await JobApplication.findOne({ where: { applicationId, userId } });
+        if (!application) throw new Error('application not found');
+
+        if (application.currentStatus !== 'selected') {
+            throw new Error('not a offer can\'t be responded');
+        }
+
+        const newStatus = action === 'accept' ? 'hired' : 'offerRejected';
+        await JobApplication.update({ currentStatus: newStatus }, { where: { applicationId } });
+
+        return { message: action === 'accept' ? 'Offer Accepted!' : 'Offer Rejected!' };
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
 export {
     addApplicationRepository,
     getAllApplicationsRepository,
@@ -280,5 +338,6 @@ export {
     getApplicationsByUserIdRepository,
     updateApplicationCurrentStatusRepository,
     deleteExistingApplicationRepository,
-    getRankedApplicantsByJobIdRepository
+    getRankedApplicantsByJobIdRepository,
+    acceptOrRejectOfferRepository,
 }

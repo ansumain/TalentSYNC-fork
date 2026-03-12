@@ -9,6 +9,7 @@ jobApplicationRouter.get('/user/me', authenticationMiddleware, JobApplicationCon
 jobApplicationRouter.get('/job/:jobId/ranked', authenticationMiddleware, JobApplicationController.getRankedApplicantsByJobId);
 jobApplicationRouter.get('/job/:jobId', authenticationMiddleware, JobApplicationController.getApplicationsByJobId);
 jobApplicationRouter.get('/:applicationId', authenticationMiddleware, JobApplicationController.getApplicationById);
+jobApplicationRouter.patch('/:applicationId/offer', authenticationMiddleware, JobApplicationController.acceptRejectJobOffer);
 jobApplicationRouter.patch('/:applicationId', authenticationMiddleware, JobApplicationController.updateApplicationCurrentStatus);
 jobApplicationRouter.delete('/:applicationId', authenticationMiddleware, JobApplicationController.deleteExistingApplication);
 

@@ -6,7 +6,8 @@ import {
     getApplicationsByUserIdRepository,
     updateApplicationCurrentStatusRepository,
     deleteExistingApplicationRepository,
-    getRankedApplicantsByJobIdRepository
+    getRankedApplicantsByJobIdRepository,
+    acceptOrRejectOfferRepository
 } from '../repository/jobApplication.repository'
 import { RankedApplicant } from '../types/JobApplication.type';
 import { Applicaiton } from '../types/Application.type';
@@ -68,6 +69,11 @@ const getRankedApplicantsByJobId = async (jobId: string): Promise<RankedApplican
     return getRankedApplicantsByJobIdRepository(jobId);
 };
 
+// allows candidate to accept or reject an offer 
+const acceptOrRejectOffer = async (applicationId: string, userId: string, action: 'accept' | 'reject') => {
+    return acceptOrRejectOfferRepository(applicationId, userId, action);
+};
+
 export {
     addApplication,
     getAllApplications,
@@ -76,5 +82,6 @@ export {
     getApplicationsByUserId,
     updateApplicationCurrentStatus,
     deleteExistingApplication,
-    getRankedApplicantsByJobId
+    getRankedApplicantsByJobId,
+    acceptOrRejectOffer,
 };

@@ -7,7 +7,8 @@ import {
     getApplicationsByUserId,
     updateApplicationCurrentStatus,
     deleteExistingApplication,
-    getRankedApplicantsByJobId
+    getRankedApplicantsByJobId,
+    acceptOrRejectOffer
 } from '../services/jobApplication.service';
 import { parsePaginationParams } from '../utils/parsePaginationParams';
 
@@ -217,6 +218,43 @@ export class JobApplicationController {
         } catch (e: unknown) {
             const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             if (errorMessage.includes('missing required field')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
+    // allows candidate to accept or reject an offer 
+    // when applicationStatus is "selected" after interview
+    static async acceptRejectJobOffer(req: Request, res: Response): Promise<void> {
+        try {
+            if (!req.params.applicationId) throw new Error('missing required field');
+            const applicationId = req.params.applicationId as string;
+
+            const { action } = req.body;
+            if (!action || !['accept', 'reject'].includes(action)) {
+                throw new Error('action must be accept or reject');
+            }
+
+            const userId = req.userInfo.sub as string;
+
+            const result = await acceptOrRejectOffer(applicationId, userId, action as 'accept' | 'reject');
+            res.status(200).json(result);
+
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
+
+            if (errorMessage.includes('missing required field') ||
+                errorMessage.includes('action must be')) {
+                res.status(400).json({ error: errorMessage });
+                return;
+            }
+            if (errorMessage.includes('application not found')) {
+                res.status(404).json({ error: errorMessage });
+                return;
+            }
+            if (errorMessage.includes('not a offer can\'t be responded')) {
                 res.status(400).json({ error: errorMessage });
                 return;
             }
