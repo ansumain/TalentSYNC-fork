@@ -163,12 +163,10 @@ export class JobApplicationController {
         } catch (e: unknown) {
             const errorMessage = e instanceof Error ? e.message : 'Internal server error';
 
-            if (errorMessage.includes('no input')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            if (errorMessage.includes('missing required field')) {
+            if (errorMessage.includes('no input') ||
+                errorMessage.includes('missing required field') ||
+                errorMessage.includes('manual status update') ||
+                errorMessage.includes('can only shortlist')) {
                 res.status(400).json({ error: errorMessage });
                 return;
             }

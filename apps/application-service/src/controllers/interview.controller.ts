@@ -6,6 +6,7 @@ import {
     getInterviewById,
     getInterviewsByJobId,
     getAssignedInterviews,
+    getCandidateInterviews,
     updateExistingInterview,
     submitInterviewResult,
     cancelInterview,
@@ -264,6 +265,19 @@ export class InterviewController {
             res.status(500).json({ error: errorMessage });
         }
     }
+
+    // get interviews for the logged-in candidate
+    static async getCandidateInterviews(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.userInfo.sub as string;
+            const interviews = await getCandidateInterviews(userId);
+            res.status(200).json({ interviews });
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
+            res.status(500).json({ error: errorMessage });
+        }
+    }
+
 
     // delete an interview
     static async deleteExistingInterview(req: Request, res: Response): Promise<void> {

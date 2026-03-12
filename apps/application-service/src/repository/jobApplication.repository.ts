@@ -158,11 +158,15 @@ const getApplicationsByJobIdRepository = async (jobId: string) => {
     }
 }
 
-// update application current status
+// update application current status: applied -> shortlisted
 const updateApplicationCurrentStatusRepository = async (applicationId: string, currentStatus: string) => {
     try {
+        if (currentStatus !== 'shortlisted') throw new Error('manual status update is only allowed for shortlisting');
+
         const existingApplication = await JobApplication.findOne({ where: { applicationId } });
         if (!existingApplication) throw new Error('application not found');
+
+        if (existingApplication.currentStatus !== 'applied') throw new Error('can only shortlist an application that is in applied status');
 
         await JobApplication.update({ currentStatus }, { where: { applicationId } });
 
@@ -171,6 +175,9 @@ const updateApplicationCurrentStatusRepository = async (applicationId: string, c
         throw error;
     }
 };
+
+
+
 
 // delete application
 const deleteExistingApplicationRepository = async (applicationId: string) => {

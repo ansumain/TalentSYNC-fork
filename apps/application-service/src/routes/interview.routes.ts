@@ -5,6 +5,7 @@ const interviewRouter: Router = express.Router();
 
 interviewRouter.get('/interviewers/available', authenticationMiddleware, InterviewController.getAvailableInterviewers);
 interviewRouter.get('/assigned', authenticationMiddleware, InterviewController.getAssignedInterviews);
+interviewRouter.get('/me', authenticationMiddleware, InterviewController.getCandidateInterviews);
 interviewRouter.get('/job/:jobId', authenticationMiddleware, InterviewController.getInterviewsByJobId);
 interviewRouter.post('/', authenticationMiddleware, InterviewController.scheduleInterview);
 interviewRouter.get('/', authenticationMiddleware, InterviewController.getAllInterviews);

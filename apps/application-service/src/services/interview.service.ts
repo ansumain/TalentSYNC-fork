@@ -8,6 +8,7 @@ import {
     getInterviewByIdRepository,
     getInterviewsByJobIdRepository,
     getAssignedInterviewsRepository,
+    getCandidateInterviewsRepository,
     updateExistingInterviewRepository,
     submitInterviewResultRepository,
     cancelInterviewRepository,
@@ -61,6 +62,11 @@ const deleteExistingInterview = async (interviewId: string) => {
     return deleteExistingInterviewRepository(interviewId);
 }
 
+// get all interviews for a candidate
+const getCandidateInterviews = async (userId: string) => {
+    return getCandidateInterviewsRepository(userId);
+};
+
 // get all assigned interviews
 const getAssignedInterviews = async (interviewerId: string) => {
     return getAssignedInterviewsRepository(interviewerId);
@@ -83,6 +89,7 @@ export {
     getInterviewById,
     getInterviewsByJobId,
     getAssignedInterviews,
+    getCandidateInterviews,
     updateExistingInterview,
     submitInterviewResult,
     cancelInterview,

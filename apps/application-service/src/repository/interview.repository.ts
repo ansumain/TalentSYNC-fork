@@ -118,6 +118,21 @@ const getInterviewsByJobIdRepository = async (jobId: string) => {
     return interviews;
 };
 
+// get all interviews for a candidate (via their applications)
+const getCandidateInterviewsRepository = async (userId: string) => {
+    const applicationRows = await JobApplication.findAll({
+        where: { userId },
+        attributes: ['applicationId'],
+        raw: true
+    });
+    const applicationIds = applicationRows.map((row: { applicationId: string }) => row.applicationId);
+
+    if (applicationIds.length === 0) return [];
+
+    const interviews = await Interview.findAll({ where: { applicationId: { [Op.in]: applicationIds } } });
+    return interviews;
+};
+
 // get all interviews assigned to a specific interviewer
 const getAssignedInterviewsRepository = async (interviewerId: string) => {
     // const interviews = await Interview.findAll({ where: { interviewerId } });
@@ -156,10 +171,10 @@ const submitInterviewResultRepository = async (interviewId: string, result: 'pas
 
     if (interview.status !== 'scheduled') throw new Error('can only submit result for a scheduled interview');
 
-    await Interview.update({ result, status: 'completed' }, { where: { interviewId } });
-
     // update application status based on result: passed -> selected & failed -> rejected
     const applicationStatus = result === 'passed' ? 'selected' : 'rejected';
+    
+    await Interview.update({ result, status: 'completed' }, { where: { interviewId } });
     await JobApplication.update({ currentStatus: applicationStatus }, { where: { applicationId: interview.applicationId } });
 
     return { message: `Interview completed. Application status updated to ${applicationStatus}.` };
@@ -200,6 +215,7 @@ export {
     getInterviewByIdRepository,
     getInterviewsByJobIdRepository,
     getAssignedInterviewsRepository,
+    getCandidateInterviewsRepository,
     updateExistingInterviewRepository,
     submitInterviewResultRepository,
     cancelInterviewRepository,
