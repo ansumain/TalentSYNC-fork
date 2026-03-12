@@ -7,7 +7,10 @@ import {
     getAllInterviewsRepository,
     getInterviewByIdRepository,
     getInterviewsByJobIdRepository,
+    getAssignedInterviewsRepository,
     updateExistingInterviewRepository,
+    submitInterviewResultRepository,
+    cancelInterviewRepository,
     deleteExistingInterviewRepository
 } from '../repository/interview.repository'
 import { CreateInterview } from '../types/CreateInterview.type';
@@ -19,9 +22,7 @@ const getAvailableInterviewers = async (date: string, applicationId: string) => 
     let availableInterviewers: Partial<User>[] = [];
     for (const interviewer of allInterviewers) {
         const interviewCount = await getDatedInterviewCountRepository(interviewer.id, date);
-        if (interviewCount > 10) continue;
-
-        console.log('interviewerId:', interviewer.id);
+        if (interviewCount >= 10) continue;
 
         const isInterviewerEligible = await checkInterviewerEligibilityRepository(interviewer.id, applicationId);
         if (isInterviewerEligible) availableInterviewers.push(interviewer);
@@ -30,41 +31,50 @@ const getAvailableInterviewers = async (date: string, applicationId: string) => 
     return availableInterviewers;
 }
 
-// schedule interview
+// schedule an interview
 const scheduleInterview = async (newInterviewData: CreateInterview) => {
-    const newInterview = await scheduleInterviewRepository(newInterviewData);
-    return newInterview;
+    return scheduleInterviewRepository(newInterviewData);
 }
 
 // get all interviews
 const getAllInterviews = async () => {
-    const scheduledInterviews = await getAllInterviewsRepository();
-    return scheduledInterviews;
+    return getAllInterviewsRepository();
 }
 
 // get interview by Id
 const getInterviewById = async (interviewId: string) => {
-    const interview = await getInterviewByIdRepository(interviewId);
-    return interview;
+    return getInterviewByIdRepository(interviewId);
 }
 
 // get interviews by jobId
 const getInterviewsByJobId = async (jobId: string) => {
-    const interviews = await getInterviewsByJobIdRepository(jobId);
-    return interviews;
+    return getInterviewsByJobIdRepository(jobId);
 }
 
-// update interview
+// update interview details
 const updateExistingInterview = async (interviewId: string, updateInterviewData: Partial<CreateInterview>) => {
-    const updatedInterview = await updateExistingInterviewRepository(interviewId, updateInterviewData);
-    return updatedInterview;
+    return updateExistingInterviewRepository(interviewId, updateInterviewData);
 }
 
-// delete interivew
+// delete an interview
 const deleteExistingInterview = async (interviewId: string) => {
-    const isDeleted = await deleteExistingInterviewRepository(interviewId);
-    if (isDeleted) return isDeleted;
+    return deleteExistingInterviewRepository(interviewId);
 }
+
+// get all assigned interviews
+const getAssignedInterviews = async (interviewerId: string) => {
+    return getAssignedInterviewsRepository(interviewerId);
+};
+
+// submit interview result + status: completed + update respective jobApplication status
+const submitInterviewResult = async (interviewId: string, result: 'passed' | 'failed') => {
+    return submitInterviewResultRepository(interviewId, result);
+};
+
+// cancel an interview 
+const cancelInterview = async (interviewId: string) => {
+    return cancelInterviewRepository(interviewId);
+};
 
 export {
     getAvailableInterviewers,
@@ -72,6 +82,9 @@ export {
     getAllInterviews,
     getInterviewById,
     getInterviewsByJobId,
+    getAssignedInterviews,
     updateExistingInterview,
+    submitInterviewResult,
+    cancelInterview,
     deleteExistingInterview
 };
