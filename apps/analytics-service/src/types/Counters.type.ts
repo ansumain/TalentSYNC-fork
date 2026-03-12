@@ -1,8 +1,9 @@
 interface Counters {
     interviews: {
+        scheduled: number;
         completed: number;
-        pending: number;
         cancelled: number;
+        noShow: number;
     },
     jobs: number;
     hires: number;

@@ -1,10 +1,15 @@
-interface BarGraph {
+interface SkillCount {
     skill: string;
     count: number;
 }
 
+interface GraphData {
+    date: string;
+    skills: SkillCount[];
+}
+
 interface Graphs {
-    barGraph: BarGraph[];
+    barGraph: GraphData[];
 }
 
 export type { Graphs };
