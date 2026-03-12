@@ -42,11 +42,11 @@ const navigationByRole = {
             items: [
                 {
                     title: "Scheduled",
-                    url: "#",
+                    url: "/candidate-interviews?status=scheduled",
                 },
                 {
                     title: "Completed",
-                    url: "#",
+                    url: "/candidate-interviews?status=completed",
                 }
             ],
         }
@@ -59,20 +59,8 @@ const navigationByRole = {
             isActive: true,
             items: [
                 {
-                    title: "Assigned",
-                    url: "#",
-                },
-                {
-                    title: "Scheduled",
-                    url: "#",
-                },
-                {
-                    title: "Completed",
-                    url: "#",
-                },
-                {
-                    title: "Feedback Pending",
-                    url: "#",
+                    title: "My Interviews",
+                    url: "/my-interviews",
                 },
             ],
         },
@@ -90,30 +78,18 @@ const navigationByRole = {
         }
     ],
     manager: [
-        // {
-        //   title: "Interviews",
-        //   url: "#",
-        //   icon: SquareTerminal,
-        //   isActive: true,
-        //   items: [
-        //     {
-        //       title: "Assigned",
-        //       url: "#",
-        //     },
-        //     {
-        //       title: "Schedule",
-        //       url: "#",
-        //     },
-        //     {
-        //       title: "Completed",
-        //       url: "#",
-        //     },
-        //     {
-        //       title: "Pending Feedback",
-        //       url: "#",
-        //     }
-        //   ],
-        // },
+        {
+            title: "Interviews",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Manage Interviews",
+                    url: "/interviews",
+                },
+            ],
+        },
         {
             title: "Candidates",
             url: "#",
@@ -148,30 +124,18 @@ const navigationByRole = {
         }
     ],
     admin: [
-        // {
-        //   title: "Interviews",
-        //   url: "#",
-        //   icon: SquareTerminal,
-        //   isActive: true,
-        //   items: [
-        //     {
-        //       title: "Assigned",
-        //       url: "#",
-        //     },
-        //     {
-        //       title: "Schedule",
-        //       url: "#",
-        //     },
-        //     {
-        //       title: "Completed",
-        //       url: "#",
-        //     },
-        //     {
-        //       title: "Pending Feedback",
-        //       url: "#",
-        //     }
-        //   ],
-        // },
+        {
+            title: "Interviews",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Manage Interviews",
+                    url: "/interviews",
+                },
+            ],
+        },
         {
             title: "Candidates",
             url: "#",

@@ -37,7 +37,21 @@ const JOB = {
         APPLY: 'Apply',
         APPLIED: 'Applied',
         OPENING: 'opening',
-        POSTED: 'Posted'
+        POSTED: 'Posted',
+        CONFIRM_APPLICATION: 'Confirm Application',
+        REVIEW: 'Review your profile data before applying to this job.',
+        JOB: 'Job',
+        PROFILE: 'Your Profile',
+        NAME: 'Name:',
+        EMAIL: 'Email:',
+        PHONE: 'Phone:',
+        NOT_SET: 'not set',
+        RESUME: 'Resume:',
+        UPLOADED: 'Uploaded',
+        NOT_UPLOADED: 'Not uploaded',
+        YOUR_SKILLS: 'Your Skills',
+        NO_SKILLS_ADDED: 'No skills added. Add skills in your profile settings.',
+        IS_PROFILE_UPDATE_REQUIRED: 'Need to update your profile? Cancel and go to Settings.'
     },
 
     JOB_DETAIL: {
@@ -74,7 +88,9 @@ const JOB = {
         FAILED_TO_LOAD_APPLICATIONS: 'Failed to load your applications',
         MY_APPLICATIONS: 'My Applications',
         NO_JOB_APPLICATIONS: "You haven't applied to any jobs yet.",
-        APPLICATION: 'Application'
+        APPLICATION: 'Application',
+        ACCEPT: 'Accept',
+        DECLINE: 'Decline'
     },
 
     ADMIN_APPLICATION_PAGE: {

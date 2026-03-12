@@ -12,10 +12,16 @@ module.exports = {
       return;
     }
 
-    const userIds = [
-      '49c7305a-daeb-4f16-84ee-35928c25619a',
-      '15e6e8b3-82ae-4fe3-8fb0-640d63752868'
-    ];
+    const [users] = await queryInterface.sequelize.query(
+      `SELECT id FROM auth.users WHERE email IN ('candidate@gmail.com', 'interviewer@gmail.com');`
+    );
+
+    if (users.length === 0) {
+      console.error("No matching users found. Please seed users first.");
+      return;
+    }
+
+    const userIds = users.map(u => u.id);
 
     const userSkillsData = [];
     const now = new Date();

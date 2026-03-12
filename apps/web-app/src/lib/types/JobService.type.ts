@@ -14,7 +14,7 @@ interface Job {
     skills?: Skill[];
 }
 
-type ApplicationStatus = 'applied' | 'shortlisted' | 'interviewing' | 'hired' | 'rejected';
+type ApplicationStatus = 'applied' | 'shortlisted' | 'interviewing' | 'selected' | 'rejected' | 'hired' | 'offerRejected'
 
 interface JobApplication {
     applicationId: string;
