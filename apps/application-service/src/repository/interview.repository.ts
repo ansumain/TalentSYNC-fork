@@ -82,6 +82,10 @@ const scheduleInterviewRepository = async (newInterviewData: CreateInterview) =>
     const existingApplication = await JobApplication.findOne({ where: { applicationId: newInterviewData.applicationId } });
     if (!existingApplication) throw new Error('application not found');
 
+    if (existingApplication.currentStatus !== 'shortlisted') {
+        throw new Error('can only schedule interview for shortlisted applications');
+    }
+
     const existingInterview = await Interview.findOne({ where: { applicationId: newInterviewData.applicationId } });
     if (existingInterview) throw new Error('interview already exists for this application');
 
@@ -173,7 +177,7 @@ const submitInterviewResultRepository = async (interviewId: string, result: 'pas
 
     // update application status based on result: passed -> selected & failed -> rejected
     const applicationStatus = result === 'passed' ? 'selected' : 'rejected';
-    
+
     await Interview.update({ result, status: 'completed' }, { where: { interviewId } });
     await JobApplication.update({ currentStatus: applicationStatus }, { where: { applicationId: interview.applicationId } });
 
@@ -200,6 +204,15 @@ const cancelInterviewRepository = async (interviewId: string) => {
 const deleteExistingInterviewRepository = async (interviewId: string) => {
     const existingInterview = await Interview.findOne({ where: { interviewId } });
     if (!existingInterview) throw new Error('interview not found');
+
+    // prevent deletion of completed interviews
+    if (existingInterview.status === 'completed') {
+        throw new Error('cannot delete a completed interview');
+    }
+
+    if (existingInterview.status === 'scheduled' || existingInterview.status === 'noshow') {
+        await JobApplication.update({ currentStatus: 'shortlisted' }, { where: { applicationId: existingInterview.applicationId } });
+    }
 
     await Interview.destroy({ where: { interviewId } });
 
