@@ -46,8 +46,9 @@ RUN pnpm install
 RUN pnpm --filter @talentsync/types build && \
     pnpm --filter @talentsync/config build && \
     pnpm --filter @talentsync/models build && \
-    pnpm --filter @talentsync/analytics-service build
+    pnpm --filter @talentsync/analytics-service build && \
+    pnpm --filter @talentsync/analytics-service worker:build
  
-EXPOSE 4003
+EXPOSE 4004
  
 CMD ["pnpm", "--filter", "@talentsync/analytics-service", "start"]

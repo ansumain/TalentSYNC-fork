@@ -213,6 +213,92 @@ services:
       retries: 3
       start_period: 40s
 
+  analytics-service:
+    build:
+      context: .
+      dockerfile: ./apps/analytics-service/Dockerfile
+    container_name: TalentSYNC-analytics-service
+    restart: unless-stopped
+    ports:
+      - "4004:4004"
+    environment:
+      PORT: 4004
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      NODE_ENV: development
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
+      QUEUE_ANALYTICS_EXPORT: analytics.export.report
+      QUEUE_ANALYTICS_EXPORT_RETRY: analytics.export.retry
+      QUEUE_ANALYTICS_EXPORT_FAILED: analytics.export.failed
+      QUEUE_MAX_RETRIES: 3
+      QUEUE_RETRY_DELAY: 5000
+      QUEUE_PREFETCH: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4004/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  analytics-worker:
+    build:
+      context: .
+      dockerfile: ./apps/analytics-service/Dockerfile
+    container_name: TalentSYNC-analytics-worker
+    restart: unless-stopped
+    environment:
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      NODE_ENV: development
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
+      QUEUE_ANALYTICS_EXPORT: analytics.export.report
+      QUEUE_ANALYTICS_EXPORT_RETRY: analytics.export.retry
+      QUEUE_ANALYTICS_EXPORT_FAILED: analytics.export.failed
+      QUEUE_MAX_RETRIES: 3
+      QUEUE_RETRY_DELAY: 5000
+      QUEUE_PREFETCH: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    command: [ "pnpm", "--filter", "@talentsync/analytics-service", "worker:start" ]
+
   web-app:
     container_name: TalentSYNC-web-app
     build:
@@ -237,6 +323,8 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       auth-service:
+        condition: service_healthy
+      analytics-service:
         condition: service_healthy
       web-app:
         condition: service_started
