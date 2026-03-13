@@ -13,24 +13,38 @@ module.exports = {
           type: Sequelize.DATEONLY,
           allowNull: false
         },
-        skill: {
-          type: Sequelize.STRING,
+        skillId: {
+          type: Sequelize.UUID,
           allowNull: false,
         },
-        count: {
+        skillName: {
+          type: Sequelize.STRING(100),
+          allowNull: false,
+        },
+        demandCount: {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0
         },
+        supplyCount: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          defaultValue: 0
+        },
+        lastRefreshedAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        }
       }
     );
 
     await queryInterface.addConstraint(
       { tableName: 'analytics_graphs', schema: 'aggregation' },
       {
-        fields: ['date', 'skill'],
+        fields: ['date', 'skillId'],
         type: 'unique',
-        name: 'dateSkills_unique_constraint'
+        name: 'date_skill_unique_constraint'
       }
     );
   },

@@ -16,17 +16,36 @@ module.exports = {
         },
         interviewerId: {
           type: Sequelize.UUID,
+          allowNull: false,
+          primaryKey: true
+        },
+        interviewerName: {
+          type: Sequelize.STRING(120),
           allowNull: false
         },
-        selected: {
+        totalInterviews: {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0
         },
-        rejected: {
+        passedCount: {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0
+        },
+        failedCount: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          defaultValue: 0
+        },
+        passRate: {
+          type: Sequelize.DECIMAL(10, 2),
+          allowNull: false,
+          defaultValue: 0
+        },
+        lastRefreshedAt: {
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
         }
       }
     );
@@ -35,7 +54,7 @@ module.exports = {
       {
         fields: ['date', 'interviewerId'],
         type: 'unique',
-        name: 'dateInterviewId_unique_constraint'
+        name: 'date_interviewer_unique_constraint'
       }
     );
   },

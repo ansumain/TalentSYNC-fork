@@ -1,7 +1,7 @@
 import { getAllCounterDataRepository } from "../repository/counters.repository";
 
-const getAllCounterData = async () => {
-    return getAllCounterDataRepository();
-}
+const getAllCounterData = async (fromDate: string, toDate: string) => {
+    return getAllCounterDataRepository(fromDate, toDate);
+};
 
-export { getAllCounterData }
+export { getAllCounterData };

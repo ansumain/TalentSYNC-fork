@@ -43,6 +43,11 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0
+        },
+        lastRefreshedAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
         }
       }
     );

@@ -1,15 +1,21 @@
-interface SkillCount {
-    skill: string;
-    count: number;
+interface SkillGapPoint {
+    skillId: string;
+    skillName: string;
+    demandCount: number;
+    supplyCount: number;
 }
 
-interface GraphData {
-    date: string;
-    skills: SkillCount[];
+interface JobApplicationsPoint {
+    jobId: string;
+    jobTitle: string;
+    applicationCount: number;
 }
 
 interface Graphs {
-    barGraph: GraphData[];
+    skillGapBar: SkillGapPoint[];
+    jobApplicationsPie: JobApplicationsPoint[];
+    top: 3 | 5 | 10;
+    lastUpdatedAt: string | null;
 }
 
 export type { Graphs };

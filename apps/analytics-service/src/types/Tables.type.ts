@@ -1,23 +1,27 @@
-interface RecentInterviewsTable {
-    applicantName: string;
+interface InterviewerPerformanceRow {
+    interviewerId: string;
     interviewerName: string;
-    result: string;
+    totalInterviews: number;
+    passedCount: number;
+    failedCount: number;
+    passRate: number;
 }
 
-interface DataBoxData {
+interface FunnelData {
+    jobId: string | 'all';
+    jobTitle: string;
     applied: number;
     shortlisted: number;
-    interviewing: number;
     selected: number;
     hired: number;
-
-    timeToHire: string;
-    conversionRate: string;
+    timeToHireDays: number;
+    conversionRate: number;
 }
 
 interface Tables {
-    recentInterviewTable: RecentInterviewsTable[];
-    dataBox: DataBoxData[]
+    funnel: FunnelData;
+    interviewerPerformance: InterviewerPerformanceRow[];
+    lastUpdatedAt: string | null;
 }
 
 export type { Tables };

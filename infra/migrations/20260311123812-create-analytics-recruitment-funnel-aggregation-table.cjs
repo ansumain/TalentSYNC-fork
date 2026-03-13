@@ -13,14 +13,19 @@ module.exports = {
         },
         jobId: {
           type: Sequelize.UUID,
+          allowNull: false,
+          primaryKey: true
+        },
+        jobTitle: {
+          type: Sequelize.STRING(120),
           allowNull: false
         },
-        timeToHire: {
-          type: Sequelize.STRING,
+        timeToHireDays: {
+          type: Sequelize.DECIMAL(10, 2),
           allowNull: false
         },
         conversionRate: {
-          type: Sequelize.STRING,
+          type: Sequelize.DECIMAL(10, 2),
           allowNull: false
         },
         applied: {
@@ -28,7 +33,7 @@ module.exports = {
           allowNull: false,
           defaultValue: 0
         },
-        shortListed: {
+        shortlisted: {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0
@@ -42,6 +47,11 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0
+        },
+        lastRefreshedAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
         },
       }
     );

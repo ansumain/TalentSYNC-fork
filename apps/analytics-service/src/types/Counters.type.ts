@@ -5,8 +5,9 @@ interface Counters {
         cancelled: number;
         noShow: number;
     },
-    jobs: number;
+    openJobs: number;
     hires: number;
+    lastUpdatedAt: string | null;
 }
 
 export type { Counters };
