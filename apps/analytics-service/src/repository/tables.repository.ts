@@ -24,7 +24,7 @@ const getAllTableDataRepository = async (fromDate: string, toDate: string, jobId
 
         const funnelSingleJobQuery = `
                 SELECT
-                        MAX("jobId") AS "jobId",
+                        "jobId",
                         MAX("jobTitle") AS "jobTitle",
                         COALESCE(SUM(applied), 0) AS applied,
                         COALESCE(SUM(shortlisted), 0) AS shortlisted,
@@ -34,6 +34,7 @@ const getAllTableDataRepository = async (fromDate: string, toDate: string, jobId
                 FROM aggregation.analytics_recruitment_funnel
                 WHERE date BETWEEN :fromDate AND :toDate
                   AND "jobId" = :jobId
+                GROUP BY "jobId"
         `;
 
         const [funnel] = await sequelize.query<{
