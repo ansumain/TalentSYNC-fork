@@ -1,5 +1,4 @@
 import * as React from "react"
-// import { SquareTerminal } from "lucide-react"
 
 import { NavMain } from "@/components/home/navMain"
 import { NavUser } from "@/components/home/navUser"
@@ -25,11 +24,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const userData = user ? {
     name: user.name,
     role: userRole,
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   } : {
-    name: "Loading...",
-    role: "...",
-    avatar: "/avatars/shadcn.jpg",
+    name: "User",
+    role: "Member",
+    avatar: "",
   }
 
   if (loading) {

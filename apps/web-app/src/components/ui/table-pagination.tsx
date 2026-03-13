@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { TableHead } from "@/components/ui/table";
 import {
@@ -12,6 +11,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface SortableHeadProps {
   column: string;
@@ -135,15 +141,16 @@ export function TablePagination({
         {onLimitChange && (
           <>
             <span>Rows per page:</span>
-            <select
-              className="text-xs border rounded px-2 py-1 bg-background"
-              value={limit}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onLimitChange(Number(e.target.value))}
-            >
-              {limitOptions.map((o) => (
-                <option key={o} value={o}>{o}</option>
-              ))}
-            </select>
+            <Select value={String(limit)} onValueChange={(value) => onLimitChange(Number(value))}>
+              <SelectTrigger className="h-8 w-[90px] text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {limitOptions.map((o) => (
+                  <SelectItem key={o} value={String(o)}>{o}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </>
         )}
         <span>{start}-{end} of {total}</span>

@@ -6,6 +6,7 @@ import { useCandidateStore } from "@/stores/candidateStore";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -65,7 +66,13 @@ export function CandidateTable() {
           <Button onClick={() => { setSearch(""); clearFilter(); fetchAll(); }} variant="ghost">{COMMON_MESSAGE.CLEAR}</Button>
         </div>
       </div>
-      {loading && <div className="text-center py-8">{COMMON_MESSAGE.LOADING}</div>}
+      {loading && (
+        <div className="space-y-3 py-2">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      )}
       {error && <div className="text-center text-red-500 py-8">{error}</div>}
       {!loading && !error && (
         <div className="overflow-x-auto">
@@ -74,7 +81,7 @@ export function CandidateTable() {
               <TableRow>
                 <SortableHead column="name" label={CANDIDATE.CANDIDATE_TABLE.NAME} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
                 <SortableHead column="email" label={CANDIDATE.CANDIDATE_TABLE.EMAIL} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
-                <SortableHead column="phone" label={CANDIDATE.CANDIDATE_TABLE.PHONE} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
+                <th className="px-4 py-2 text-left text-sm font-medium">{CANDIDATE.CANDIDATE_TABLE.PHONE}</th>
                 <SortableHead column="createdAt" label={CANDIDATE.CANDIDATE_TABLE.UPLOADED_AT} currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={setSort} />
               </TableRow>
             </TableHeader>

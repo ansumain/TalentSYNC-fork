@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppSidebar } from "@/components/home/appSideBar";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { JOB } from "@/constants/job";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useAuthStore } from "@/stores/authStore";
 import { COMMON_MESSAGE } from "@/constants/common";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type SortField = "createdAt" | "title";
 
@@ -66,21 +68,21 @@ export default function JobBoardPage() {
   }, [page, limit, sortBy, sortOrder]);
 
   const handleApply = async (jobId: string) => {
-    setApplying((prev) => ({ ...prev, [jobId]: true }));
+    setApplying((prev: Record<string, boolean>) => ({ ...prev, [jobId]: true }));
     try {
       await applicationService.applyToJob(jobId);
-      setApplied((prev) => ({ ...prev, [jobId]: true }));
+      setApplied((prev: Record<string, boolean>) => ({ ...prev, [jobId]: true }));
       toast.success("Application submitted successfully!");
     } catch (err: any) {
       const msg = err.message || "Failed to apply";
       if (msg.includes("already exists")) {
         toast.error("You have already applied to this job.");
-        setApplied((prev) => ({ ...prev, [jobId]: true }));
+        setApplied((prev: Record<string, boolean>) => ({ ...prev, [jobId]: true }));
       } else {
         toast.error(msg);
       }
     } finally {
-      setApplying((prev) => ({ ...prev, [jobId]: false }));
+      setApplying((prev: Record<string, boolean>) => ({ ...prev, [jobId]: false }));
     }
   };
 
@@ -108,24 +110,26 @@ export default function JobBoardPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
-          <h1 className="text-xl font-semibold">{JOB.JOB_BOARD.OPEN_JOBS}</h1>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{JOB.JOB_BOARD.SORT_BY}</span>
-            <button
-              className={`flex items-center gap-1 px-2 py-1 rounded hover:bg-muted ${sortBy === "createdAt" ? "font-medium text-foreground" : ""}`}
-              onClick={() => handleSort("createdAt")}
-            >
-              {JOB.JOB_BOARD.DATE} <SortIcon field="createdAt" />
-            </button>
-            <button
-              className={`flex items-center gap-1 px-2 py-1 rounded hover:bg-muted ${sortBy === "title" ? "font-medium text-foreground" : ""}`}
-              onClick={() => handleSort("title")}
-            >
-              {JOB.JOB_BOARD.TITLE} <SortIcon field="title" />
-            </button>
-          </div>
-        </header>
+        <AppPageHeader
+          title={JOB.JOB_BOARD.OPEN_JOBS}
+          actions={
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{JOB.JOB_BOARD.SORT_BY}</span>
+              <button
+                className={`flex items-center gap-1 rounded px-2 py-1 hover:bg-muted ${sortBy === "createdAt" ? "font-medium text-foreground" : ""}`}
+                onClick={() => handleSort("createdAt")}
+              >
+                {JOB.JOB_BOARD.DATE} <SortIcon field="createdAt" />
+              </button>
+              <button
+                className={`flex items-center gap-1 rounded px-2 py-1 hover:bg-muted ${sortBy === "title" ? "font-medium text-foreground" : ""}`}
+                onClick={() => handleSort("title")}
+              >
+                {JOB.JOB_BOARD.TITLE} <SortIcon field="title" />
+              </button>
+            </div>
+          }
+        />
 
         <div className="flex flex-col gap-4 p-4 pt-0">
           {!loading && hasResume === false && (
@@ -143,7 +147,26 @@ export default function JobBoardPage() {
             </div>
           )}
 
-          {loading && <div className="text-center py-8 text-muted-foreground">{JOB.JOB_BOARD.LOADING_JOBS}</div>}
+          {loading && (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index}>
+                  <CardContent className="space-y-4 py-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-2">
+                        <Skeleton className="h-5 w-56" />
+                        <Skeleton className="h-4 w-40" />
+                      </div>
+                      <Skeleton className="h-8 w-20" />
+                    </div>
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
+                    <Skeleton className="h-3 w-48" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {!loading && jobs.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">{JOB.JOB_BOARD.NO_JOBS}</div>
@@ -224,12 +247,15 @@ export default function JobBoardPage() {
                 <div className="rounded-md border bg-muted/40 px-4 py-3 space-y-2">
                   <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{JOB.JOB_BOARD.YOUR_SKILLS}</p>
                   {confirmLoading ? (
-                    <p className="text-sm text-muted-foreground">{COMMON_MESSAGE.LOADING}</p>
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-36" />
+                      <Skeleton className="h-4 w-28" />
+                    </div>
                   ) : confirmSkills.length === 0 ? (
                     <p className="text-sm text-muted-foreground italic">{JOB.JOB_BOARD.NO_SKILLS_ADDED}</p>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
-                      {confirmSkills.map(s => (
+                      {confirmSkills.map((s: Skill) => (
                         <span key={s.skillId} className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">{s.skillName}</span>
                       ))}
                     </div>

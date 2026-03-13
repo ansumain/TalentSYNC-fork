@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppSidebar } from "@/components/home/appSideBar";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,13 +41,15 @@ export default function CandidateProfilePage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/candidates")}>
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            {COMMON_MESSAGE.BACK}
-          </Button>
-          <h1 className="text-xl font-semibold">{parsedJSON.name || "Candidate Profile"}</h1>
-        </header>
+        <AppPageHeader
+          title={parsedJSON.name || "Candidate Profile"}
+          leading={
+            <Button variant="ghost" size="sm" onClick={() => navigate("/candidates")}>
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              {COMMON_MESSAGE.BACK}
+            </Button>
+          }
+        />
 
         <div className="flex flex-col gap-4 p-4 pt-0">
 

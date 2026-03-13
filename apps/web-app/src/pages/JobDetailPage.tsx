@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppSidebar } from "@/components/home/appSideBar";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import type { Job, RankedApplicant } from "@/lib/api/application.service";
 import { useAuthStore } from "@/stores/authStore";
 import { JOB } from "@/constants/job";
 import { COMMON_MESSAGE } from "@/constants/common";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const STATUS_COLORS: Record<string, string> = {
   applied: "bg-blue-100 text-blue-700",
@@ -61,16 +63,58 @@ export default function JobDetailPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")}>
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            {COMMON_MESSAGE.BACK}
-          </Button>
-          <h1 className="text-xl font-semibold">{job ? job.title : "Job Details"}</h1>
-        </header>
+        <AppPageHeader
+          title={job ? job.title : "Job Details"}
+          leading={
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")}>
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              {COMMON_MESSAGE.BACK}
+            </Button>
+          }
+        />
 
         <div className="flex flex-col gap-4 p-4 pt-0">
-          {loading && <div className="text-center py-8">{COMMON_MESSAGE.LOADING}</div>}
+          {loading && (
+            <>
+              <Card>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-5 w-40" />
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className="space-y-2">
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-5 w-36" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <Skeleton key={index} className="h-6 w-20 rounded-full" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-5 w-28" />
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+            </>
+          )}
           {error && <div className="text-center text-red-500 py-8">{error}</div>}
 
           {!loading && !error && job && (
@@ -150,7 +194,11 @@ export default function JobDetailPage() {
                   </CardHeader>
                   <CardContent>
                     {rankedLoading && (
-                      <p className="text-sm text-muted-foreground py-2">{JOB.JOB_DETAIL.LOADING_APPLICANTS}</p>
+                      <div className="space-y-3 py-2">
+                        <Skeleton className="h-14 w-full" />
+                        <Skeleton className="h-14 w-full" />
+                        <Skeleton className="h-14 w-full" />
+                      </div>
                     )}
                     {!rankedLoading && rankedApplicants.length === 0 && (
                       <p className="text-sm text-muted-foreground py-2">{JOB.JOB_DETAIL.NO_APPLICANTS}</p>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { FileText } from "lucide-react";
 import { candidateService, type Candidate } from "@/lib/api/application.service";
 import { API_CONFIG } from "@/lib/api/config";
 import { JOB } from "@/constants/job";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MyResumesPage() {
   const [resumes, setResumes] = useState<Candidate[]>([]);
@@ -25,12 +27,29 @@ export default function MyResumesPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <h1 className="text-xl font-semibold">{JOB.RESUME_PAGE.MY_RESUMES}</h1>
-        </header>
+        <AppPageHeader title={JOB.RESUME_PAGE.MY_RESUMES} />
 
         <div className="flex flex-col gap-4 p-4 pt-0">
-          {loading && <div className="text-center py-8">Loading...</div>}
+          {!loading && !error && resumes.length > 0 && (
+            <p className="text-xs text-muted-foreground">Stored resumes: {resumes.length}/5</p>
+          )}
+
+          {loading && (
+            <div className="space-y-3 py-2">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index}>
+                  <CardContent className="flex items-center gap-4 pt-4">
+                    <Skeleton className="h-5 w-5 rounded" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-48" />
+                      <Skeleton className="h-3 w-36" />
+                    </div>
+                    <Skeleton className="h-8 w-20" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
           {error && <div className="text-center text-red-500 py-8">{error}</div>}
           {!loading && !error && resumes.length === 0 && (
             <div className="text-center text-muted-foreground py-8">

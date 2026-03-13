@@ -1,5 +1,6 @@
 import { FileUpload } from "@/components/upload"
 import { AppSidebar } from "@/components/home/appSideBar"
+import { AppPageHeader } from "@/components/layout/AppPageHeader"
 import {
     SidebarInset,
     SidebarProvider
@@ -11,11 +12,7 @@ export default function UploadPage() {
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-                    <div className="flex items-center gap-2 px-4">
-                        <h1 className="text-xl font-semibold">{UPLOAD.UPLOAD_COMPONENT.UPLOAD_RESUME}</h1>
-                    </div>
-                </header>
+                <AppPageHeader title={UPLOAD.UPLOAD_COMPONENT.UPLOAD_RESUME} />
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                     <FileUpload />
                 </div>

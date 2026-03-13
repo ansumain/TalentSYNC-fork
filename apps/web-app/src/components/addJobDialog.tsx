@@ -16,6 +16,7 @@ import {
 import { useJobStore } from "@/stores/jobStore";
 import { skillService, type Skill } from "@/lib/api/application.service";
 import { JOB } from "@/constants/job";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const JOB_TYPES = ["Remote", "On-site", "Hybrid"] as const;
 
@@ -34,14 +35,20 @@ export function AddJobDialog() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open && skills.length === 0) {
-      skillService.getAllSkills().then(res => setSkills(res.skills)).catch(() => { });
+      setSkillsLoading(true);
+      skillService
+        .getAllSkills()
+        .then((res) => setSkills(res.skills))
+        .catch(() => {})
+        .finally(() => setSkillsLoading(false));
     }
-  }, [open]);
+  }, [open, skills.length]);
 
   const toggleSkill = (skillId: string) => {
     setForm(prev => ({
@@ -152,8 +159,15 @@ export function AddJobDialog() {
           <div className="flex flex-col gap-1.5">
             <Label>{JOB.NEW_JOB.REQ_SKILLS}</Label>
             <div className="border border-input rounded-md p-3 max-h-40 overflow-y-auto grid grid-cols-2 gap-2">
-              {skills.length === 0 ? (
-                <p className="text-muted-foreground text-xs col-span-2">{JOB.NEW_JOB.LOADING_SKILLS}</p>
+              {skillsLoading ? (
+                <>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </>
+              ) : skills.length === 0 ? (
+                <p className="text-muted-foreground text-xs col-span-2">No skills found.</p>
               ) : skills.map(skill => (
                 <label
                   key={skill.skillId}
