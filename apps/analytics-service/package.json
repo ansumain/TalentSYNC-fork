@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx --watch src/server.ts",
+    "worker:dev": "tsx --watch src/worker/export.worker.ts",
     "build": "esbuild src/server.ts --bundle --platform=node --format=esm --outdir=dist --packages=external",
+    "worker:build": "esbuild src/worker/export.worker.ts --bundle --platform=node --format=esm --outdir=dist/worker --packages=external",
+    "worker:start": "node dist/worker/export.worker.js",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -13,6 +16,17 @@
   "dependencies": {
     "@talentsync/config": "workspace:*",
     "@talentsync/models": "workspace:*",
-    "@talentsync/types": "workspace:*"
+    "@talentsync/types": "workspace:*",
+    "amqplib": "^0.10.8",
+    "exceljs": "^4.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^7.0.5",
+    "pdfkit": "^0.17.2"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "@types/nodemailer": "^7.0.0",
+    "@types/pdfkit": "^0.17.5"
   }
 }

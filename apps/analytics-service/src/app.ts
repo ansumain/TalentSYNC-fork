@@ -7,6 +7,8 @@ import rateLimit from 'express-rate-limit';
 import counterRoutes from './routes/counters.routes';
 import graphRoutes from './routes/graphs.routes';
 import tableRoutes from './routes/tables.routes';
+import refreshRoutes from './routes/refresh.routes';
+import exportRoutes from './routes/export.routes';
 
 const app: Application = express();
 
@@ -50,6 +52,8 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api', counterRoutes);
 app.use('/api', graphRoutes);
 app.use('/api', tableRoutes);
+app.use('/api', refreshRoutes);
+app.use('/api', exportRoutes);
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
