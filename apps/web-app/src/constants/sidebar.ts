@@ -72,7 +72,7 @@ const navigationByRole = {
             items: [
                 {
                     title: "My Candidates",
-                    url: "#",
+                    url: "/candidates",
                 }
             ],
         }
@@ -121,6 +121,18 @@ const navigationByRole = {
                     url: "/applications",
                 },
             ]
+        },
+        {
+            title: "Analytics",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Dashboard",
+                    url: "/analytics",
+                },
+            ],
         }
     ],
     admin: [
@@ -166,14 +178,6 @@ const navigationByRole = {
                     title: "Applications",
                     url: "/applications",
                 },
-                // {
-                //   title: "Roles",
-                //   url: "#",
-                // },
-                // {
-                //   title: "Permissions",
-                //   url: "#",
-                // }
             ],
         },
         {
@@ -183,16 +187,8 @@ const navigationByRole = {
             isActive: true,
             items: [
                 {
-                    title: "Interview Report",
-                    url: "#",
-                },
-                {
-                    title: "Candidate Report",
-                    url: "#",
-                },
-                {
-                    title: "Hiring Summary",
-                    url: "#",
+                    title: "Dashboard",
+                    url: "/analytics",
                 },
             ],
         }

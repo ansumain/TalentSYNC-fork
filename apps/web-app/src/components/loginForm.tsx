@@ -23,6 +23,7 @@ import { authService } from "@/lib/api/auth.service"
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth.schema"
 import { useAuthStore } from "@/stores/authStore"
 import { AUTH } from "@/constants/auth"
+import { getDefaultRouteForRoles } from "@/lib/auth/defaultRoute"
 
 export function LoginForm() {
   const navigate = useNavigate()
@@ -44,7 +45,8 @@ export function LoginForm() {
       const response = await authService.login(data)
       toast.success(response.message || AUTH.LOGIN.LOGGEDIN)
       await fetchUser()
-      navigate('/home', { replace: true })
+      const updatedUser = useAuthStore.getState().user
+      navigate(getDefaultRouteForRoles(updatedUser?.roles), { replace: true })
     } catch (error) {
       const err = error as { message: string; status?: number }
       toast.error(err.message || AUTH.LOGIN.NOT_LOGGEDIN)

@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { authService } from '@/lib/api/auth.service';
 import { useAuthStore } from '@/stores/authStore';
+import { useNavigate } from 'react-router-dom';
 
-// Interval in milliseconds (13 minutes)
 const REFRESH_INTERVAL = 13 * 60 * 1000;
 
 export function GetAccessTokenFromRefreshTokenInterval() {
   const user = useAuthStore((state) => state.user);
+  const clearUser = useAuthStore((state) => state.clearUser);
+  const navigate = useNavigate();
   const intervalIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -14,7 +16,8 @@ export function GetAccessTokenFromRefreshTokenInterval() {
       try {
         await authService.refreshToken();
       } catch (e) {
-        console.log('error fetching access token');
+        clearUser();
+        navigate('/signin', { replace: true });
       }
     }
 
@@ -30,5 +33,6 @@ export function GetAccessTokenFromRefreshTokenInterval() {
         intervalIdRef.current = null;
       }
     };
-  }, [user]);
+  }, [user, clearUser, navigate]);
 }
+

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import type { ReactElement } from 'react'
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { getDefaultRouteForRoles } from '@/lib/auth/defaultRoute';
 
 interface PublicRouteProps {
     children: ReactElement;
@@ -18,7 +19,7 @@ export function PublicRoute({ children }: PublicRouteProps) {
 
     if(loading) return null;
     
-    if (user) return <Navigate to="/home" replace />;
+    if (user) return <Navigate to={getDefaultRouteForRoles(user.roles)} replace />;
     
 
     return children;

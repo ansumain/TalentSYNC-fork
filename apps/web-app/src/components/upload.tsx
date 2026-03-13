@@ -12,9 +12,13 @@ import { Progress } from "@/components/ui/progress";
 import { useUploadStore } from "@/stores/uploadStore";
 import { UPLOAD } from "@/constants/upload";
 import { COMMON_MESSAGE } from "@/constants/common";
+import { candidateService } from "@/lib/api/application.service";
+import { useEffect, useState } from "react";
 
 export function FileUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [resumeCount, setResumeCount] = useState(0);
+  const [isResumeCountLoading, setIsResumeCountLoading] = useState(false);
 
   const user = useAuthStore((state) => state.user);
   const isCandidate = user?.roles?.includes('candidate') ?? false;
@@ -40,6 +44,28 @@ export function FileUpload() {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ];
 
+  useEffect(() => {
+    if (!isCandidate) {
+      return;
+    }
+
+    const fetchResumeCount = async () => {
+      try {
+        setIsResumeCountLoading(true);
+        const res = await candidateService.getMyResumes();
+        setResumeCount(res.resumes.length);
+      } catch {
+        // Ignore count fetch errors and allow upload flow to continue.
+      } finally {
+        setIsResumeCountLoading(false);
+      }
+    };
+
+    fetchResumeCount();
+  }, [isCandidate]);
+
+  const hasReachedResumeLimit = isCandidate && resumeCount >= 5;
+
   const validateAndAddFiles = (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
 
@@ -52,6 +78,14 @@ export function FileUpload() {
 
     // Candidates may only upload one file at a time
     if (isCandidate) {
+      if (hasReachedResumeLimit) {
+        toast.error("You can upload up to 5 resumes only.", {
+          position: "bottom-right",
+          duration: 3000,
+        });
+        return;
+      }
+
       if (filesArray.length > 1) {
         toast.error(UPLOAD.UPLOAD_COMPONENT.ONE_UPLOAD, {
           position: "bottom-right",
@@ -108,6 +142,14 @@ export function FileUpload() {
   };
 
   const handleUpload = async () => {
+    if (hasReachedResumeLimit) {
+      toast.error("Resume limit reached. You can keep up to 5 resumes.", {
+        position: "bottom-right",
+        duration: 3000,
+      });
+      return;
+    }
+
     try {
       await uploadFiles();
 
@@ -119,6 +161,10 @@ export function FileUpload() {
           position: "bottom-right",
           duration: 2000,
         });
+
+        if (isCandidate) {
+          setResumeCount((prev) => prev + currentState.uploadedCount);
+        }
       } else {
         toast.error(`${currentState.failedCount} ${UPLOAD.UPLOAD_COMPONENT.FAILED_UPLOAD}`, {
           position: "bottom-right",
@@ -207,7 +253,7 @@ export function FileUpload() {
                     multiple={!isCandidate}
                     onChange={handleFileChange}
                     ref={fileInputRef}
-                    disabled={status === 'uploading'}
+                    disabled={status === 'uploading' || hasReachedResumeLimit || isResumeCountLoading}
                   />
                 </label>
                 <p>{UPLOAD.UPLOAD_COMPONENT.TO_UPLOAD}</p>
@@ -215,6 +261,18 @@ export function FileUpload() {
             </div>
           </div>
         </div>
+
+        {/* {isCandidate && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Resume limit: {resumeCount}/5
+          </p>
+        )}
+
+        {hasReachedResumeLimit && (
+          <p className="mt-1 text-xs text-destructive">
+            Maximum of 5 resumes reached. Delete support will be enabled once the API is available.
+          </p>
+        )} */}
 
         <p className="text-pretty mt-2 text-xs leading-5 text-muted-foreground sm:flex sm:items-center sm:justify-between">
           <span>
@@ -346,7 +404,7 @@ export function FileUpload() {
               <Button
                 type="button"
                 onClick={handleUpload}
-                disabled={status === 'uploading' || pendingFiles === 0 || hasRestoredFiles}
+                disabled={status === 'uploading' || pendingFiles === 0 || hasRestoredFiles || hasReachedResumeLimit || isResumeCountLoading}
                 title={hasRestoredFiles ? "Cannot upload these files. Please select the files again." : ""}
               >
                 {status === 'uploading' ? (

@@ -1,9 +1,18 @@
 import { useEffect, useState, useCallback } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { applicationService } from "@/lib/api/application.service";
 import type { JobApplication } from "@/lib/api/application.service";
 import { toast } from "sonner";
@@ -44,6 +53,16 @@ export default function ApplicationsPage() {
   // Search
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [jobTypeFilter, setJobTypeFilter] = useState("all");
+
+  const filteredApplications = applications.filter((app: JobApplication) => {
+    const statusOk = statusFilter === "all" || app.currentStatus === statusFilter;
+    const locationOk = locationFilter === "all" || app.job?.location === locationFilter;
+    const typeOk = jobTypeFilter === "all" || app.job?.jobType === jobTypeFilter;
+    return statusOk && locationOk && typeOk;
+  });
 
   const handleSort = useCallback((column: string) => {
     const newOrder = column === sortBy ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
@@ -89,27 +108,74 @@ export default function ApplicationsPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <h1 className="text-xl font-semibold flex-1">{JOB.APPLICATION_PAGE.MY_APPLICATIONS}</h1>
-          <Button size="sm" variant="outline" onClick={fetchApplications} className="gap-1.5">
-            <RefreshCw className="h-3.5 w-3.5" /> Refresh
-          </Button>
-        </header>
+        <AppPageHeader
+          title={JOB.APPLICATION_PAGE.MY_APPLICATIONS}
+          actions={
+            <Button size="sm" variant="outline" onClick={fetchApplications} className="gap-1.5">
+              <RefreshCw className="h-3.5 w-3.5" /> Refresh
+            </Button>
+          }
+        />
 
-        <div className="flex flex-col gap-4 p-4 pt-0">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Search by job title..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
-              className="max-w-sm"
-            />
-            <Button variant="outline" onClick={() => { setSearch(searchInput); setPage(1); }}>Search</Button>
-            {search && <Button variant="ghost" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}>Clear</Button>}
+        <div className="flex flex-col gap-4 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex w-full max-w-xl gap-2">
+              <Input
+                placeholder="Search by job title..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
+              />
+              <Button variant="outline" onClick={() => { setSearch(searchInput); setPage(1); }}>Search</Button>
+              {search && <Button variant="ghost" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}>Clear</Button>}
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value); setPage(1); }}>
+                <SelectTrigger className="w-full sm:w-[170px]"><SelectValue placeholder="Status" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="applied">Applied</SelectItem>
+                  <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                  <SelectItem value="interviewing">Interviewing</SelectItem>
+                  <SelectItem value="selected">Selected</SelectItem>
+                  <SelectItem value="hired">Hired</SelectItem>
+                  <SelectItem value="offerRejected">Offer Rejected</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={locationFilter} onValueChange={(value) => { setLocationFilter(value); setPage(1); }}>
+                <SelectTrigger className="w-full sm:w-[170px]"><SelectValue placeholder="Location" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {Array.from(new Set(applications.map((a) => a.job?.location).filter(Boolean) as string[])).map((location) => (
+                    <SelectItem key={location} value={location}>{location}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={jobTypeFilter} onValueChange={(value) => { setJobTypeFilter(value); setPage(1); }}>
+                <SelectTrigger className="w-full sm:w-[170px]"><SelectValue placeholder="Job Type" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  {Array.from(new Set(applications.map((a) => a.job?.jobType).filter(Boolean) as string[])).map((type) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {loading && <div className="text-center py-8 text-muted-foreground">Loading...</div>}
+          {loading && (
+            <Card>
+              <CardContent className="space-y-3 py-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          )}
 
           {!loading && total === 0 && (
             <div className="text-center py-8 text-muted-foreground">
@@ -130,15 +196,15 @@ export default function ApplicationsPage() {
                     <TableHeader>
                       <TableRow className="text-muted-foreground text-xs">
                         <SortableTh column="jobTitle" label="Job Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                        <SortableTh column="jobLocation" label="Location" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                        <SortableTh column="jobType" label="Type" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                        <SortableTh column="currentStatus" label="Status" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <TableHead className="font-medium">Location</TableHead>
+                        <TableHead className="font-medium">Type</TableHead>
+                        <TableHead className="font-medium">Status</TableHead>
                         <SortableTh column="createdAt" label="Applied On" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <TableHead className="font-medium">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {applications.map((app) => (
+                      {filteredApplications.map((app) => (
                         <TableRow key={app.applicationId}>
                           <TableCell className="font-medium">{app.job?.title ?? "—"}</TableCell>
                           <TableCell className="text-muted-foreground">{app.job?.location ?? "—"}</TableCell>
@@ -180,6 +246,14 @@ export default function ApplicationsPage() {
                           </TableCell>
                         </TableRow>
                       ))}
+
+                      {filteredApplications.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center text-muted-foreground">
+                            No applications match selected filters.
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </div>

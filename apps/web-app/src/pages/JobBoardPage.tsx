@@ -131,7 +131,7 @@ export default function JobBoardPage() {
           }
         />
 
-        <div className="flex flex-col gap-4 p-4 pt-0">
+        <div className="flex flex-col gap-4 p-4">
           {!loading && hasResume === false && (
             <div className="flex items-center gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               <AlertCircle className="h-4 w-4 shrink-0" />

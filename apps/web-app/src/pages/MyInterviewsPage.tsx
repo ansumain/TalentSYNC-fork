@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,6 +23,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { interviewService, type Interview } from "@/lib/api/interview.service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const STATUS_COLORS: Record<string, string> = {
   scheduled: "bg-blue-100 text-blue-700",
@@ -101,12 +103,27 @@ export default function MyInterviewsPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <h1 className="text-xl font-semibold">My Interviews</h1>
-        </header>
+        <AppPageHeader title="My Interviews" />
 
-        <div className="flex flex-col gap-4 p-4 pt-0">
-          {loading && <div className="text-center py-8 text-muted-foreground">Loading...</div>}
+        <div className="flex flex-col gap-4 p-4">
+          {loading && (
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-40" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="grid grid-cols-5 gap-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
 
           {!loading && interviews.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
@@ -116,11 +133,6 @@ export default function MyInterviewsPage() {
 
           {!loading && interviews.length > 0 && (
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base text-left">
-                  {interviews.length} Interview{interviews.length !== 1 ? "s" : ""}
-                </CardTitle>
-              </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
                   <Table>
@@ -137,7 +149,7 @@ export default function MyInterviewsPage() {
                       {interviews.map((iv) => (
                         <TableRow key={iv.interviewId}>
                           <TableCell className="font-mono text-xs text-muted-foreground">
-                            {iv.applicationId.slice(0, 8)}…
+                            #{iv.applicationId.slice(0, 6)}
                           </TableCell>
                           <TableCell className="text-muted-foreground whitespace-nowrap">
                             {new Date(iv.scheduledAt).toLocaleString()}

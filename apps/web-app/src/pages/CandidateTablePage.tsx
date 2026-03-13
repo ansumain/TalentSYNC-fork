@@ -13,7 +13,7 @@ export default function CandidateTablePage() {
             <AppSidebar />
             <SidebarInset>
                 <AppPageHeader title={CANDIDATE.CANDIDATE_TABLE_PAGE.HEADING} />
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                <div className="flex flex-1 flex-col gap-4 p-4">
                     <CandidateTable />
                 </div>
             </SidebarInset>

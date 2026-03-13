@@ -16,7 +16,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 export function NavMain({
   items,
@@ -32,6 +32,21 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const location = useLocation()
+
+  const isSubItemActive = (url: string) => {
+    if (url === "#") return false
+
+    const currentPath = location.pathname
+    const currentQuery = location.search
+
+    if (url.includes("?")) {
+      return `${currentPath}${currentQuery}` === url
+    }
+
+    return currentPath === url || currentPath.startsWith(`${url}/`)
+  }
+
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -54,7 +69,8 @@ export function NavMain({
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
+                      <SidebarMenuSubButton asChild isActive={isSubItemActive(subItem.url)}
+                        className="data-[active=true]:bg-black data-[active=true]:text-white">
                         <Link to={subItem.url}>
                           <span>{subItem.title}</span>
                         </Link>

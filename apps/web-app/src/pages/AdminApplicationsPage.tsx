@@ -1,10 +1,19 @@
 import { useEffect, useState, useCallback } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { applicationService } from "@/lib/api/application.service";
 import type { JobApplication, ApplicationStatus } from "@/lib/api/application.service";
 import { Trash2 } from "lucide-react";
@@ -46,6 +55,11 @@ export default function ApplicationsAdminPage() {
   // Search
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const filteredApplications = applications.filter(
+    (app: JobApplication) => statusFilter === "all" || app.currentStatus === statusFilter
+  );
 
   const handleSort = useCallback((column: string) => {
     const newOrder = column === sortBy ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
@@ -67,7 +81,7 @@ export default function ApplicationsAdminPage() {
       })
       .catch(() => toast.error("Failed to load applications"))
       .finally(() => setLoading(false));
-  }, [page, limit, sortBy, sortOrder]);
+  }, [page, limit, sortBy, sortOrder, search]);
 
   useEffect(() => {
     fetchApplications(page, limit, sortBy, sortOrder);
@@ -109,24 +123,55 @@ export default function ApplicationsAdminPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-          <h1 className="text-xl font-semibold">All Applications</h1>
-        </header>
+        <AppPageHeader title="All Applications" />
 
-        <div className="flex flex-col gap-4 p-4 pt-0">
-          <div className="flex gap-2">
-            <Input
-              placeholder={JOB.ADMIN_APPLICATION_PAGE.SEARCH_CANDIDATE_TITLE}
-              value={searchInput}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
-              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
-              className="max-w-sm"
-            />
-            <Button variant="outline" onClick={() => { setSearch(searchInput); setPage(1); }}>Search</Button>
-            {search && <Button variant="ghost" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}>Clear</Button>}
+        <div className="flex flex-col gap-4 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex w-full max-w-xl gap-2">
+              <Input
+                placeholder={JOB.ADMIN_APPLICATION_PAGE.SEARCH_CANDIDATE_TITLE}
+                value={searchInput}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setSearch(searchInput); setPage(1); } }}
+              />
+              <Button variant="outline" onClick={() => { setSearch(searchInput); setPage(1); }}>Search</Button>
+              {search && <Button variant="ghost" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}>Clear</Button>}
+            </div>
+
+            <div className="w-full sm:w-[210px]">
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="applied">Applied</SelectItem>
+                  <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                  <SelectItem value="interviewing">Interviewing</SelectItem>
+                  <SelectItem value="selected">Selected</SelectItem>
+                  <SelectItem value="hired">Hired</SelectItem>
+                  <SelectItem value="offerRejected">Offer Rejected</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {loading && <div className="text-center py-8 text-muted-foreground">Loading...</div>}
+          {loading && (
+            <Card>
+              <CardContent className="space-y-3 py-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          )}
 
           {!loading && applications.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">{JOB.ADMIN_APPLICATION_PAGE.NO_APPLICATIONS}</div>
@@ -134,11 +179,6 @@ export default function ApplicationsAdminPage() {
 
           {!loading && (total > 0 || applications.length > 0) && (
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base text-left">
-                  {total} {JOB.ADMIN_APPLICATION_PAGE.APPLICATION}{total !== 1 ? "s" : ""}
-                </CardTitle>
-              </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
                   <Table>
@@ -146,14 +186,14 @@ export default function ApplicationsAdminPage() {
                       <TableRow className="text-muted-foreground text-xs">
                         <SortableTh column="candidateName" label="Candidate" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <SortableTh column="jobTitle" label="Job Title" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
-                        <SortableTh column="currentStatus" label="Current Status" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
+                        <TableHead className="font-medium">Current Status</TableHead>
                         <SortableTh column="createdAt" label="Applied On" currentSortBy={sortBy} currentSortOrder={sortOrder} onSort={handleSort} />
                         <TableHead className="font-medium">Action</TableHead>
                         <TableHead />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {applications.map((app: JobApplication) => (
+                      {filteredApplications.map((app: JobApplication) => (
                         <TableRow key={app.applicationId}>
                           <TableCell className="font-medium">
                             {app.candidateName ?? <span className="text-muted-foreground italic">{JOB.ADMIN_APPLICATION_PAGE.UNKNOWN}</span>}
@@ -199,6 +239,14 @@ export default function ApplicationsAdminPage() {
                           </TableCell>
                         </TableRow>
                       ))}
+
+                      {filteredApplications.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center text-muted-foreground">
+                            No applications match selected filters.
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </div>

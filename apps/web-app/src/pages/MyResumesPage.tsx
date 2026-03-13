@@ -29,10 +29,7 @@ export default function MyResumesPage() {
       <SidebarInset>
         <AppPageHeader title={JOB.RESUME_PAGE.MY_RESUMES} />
 
-        <div className="flex flex-col gap-4 p-4 pt-0">
-          {!loading && !error && resumes.length > 0 && (
-            <p className="text-xs text-muted-foreground">Stored resumes: {resumes.length}/5</p>
-          )}
+        <div className="flex flex-col gap-4 p-4">
 
           {loading && (
             <div className="space-y-3 py-2">
