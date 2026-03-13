@@ -1,4 +1,4 @@
-import User from './User';
+import { User } from '@talentsync/models';
 import RefreshToken from './RefreshToken';
 
 User.hasMany(RefreshToken, { foreignKey: 'userId' });

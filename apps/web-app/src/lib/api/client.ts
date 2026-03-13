@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import type {AxiosResponse} from 'axios';
+import type { AxiosResponse } from 'axios';
 import { API_CONFIG } from './config';
 
 export interface ApiError {
@@ -30,8 +30,8 @@ axiosInstance.interceptors.response.use(
 
 // API client
 export const apiClient = {
-  async get<ResponseType>(endpoint: string): Promise<ResponseType> {
-    const response = await axiosInstance.get<ResponseType>(endpoint);
+  async get<ResponseType>(endpoint: string, params?: Record<string, any>): Promise<ResponseType> {
+    const response = await axiosInstance.get<ResponseType>(endpoint, {params});
     return response as unknown as ResponseType;
   },
 
@@ -54,5 +54,20 @@ export const apiClient = {
     const response = await axiosInstance.delete<ResponseType>(endpoint);
     return response as unknown as ResponseType;
   },
+
+  async postFormData<ResponseType>(endpoint: string, formData: FormData, onProgress?: (progress: number) => void): Promise<ResponseType> {
+    const response = await axiosInstance.post<ResponseType>(endpoint, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      onUploadProgress: (ProgressEvent) => {
+        if (onProgress && ProgressEvent.total) {
+          const percentCompleted = Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100 );
+          onProgress(percentCompleted);
+        }
+      }
+    });
+    return response as unknown as ResponseType;
+  }
 };
 

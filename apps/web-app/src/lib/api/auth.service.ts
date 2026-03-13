@@ -62,4 +62,8 @@ export const authService = {
   async resetPassword(data: ResetPasswordData): Promise<ResetPasswordResponse> {
     return apiClient.post<ResetPasswordResponse>(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
   },
+
+  async refreshToken(): Promise<{accessToken: string}> {
+    return apiClient.post<{accessToken: string}>(API_ENDPOINTS.AUTH.REFRESH);
+  },
 };

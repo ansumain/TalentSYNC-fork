@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { registerUser } from '../services/registerUser.service';
 
 export class RegisterUserController {
+  // register a new user
   static async register(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body) throw new Error('Missing body');
@@ -15,10 +16,9 @@ export class RegisterUserController {
         email: user.email,
         phone: user.phone,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Map service errors to HTTP status codes
-      const errorMessage = error.message || 'Internal server error';
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (

@@ -3,6 +3,7 @@ import { loginUser } from '../services/loginUser.service';
 import { cookieOptions } from '../utils/cookieOptions';
 
 export class LoginUserController {
+  // Login User
   static async login(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body) throw new Error('Missing body');
@@ -12,6 +13,8 @@ export class LoginUserController {
 
       res.cookie('access_token', tokens.accessToken, {
         ...cookieOptions,
+        sameSite: 'lax',
+        path: '/',
         maxAge: 15 * 60 * 1000,
       });
 
@@ -25,9 +28,8 @@ export class LoginUserController {
         message: 'Login Successful',
       });
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (

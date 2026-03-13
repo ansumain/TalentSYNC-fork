@@ -3,6 +3,7 @@ import { refreshToken } from '../services/refreshToken.service';
 import { cookieOptions } from '../utils/cookieOptions';
 
 export class RefreshTokenController {
+  // get access token from refresh token
   static async getAccessToken(req: Request, res: Response): Promise<void> {
     try {
       const token = req.cookies.refresh_token;
@@ -18,9 +19,8 @@ export class RefreshTokenController {
         message: 'Access Token Renewed Successfully!',
       });
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {

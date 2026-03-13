@@ -1,10 +1,11 @@
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import PasswordResetOtp from '../models/PasswordResetOtp';
 import { RequestPasswordResetInput } from '../types/RequestPasswordResetInput';
 import { RequestPasswordResetOutput } from '../types/RequestPasswordResetOutput';
 import bcrypt from 'bcryptjs';
 import { sendOtpEmail } from '../utils/emailService';
 
+// request password reset service
 export const requestPasswordReset = async ({
   email,
 }: RequestPasswordResetInput): Promise<RequestPasswordResetOutput> => {

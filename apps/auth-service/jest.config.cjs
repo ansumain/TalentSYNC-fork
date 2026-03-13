@@ -9,4 +9,19 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
+  moduleNameMapper: {
+    '^@talentsync/models$': '<rootDir>/../../packages/models/src/index.ts',
+    '^@talentsync/config$': '<rootDir>/../../packages/config/src/index.ts',
+    '^@talentsync/types$': '<rootDir>/../../packages/types/src/index.ts',
+  },
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  collectCoverageFrom: [
+    'src/services/*.ts',
+    'src/controllers/*.ts',
+    '!src/**/*.d.ts',
+    '!src/**/index.ts',
+    '!src/server.ts',
+    '!src/app.ts',
+  ],
 };

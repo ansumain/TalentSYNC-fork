@@ -10,6 +10,7 @@ interface EmailOptions {
 
 let transporter: nodemailer.Transporter | null = null;
 
+// initiate the transporter to send mails
 const getTransporter = () => {
   if (transporter) return transporter;
 
@@ -30,6 +31,7 @@ const getTransporter = () => {
   return transporter;
 };
 
+// using the transporter to send mail
 export const sendEmail = async ({ to, subject, text, html }: EmailOptions): Promise<void> => {
   const transport = getTransporter();
 
@@ -52,6 +54,7 @@ export const sendEmail = async ({ to, subject, text, html }: EmailOptions): Prom
   }
 };
 
+// mail content + invoking sendMail
 export const sendOtpEmail = async (email: string, otp: string): Promise<void> => {
   const subject = 'Reset Password';
   const text = `Your password reset OTP is: ${otp}\n\nThis OTP will expire in 15 minutes.\n\nIf you didn't request this, Please secure your account!.`;

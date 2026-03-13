@@ -1,11 +1,12 @@
 import bcrypt from 'bcryptjs';
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import { RegisterUserInput } from '../types/RegisterUserInput';
 import { RegisterUserOutput } from '../types/RegisterUserOutput';
 import { Op } from 'sequelize';
 import Role from '../models/Role';
 import UserRole from '../models/UserRole';
 
+// register user service
 export const registerUser = async ({
   name,
   email,

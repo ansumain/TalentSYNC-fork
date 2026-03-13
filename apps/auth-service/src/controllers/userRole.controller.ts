@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { assignRoleToUser, revokeRoleFromUser } from '../services/userRole.service';
 
 export class UserRoleController {
+  // assign role to user
   static async assignRoleToUser(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');
@@ -15,9 +16,8 @@ export class UserRoleController {
         message: 'Role assigned successfully',
         roleAssigned,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {
@@ -42,6 +42,7 @@ export class UserRoleController {
     }
   }
 
+  // revoke role from user
   static async revokeRoleFromUser(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');
@@ -55,9 +56,8 @@ export class UserRoleController {
         message: 'Role revoked successfully',
         roleRevoked,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {

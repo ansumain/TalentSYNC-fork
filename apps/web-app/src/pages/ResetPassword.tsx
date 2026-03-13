@@ -1,6 +1,6 @@
 import { GalleryVerticalEnd } from "lucide-react"
-
 import { ResetPassword } from "@/components/resetPassword"
+import { AUTH } from "@/constants/auth"
 
 export default function ResetPasswordPage() {
   return (
@@ -10,7 +10,7 @@ export default function ResetPasswordPage() {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <GalleryVerticalEnd className="size-4" />
           </div>
-          TalentSYNC
+          {AUTH.RESET_PASSWORD.HEADING}
         </a>
         <ResetPassword />
       </div>

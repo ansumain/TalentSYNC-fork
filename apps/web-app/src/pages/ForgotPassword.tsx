@@ -1,6 +1,6 @@
 import { GalleryVerticalEnd } from "lucide-react"
-
 import { ForgotPassword } from "@/components/forgotPassword"
+import { AUTH } from "@/constants/auth"
 
 export default function ForgotPasswordPage() {
   return (
@@ -10,7 +10,7 @@ export default function ForgotPasswordPage() {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <GalleryVerticalEnd className="size-4" />
           </div>
-          TalentSYNC
+          {AUTH.FORGOT_PASSWORD.HEADING}
         </a>
         <ForgotPassword />
       </div>

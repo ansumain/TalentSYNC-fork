@@ -1,11 +1,15 @@
 import { refreshToken } from '../../services/refreshToken.service';
 import RefreshToken from '../../models/RefreshToken';
-import User from '../../models/User';
+import { User } from '@talentsync/models';
+import UserRole from '../../models/UserRole';
+import Role from '../../models/Role';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 jest.mock('../../models/RefreshToken');
-jest.mock('../../models/User');
+jest.mock('@talentsync/models');
+jest.mock('../../models/UserRole');
+jest.mock('../../models/Role');
 jest.mock('jsonwebtoken');
 jest.mock('bcryptjs');
 
@@ -115,6 +119,9 @@ describe('Authentication - Refresh Token', () => {
       id: 'user123',
       name: 'Ansuman Panda',
     });
+
+    (UserRole.findAll as jest.Mock).mockResolvedValue([{ roleId: 'role-1' }]);
+    (Role.findOne as jest.Mock).mockResolvedValue({ id: 'role-1', role: 'manager' });
 
     const mockBcryptCompare = bcrypt.compare as jest.Mock;
     mockBcryptCompare.mockResolvedValue(true);

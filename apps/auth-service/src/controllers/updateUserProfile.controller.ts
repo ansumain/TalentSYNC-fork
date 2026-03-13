@@ -3,6 +3,7 @@ import { updateUserProfile } from '../services/updateUserProfile.service';
 import { UpdateUserProfileInput } from '../types/UpdateUserProfileInput';
 
 export class UpdateUserProfileController {
+  // update user profile
   static async updateUserProfile(req: Request, res: Response): Promise<void> {
     try {
       if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');
@@ -21,9 +22,8 @@ export class UpdateUserProfileController {
 
       res.status(200).json({ ...updated });
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing body')) {

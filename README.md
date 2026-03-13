@@ -1,221 +1,259 @@
 # TalentSYNC - Recruitment Management System
 
-A modern, full-stack recruitment management platform built with **React**, **Express.js**, **PostgreSQL**, and **TypeScript**. Features JWT-based authentication, role-based access control, and a responsive UI.
+A full-stack recruitment platform built as a **pnpm monorepo** with three independent microservices, a React frontend, PostgreSQL.
+
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, React Router 7, Vite 7, TailwindCSS 4, shadcn/ui, Zustand 5, Axios |
+| Backend | Express 5, TypeScript 5.9, tsx, esbuild |
+| Database | PostgreSQL 15, Sequelize 6 |
+| Queue | RabbitMQ 4 |
+| Infrastructure | Docker Compose, Nginx |
+| Monorepo | pnpm workspaces, TurboRepo |
+
+---
+
+## Monorepo Structure
+
+```
+TalentSYNC-DEVELOPMENT/
+├── apps/
+│   ├── auth-service/           # Identity & access management  
+│   ├── resume-parser-service/  # Resume upload + parsing    
+│   ├── application-service/    # Jobs, applications, interviews
+│   └── web-app/                # React webapp
+├── packages/
+│   ├── config/                 # Shared Sequelize + DB config
+│   ├── models/                 # Shared Sequelize models
+│   └── types/                  # Shared TypeScript types
+├── infra/
+│   ├── migrations/             # All DB migrations (sequelize-cli)
+│   └── seeders/                # Data seeders
+├── nginx.conf                  # Reverse proxy config
+├── docker-compose.yml
+└── pnpm-workspace.yaml
+```
 
 ---
 
 ## Features
 
-### Authentication & Authorization
-- User registration with email validation
-- Secure login with JWT tokens (httpOnly cookies)
-- Password reset with OTP via email
-- Role-based access control (Admin, Manager, Interviewer, Candidate)
-- Protected routes with automatic authentication verification
-- Auto-refresh tokens for seamless user experience
+### Authentication & Access Control
+- Registration, login, logout with httpOnly cookie-based JWT
+- Access token (15 min) + refresh token (30 days) with silent auto-refresh
+- Password reset via OTP email (Nodemailer + Gmail)
+- Role-based access control - **Admin**, **Manager**, **Interviewer**, **Candidate**
 
-### User Management
-- User profile management
-- Password update functionality
-- Role assignment and permissions
+### Resume Management
+- Resume upload (PDF/DOCX/image) with Multer
+- Async parsing via RabbitMQ worker - Tesseract OCR + pdf-parse + mammoth
+- Parsed JSON stored per candidate (name, email, phone, education, skills, experience)
+- Authenticated file download via `/files/:filename`
+- Candidate "My Resumes" page with status tracking
 
-### Frontend
-- Responsive design with TailwindCSS
-- Modern UI with Shadcn components
-- Form validation with Zod
-- Toast notifications
-- Role-based navigation menus
-- Protected and public route guards
+### Jobs & Applications
+- Full CRUD for job postings with skill tagging
+- Candidate job applications with lifecycle tracking (applied → shortlisted → interviewing → hired/rejected)
+- Interview scheduling
+- Ranked applicant matching by skills
 
-### Security
-- httpOnly cookies (XSS protection)
-- CORS configuration
-- Password hashing with bcrypt
-- JWT token expiration
-- Environment variable security
+### API Documentation
+- Unified Swagger UI at `http://localhost/docs` (dev mode)
+- All three services documented in a single merged spec
+- Cookie-based auth (`access_token`) works automatically in Swagger
 
 ---
 
-### Frontend Architecture
-```
-apps/web-app/src/
-├── lib/
-│   ├── api/
-│   │   ├── config.ts          - API base URL + endpoints
-│   │   ├── client.ts          - Axios instance + interceptors
-│   │   └── auth.service.ts    - Authentication API methods
-│   └── validations/
-│       └── auth.schema.ts     - Zod validation schemas
-├── stores/
-│   └── authStore.ts           - Zustand global state
-├── components/
-│   ├── ProtectedRoute.tsx     - Auth guard for protected pages
-│   ├── PublicRoute.tsx        - Redirect authenticated users
-│   ├── loginForm.tsx          - Login UI + logic
-│   ├── signupForm.tsx         - Registration UI + logic
-│   └── dashBoard/
-│       ├── appSidebar.tsx     - Role-based navigation
-│       └── navUser.tsx        - User dropdown + logout
-├── pages/                     - Page components
-└── App.tsx                    - Route configuration
-```
+## Architecture
 
-### Backend Architecture
 ```
-apps/auth-service/src/
-├── config/
-│   ├── env.ts                 - Environment configuration
-│   ├── sequelize.ts           - Database connection
-│   └── sequelize-cli-config.cjs - Sequelize CLI config
-├── models/                    - Sequelize models
-│   ├── User.ts
-│   ├── Role.ts
-│   ├── Permission.ts
-│   ├── RefreshToken.ts
-│   └── ...
-├── routes/                    - API routes
-├── controllers/               - Route handlers
-├── services/                  - Business logic
-├── middlewares/               - Auth & validation middleware
-├── migrations/                - Database migrations
-├── seeders/                   - Seed data
-└── app.ts                     - Express app setup
-└── server.ts                  - Run server
+Browser
+  │
+  ▼
+Nginx (:80)          ← single entry point
+  ├── /api/auth/*    → auth-service 
+  ├── /api/users/*   → auth-service 
+  ├── /api/admin/*   → auth-service
+  ├── /api/resume/*  → resume-parser-service
+  ├── /files/*       → resume-parser-service
+  ├── /api/candidate/* → application-service
+  ├── /api/jobs/*    → application-service
+  ├── /api/applications/* → application-service
+  ├── /api/skills/*  → application-service
+  ├── /api/interviews/* → application-service
+  ├── /docs          → application-service
+  └── /*             → web-app
 ```
 
 ---
 
-## Project Structure
+## API Endpoints
 
-```
-TalentSYNC-development/
-├── apps/
-│   ├── auth-service/          # Backend Express API
-│   │   ├── src/
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   │
-│   └── web-app/               # Frontend React App
-│       ├── src/
-│       ├── public/
-│       ├── package.json
-│       └── vite.config.ts
-│
-├── package.json               
-├── pnpm-workspace.yaml        
-├── docker-compose.yml         
-├── commitlint.config.js       
-└── eslint.config.ts           
-```
+### Auth Service - `/api/auth`, `/api/users`, `/api/admin`
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/api/auth/register` | Register new user | ❌ |
+| POST | `/api/auth/login` | Login (sets cookies) | ❌ |
+| POST | `/api/auth/logout` | Logout (clears cookies) | ✔ |
+| POST | `/api/auth/refresh-token` | Refresh access token | ✔ |
+| POST | `/api/auth/forgot-password` | Send OTP to email | ❌ |
+| POST | `/api/auth/reset-password` | Reset password with OTP | ❌ |
+| GET | `/api/users/me` | Get own profile | ✔ |
+| PUT | `/api/users/me` | Update profile | ✔ |
+| PATCH | `/api/users/me/password` | Change password | ✔ |
+| GET | `/api/admin/roles` | List all roles | Admin |
+| GET | `/api/admin/permissions` | List all permissions | Admin |
+| POST | `/api/admin/user-roles` | Assign role to user | Admin |
+
+### Resume Parser Service - `/api/resume`, `/files`
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/api/resume/upload` | Upload resume file | ✔ |
+| GET | `/api/resume/parsed/userId` | Get parsed data for user | Admin/Manager |
+| GET | `/files/:filename` | Download resume file | ✔ |
+
+### Application Service - `/api/candidate`, `/api/jobs`, `/api/applications`, `/api/skills`, `/api/interviews`
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/api/candidate/parsed` | List all candidates (paginated) | Admin/Manager |
+| GET | `/api/candidate/my-resumes` | Get own resume list | Candidate |
+| GET | `/api/candidate/resume-status` | Check if resume uploaded | ✔ |
+| GET | `/api/jobs` | List all jobs (paginated) | ✔ |
+| POST | `/api/jobs` | Create job | Admin/Manager |
+| DELETE | `/api/jobs/:jobId` | Delete job | Admin/Manager |
+| GET | `/api/skills` | List all skills | ✔ |
+| POST | `/api/applications/:jobId` | Apply to job | Candidate |
+| GET | `/api/applications/user/me` | My applications | Candidate |
+| GET | `/api/applications` | All applications | Admin/Manager |
+| PATCH | `/api/applications/:id` | Update status | Admin/Manager |
+| GET | `/api/applications/job/:jobId/ranked` | Ranked applicants by skill match | Admin/Manager |
 
 ---
 
 ## Authentication Flow
 
-### Route Protection
-- **ProtectedRoute**: Verifies authentication before rendering protected pages
-  - If not authenticated → Redirect to `/signin`
-  - If authenticated → Dashboard
-  
-- **PublicRoute**: Prevents authenticated users from accessing auth pages
-  - If not authenticated → SignIn Page
-  - If authenticated → Redirect to `/dashboard`
-
-### Cookie-Based Authentication
-- Access Token: 15 minutes (httpOnly, secure)
-- Refresh Token: 30 days (httpOnly, secure, path=/auth/refresh-token)
-- Automatically sent with every request (withCredentials: true)
+- **httpOnly cookies** - browser sends them automatically on every request, no localStorage reducing XSS risk
+- Access token expires in **15 minutes**; frontend silently refreshes every **13 minutes**
+- Refresh token is **path-restricted** to `/api/auth/refresh-token` only
+- `ProtectedRoute`- redirects unauthenticated users to `/signin`
+- `PublicRoute` - redirects already-authenticated users away from auth pages
 
 ---
 
-## 🔌 API Endpoints
+## Running with Docker (recommended)
 
-### Authentication (`/auth`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/auth/register` | Register new user | ❌ |
-| POST | `/auth/login` | Login user (sets cookies) | ❌ |
-| POST | `/auth/logout` | Logout user (clears cookies) | ✔️ |
-| POST | `/auth/refresh-token` | Refresh access token | ✔️ |
-| POST | `/auth/forgot-password` | Request password reset OTP | ❌ |
-| POST | `/auth/reset-password` | Reset password with OTP | ❌ |
-
-### User Profile (`/users`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/users/me` | Get current user profile | ✔️ |
-| PUT | `/users/me` | Update user profile | ✔️ |
-| PATCH | `/users/me/password` | Update password | ✔️ |
-
-## 🔧 Environment Variables
-
-### Backend (`.env` in `apps/auth-service/`)
+**Prerequisites:** Docker Desktop installed and running.
 
 ```bash
-# Server
+# 1. Clone
+git clone https://github.com/dev-ansuman/TalentSYNC
+cd TalentSYNC-DEVELOPMENT
+
+# 2. Install dependencies (locks pnpm-lock.yaml for Docker)
+pnpm install
+
+# 3. Build and start all containers
+docker compose up --build -d
+
+# 4. Open in browser
+open http://localhost
+```
+
+Docker Compose starts these containers in order:
+
+| Container | Role |
+|---|---|
+| `postgres` | PostgreSQL 15 database |
+| `rabbitmq` | Message queue (management UI at `:15672`) |
+| `db-migrate` | Runs all Sequelize migrations once, then exits |
+| `auth-service` | Identity service on port 4001 |
+| `resume-parser-api` | Resume upload API on port 4002 |
+| `resume-parser-worker` | Background OCR/parsing worker |
+| `application-service` | Jobs/applications API on port 4003 |
+| `web-app` | React app (vite preview) on port 5173 |
+| `nginx` | Reverse proxy, serves everything on port 80 |
+
+---
+
+## Running Locally (without Docker)
+
+**Prerequisites:** Node.js 20+, pnpm, PostgreSQL, RabbitMQ running locally.
+
+```bash
+pnpm install
+
+# Run all services in parallel (via TurboRepo)
+pnpm dev
+```
+
+Individual services:
+```bash
+pnpm --filter @talentsync/auth-service dev        # :4001
+pnpm --filter @talentsync/resume-parser-service dev  # :4002
+pnpm --filter @talentsync/resume-parser-service worker:dev
+pnpm --filter @talentsync/application-service dev  # :4003
+pnpm --filter @talentsync/web-app dev             # :5173
+```
+
+---
+
+## Environment Variables
+
+Each service reads its own `.env` file. Example for **auth-service** (`apps/auth-service/.env`):
+
+```bash
 PORT=4001
 NODE_ENV=development
 
-# JWT Secrets (use strong random strings)
-ACCESS_TOKEN_SECRET=your_access_token_secret_here
-REFRESH_TOKEN_SECRET=your_refresh_token_secret_here
+ACCESS_TOKEN_SECRET=your_strong_secret_here
+REFRESH_TOKEN_SECRET=your_strong_secret_here
 JWT_EXPIRES_IN=15m
 
-# Database (PostgreSQL)
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
-DB_NAME=talentsync_db
+DB_USER=rms_user
+DB_PASSWORD=rms_password
+DB_NAME=rms_db
 
-# Email Configuration (for OTP)
 EMAIL_SERVICE=gmail
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASSWORD=your_email_app_password
-EMAIL_FROM=NAME <noreply@talentsync.com>
+EMAIL_USER=you@gmail.com
+EMAIL_PASSWORD=your_app_password
+EMAIL_FROM="TalentSYNC <noreply@talentsync.com>"
 
-# Frontend URL (for CORS)
 FRONTEND_URL=http://localhost:5173
 ```
 
-### Frontend (`.env` in `apps/web-app/`)
-
-```bash
-# Backend API URL
-VITE_API_URL=http://localhost:4001
-```
+For **resume-parser-service** and **application-service**, the same `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, and DB variables apply. No separate `.env` is needed for the frontend when running against Docker/Nginx.
 
 ---
 
-## Local Setup
+## Database Migrations & Seeding
 
-### Step 1: Clone the Repository
+Migrations live in `infra/migrations/` and are managed with `sequelize-cli`.
+
 ```bash
-git clone https://github.com/dev-ansuman/TalentSYNC
-cd TalentSYNC
+# Run all pending migrations
+npx sequelize-cli db:migrate
+
+# Seed default roles, permissions, and an admin user
+npx sequelize-cli db:seed:all
+
+# Undo last migration
+npx sequelize-cli db:migrate:undo
 ```
 
-### Step 2: Install Dependencies
-```bash
-pnpm install
-```
+In Docker, migrations run automatically via the `db-migrate` container on every `docker compose up`.
 
-### Step 3: Database Setup
-```bash
-docker-compose up -d
-```
+---
 
-## Running the Project
+## Time Estimate
 
-#### Run Both Services Simultaneously
-```bash
-# Terminal 1: Backend
-cd apps/auth-service
-pnpm run dev
-# Backend runs on http://localhost:4001
-
-# Terminal 2: Frontend
-cd apps/web-app
-pnpm run dev
-# Frontend runs on http://localhost:5173
-```
+https://docs.google.com/spreadsheets/d/1JFqGcp4_5iVs1nwu_vNscRIF5giJ6EcFSDzm9W8GkjE/edit?gid=0#gid=0

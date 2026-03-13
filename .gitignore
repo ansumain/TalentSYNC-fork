@@ -1,6 +1,16 @@
-node_modules
+**/node_modules
 
-dist/
-build/
+**/dist
+**/build
+
+.turbo
+
+**/*.tsbuildinfo
 
 .env
+**/.env
+
+**/coverage
+
+**/uploads
+**/temp

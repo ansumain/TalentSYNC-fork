@@ -39,6 +39,7 @@ describe('UserProfileController - User Profile', () => {
       name: 'Ansuman Panda',
       email: 'ansuman@gmail.com',
       phone: '9090909090',
+      roles: []
     });
 
     await UserProfileController.userProfile(mockRequest as Request, mockResponse as Response);
@@ -54,6 +55,7 @@ describe('UserProfileController - User Profile', () => {
         name: 'Ansuman Panda',
         email: 'ansuman@gmail.com',
         phone: '9090909090',
+        roles: []
       },
     });
   });

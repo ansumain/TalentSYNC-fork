@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { authService } from "@/lib/api/auth.service"
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth.schema"
+import { AUTH } from "@/constants/auth"
 
 export function SignupForm() {
     const navigate = useNavigate()
@@ -44,11 +45,11 @@ export function SignupForm() {
                 phone: data.phone,
                 password: data.password,
             })
-            toast.success(`Account created successfully! \nWelcome, ${response.name}`)
+            toast.success(`${AUTH.SIGNUP.ACCOUNT_CREATED} ${response.name}`)
             navigate('/signin')
         } catch (error) {
             const err = error as { message: string; status?: number }
-            toast.error(err.message || 'Registration failed. Please try again.')
+            toast.error(err.message || AUTH.SIGNUP.REG_FAILED)
         } finally {
             setIsLoading(false)
         }
@@ -58,17 +59,17 @@ export function SignupForm() {
         <div className={cn("flex flex-col" )}>
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="text-xl">Create your account</CardTitle>
+                    <CardTitle className="text-xl">{AUTH.SIGNUP.CREATE}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <FieldGroup>
                             <Field>
-                                <FieldLabel htmlFor="name">Name</FieldLabel>
+                                <FieldLabel htmlFor="name">{AUTH.SIGNUP.NAME}</FieldLabel>
                                 <Input
                                     id="name"
                                     type="text"
-                                    placeholder="Enter your full name"
+                                    placeholder={AUTH.SIGNUP.ENTER_NAME}
                                     {...register("name")}
                                     disabled={isLoading}
                                 />
@@ -77,10 +78,10 @@ export function SignupForm() {
                                 )}
                             </Field>
                             <Field>
-                                <FieldLabel htmlFor="email">Email</FieldLabel>
+                                <FieldLabel htmlFor="email">{AUTH.SIGNUP.EMAIL}</FieldLabel>
                                 <Input
                                     id="email"
-                                    placeholder="Enter your email"
+                                    placeholder={AUTH.SIGNUP.ENTER_EMAIL}
                                     {...register("email")}
                                     disabled={isLoading}
                                 />
@@ -89,11 +90,11 @@ export function SignupForm() {
                                 )}
                             </Field>
                             <Field>
-                                <FieldLabel htmlFor="phone">Phone</FieldLabel>
+                                <FieldLabel htmlFor="phone">{AUTH.SIGNUP.PHONE}</FieldLabel>
                                 <Input
                                     id="phone"
                                     type="tel"
-                                    placeholder="Enter your phone number"
+                                    placeholder={AUTH.SIGNUP.ENTER_PHONE}
                                     maxLength={10}
                                     {...register("phone")}
                                     disabled={isLoading}
@@ -105,11 +106,11 @@ export function SignupForm() {
                             <Field>
                                 <Field className="grid grid-cols-2 gap-4">
                                     <Field>
-                                        <FieldLabel htmlFor="password">Password</FieldLabel>
+                                        <FieldLabel htmlFor="password">{AUTH.SIGNUP.PASSWORD}</FieldLabel>
                                         <Input
                                             id="password"
                                             type="password"
-                                            placeholder="Create password"
+                                            placeholder={AUTH.SIGNUP.CREATE_PASSWORD}
                                             {...register("password")}
                                             disabled={isLoading}
                                         />
@@ -119,12 +120,12 @@ export function SignupForm() {
                                     </Field>
                                     <Field>
                                         <FieldLabel htmlFor="confirmPassword">
-                                            Confirm Password
+                                            {AUTH.SIGNUP.CONFIRM_PASSWORD}
                                         </FieldLabel>
                                         <Input
                                             id="confirmPassword"
                                             type="text"
-                                            placeholder="Confirm password"
+                                            placeholder={AUTH.SIGNUP.CREATE_CONFIRM_PASSWORD}
                                             {...register("confirmPassword")}
                                             disabled={isLoading}
                                         />
@@ -136,11 +137,11 @@ export function SignupForm() {
                             </Field>
                             <Field>
                                 <Button type="submit" disabled={isLoading} className="w-full">
-                                    {isLoading ? 'Creating account...' : 'Create account'}
+                                    {isLoading ? AUTH.SIGNUP.CREATING_ACC : AUTH.SIGNUP.CREATE_ACC}
                                 </Button>
                                 <FieldDescription className="text-center">
-                                    Already have an account?{" "}
-                                    <Link to="/signin" className="underline">Sign in</Link>
+                                    {AUTH.SIGNUP.HAVE_ACCOUNT}{" "}
+                                    <Link to="/signin" className="underline">{AUTH.SIGNUP.SIGNIN}</Link>
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>

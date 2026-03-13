@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { updatePassword } from '../services/updatePassword.service';
 
 export class UpdatePasswordController {
+  // update user password
   static async updatePassword(req: Request, res: Response): Promise<void> {
     try {
       if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');
@@ -15,9 +16,8 @@ export class UpdatePasswordController {
 
       res.status(201).json(result);
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (

@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../config/sequelize';
+import { sequelize } from '@talentsync/config';
 
 interface RoleAttributes {
   id: string;

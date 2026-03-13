@@ -22,6 +22,8 @@ import { Input } from "@/components/ui/input"
 import { authService } from "@/lib/api/auth.service"
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth.schema"
 import { useAuthStore } from "@/stores/authStore"
+import { AUTH } from "@/constants/auth"
+import { getDefaultRouteForRoles } from "@/lib/auth/defaultRoute"
 
 export function LoginForm() {
   const navigate = useNavigate()
@@ -41,12 +43,13 @@ export function LoginForm() {
     
     try {
       const response = await authService.login(data)
-      toast.success(response.message || 'Login successful!')
+      toast.success(response.message || AUTH.LOGIN.LOGGEDIN)
       await fetchUser()
-      navigate('/dashboard', { replace: true })
+      const updatedUser = useAuthStore.getState().user
+      navigate(getDefaultRouteForRoles(updatedUser?.roles), { replace: true })
     } catch (error) {
       const err = error as { message: string; status?: number }
-      toast.error(err.message || 'Login failed! Please try again!')
+      toast.error(err.message || AUTH.LOGIN.NOT_LOGGEDIN)
     } finally {
       setIsLoading(false)
     }
@@ -56,16 +59,16 @@ export function LoginForm() {
     <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">{AUTH.LOGIN.WELCOME}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">{AUTH.LOGIN.EMAIL}</FieldLabel>
                 <Input
                   id="email"
-                  placeholder="Enter you email"
+                  placeholder={AUTH.LOGIN.ENTER_EMAIL}
                   {...register("email")}
                   disabled={isLoading}
                 />
@@ -75,15 +78,15 @@ export function LoginForm() {
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">{AUTH.LOGIN.PASSWORD}</FieldLabel>
                   <Link to="/forgot-password" className="ml-auto text-sm underline-offset-4 hover:underline">
-                    Forgot your password?
+                    {AUTH.LOGIN.FORGOT_PASSWORD}
                   </Link>
                 </div>
                 <Input 
                   id="password" 
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={AUTH.LOGIN.ENTER_PASSWORD}
                   {...register("password")}
                   disabled={isLoading}
                 />
@@ -93,11 +96,11 @@ export function LoginForm() {
               </Field>
               <Field>
                 <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? 'Signing In...' : 'Sign In'}
+                  {isLoading ? AUTH.LOGIN.SIGNING_IN : AUTH.LOGIN.SIGN_IN}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don't have an account?{" "}
-                  <Link to="/signup" className="underline">Sign Up</Link>
+                  {AUTH.LOGIN.NO_ACCOUNT}{" "}
+                  <Link to="/signup" className="underline">{AUTH.LOGIN.SIGNUP}</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

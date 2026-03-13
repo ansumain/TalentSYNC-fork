@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { resetPassword } from '../services/resetPassword.service';
 
 export class ResetPasswordController {
+  // Reset Password using the received OTP via mail
   static async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body || !req.body.email || !req.body.otp || !req.body.newPassword)
@@ -11,9 +12,8 @@ export class ResetPasswordController {
       const result = await resetPassword({ email, otp, newPassword });
 
       res.status(200).json(result);
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (

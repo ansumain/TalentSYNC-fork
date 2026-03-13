@@ -4,6 +4,7 @@ import { getUserRoles } from '../services/rbac.service';
 
 // [admin]
 export class RoleController {
+  // get all roles available
   static async getAllRoles(req: Request, res: Response): Promise<void> {
     try {
       const roles = await getAllRoles();
@@ -17,7 +18,7 @@ export class RoleController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // get user's roles
   static async getRoleByUserId(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');
@@ -28,9 +29,8 @@ export class RoleController {
         message: 'Role fetched sucessfully',
         roles,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing user ID')) {
@@ -49,6 +49,7 @@ export class RoleController {
     }
   }
 
+  // create a role
   static async createRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body || !req.body.role) throw new Error('Missing required field');
@@ -58,9 +59,8 @@ export class RoleController {
       res.status(201).json({
         message: 'Role created successfully',
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {
@@ -79,6 +79,7 @@ export class RoleController {
     }
   }
 
+  // delete a role
   static async deleteRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
@@ -88,9 +89,8 @@ export class RoleController {
       res.status(200).json({
         message: 'Role deleted sucessfully',
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing role ID')) {

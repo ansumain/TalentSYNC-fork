@@ -1,10 +1,11 @@
-import User from '../models/User';
+import { User } from '@talentsync/models';
 import PasswordResetOtp from '../models/PasswordResetOtp';
 import { ResetPasswordInput } from '../types/ResetPasswordInput';
 import { ResetPasswordOutput } from '../types/ResetPasswordOutput';
 import bcrypt from 'bcryptjs';
 import { Op } from 'sequelize';
 
+// reset password service
 export const resetPassword = async ({
   email,
   otp,

@@ -2,12 +2,14 @@ import Role from '../models/Role';
 import RolePermission from '../models/RolePermission';
 import Permission from '../models/Permission';
 
+// gety all roles service
 const getAllRoles = async (): Promise<string[]> => {
   const getRoles = await Role.findAll();
   const roles = getRoles.map((role) => role.role);
   return roles;
 };
 
+// get role by id service
 const getRoleById = async (roleId: string) => {
   if (!roleId) throw new Error('Missing role ID');
 
@@ -17,6 +19,7 @@ const getRoleById = async (roleId: string) => {
   return getRole.role;
 };
 
+// get permissions of a particular role
 const getRolePermissions = async (roleId: string): Promise<string[]> => {
   if (!roleId) throw new Error('Missing role ID');
 
@@ -35,6 +38,7 @@ const getRolePermissions = async (roleId: string): Promise<string[]> => {
   return permissions;
 };
 
+// create role service
 const createRole = async (role: string) => {
   if (!role) throw new Error('Missing required field');
 
@@ -45,6 +49,7 @@ const createRole = async (role: string) => {
   await Role.create({ role });
 };
 
+// delete role service
 const deleteRole = async (roleId: string) => {
   if (!roleId) throw new Error('Missing role ID');
 

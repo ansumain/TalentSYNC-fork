@@ -9,6 +9,7 @@ import { getRolePermissions } from '../services/role.service';
 
 // [admin]
 export class PermissionController {
+  // get all permissions
   static async getAllPermissions(req: Request, res: Response): Promise<void> {
     try {
       const permisisons = await getAllPermission();
@@ -22,7 +23,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // get permissions by userID
   static async getPermissionByUserId(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.userId) throw new Error('Missing user ID');
@@ -33,9 +34,8 @@ export class PermissionController {
         message: 'User Permissions fetched sucessfully',
         userPermissions,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing user ID')) {
@@ -53,7 +53,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // get permissions by roleID
   static async getPermissionByRoleId(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
@@ -64,9 +64,8 @@ export class PermissionController {
         message: 'Role Permissions fetched sucessfully',
         rolePermissions,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing role ID')) {
@@ -84,7 +83,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // create a new permission
   static async createPermission(req: Request, res: Response): Promise<void> {
     try {
       if (!req.body || !req.body.permission) throw new Error('Missing required field');
@@ -94,9 +93,8 @@ export class PermissionController {
       res.status(201).json({
         message: 'Permission created successfully',
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {
@@ -114,7 +112,7 @@ export class PermissionController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  // delete a permission
   static async deletePermission(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.permissionId) throw new Error('Missing permission ID');
@@ -124,9 +122,8 @@ export class PermissionController {
       res.status(200).json({
         message: 'Permission deleted sucessfully',
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing permission ID')) {

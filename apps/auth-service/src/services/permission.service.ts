@@ -1,5 +1,6 @@
 import Permission from '../models/Permission';
 
+// get all permissions service
 const getAllPermission = async (): Promise<string[]> => {
   const getPermissions = await Permission.findAll();
   const permissions = getPermissions.map((permission) => permission.permission);
@@ -7,6 +8,7 @@ const getAllPermission = async (): Promise<string[]> => {
   return permissions;
 };
 
+// get permission by id service
 const getPermissionById = async (permissionId: string) => {
   if (!permissionId) throw new Error('Missing permission ID');
 
@@ -16,6 +18,7 @@ const getPermissionById = async (permissionId: string) => {
   return permission.permission;
 };
 
+// create permission service
 const createPermission = async (permission: string) => {
   if (!permission) throw new Error('Missing required field');
 
@@ -26,6 +29,7 @@ const createPermission = async (permission: string) => {
   await Permission.create({ permission });
 };
 
+// delete permission service
 const deletePermission = async (permissionId: string) => {
   if (!permissionId) throw new Error('Missing permission ID');
 

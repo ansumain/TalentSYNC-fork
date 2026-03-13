@@ -1,7 +1,11 @@
 import { userProfile } from '../../services/userProfile.service';
-import User from '../../models/User';
+import { User } from '@talentsync/models';
+import UserRole from '../../models/UserRole';
+import Role from '../../models/Role';
 
-jest.mock('../../models/User');
+jest.mock('@talentsync/models');
+jest.mock('../../models/UserRole');
+jest.mock('../../models/Role');
 
 describe('UserProfile - Get User Data service', () => {
   let mockFindOne: jest.SpyInstance;
@@ -28,6 +32,9 @@ describe('UserProfile - Get User Data service', () => {
     };
 
     mockFindOne.mockResolvedValue(mockUser);
+    (UserRole.findAll as jest.Mock).mockResolvedValue([]);
+    (Role.findAll as jest.Mock).mockResolvedValue([]);
+
     const result = await userProfile({ userId: 'user123' });
 
     expect(User.findOne).toHaveBeenCalledWith({ where: { id: 'user123' } });
@@ -37,6 +44,7 @@ describe('UserProfile - Get User Data service', () => {
       name: mockUser.name,
       email: mockUser.email,
       phone: mockUser.phone,
+      roles: [],
     });
   });
 });

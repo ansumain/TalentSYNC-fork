@@ -5,6 +5,7 @@ import {
 } from '../services/rolePermission.service';
 
 export class RolePermissionController {
+  // assign permission to a role
   static async assignPermissionToRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
@@ -18,9 +19,8 @@ export class RolePermissionController {
         message: 'Permission assigned successfully',
         permissionAssigned,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {
@@ -48,6 +48,7 @@ export class RolePermissionController {
     }
   }
 
+  // revoke permission from a role
   static async revokePermissionFromRole(req: Request, res: Response): Promise<void> {
     try {
       if (!req.params || !req.params.roleId) throw new Error('Missing role ID');
@@ -64,9 +65,9 @@ export class RolePermissionController {
         message: 'Permission revoked successfully',
         permissionRevoked,
       });
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-    } catch (error: any) {
-      const errorMessage = error.message || 'Internal server error';
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
       // 400 - Validation errors
       if (errorMessage.includes('Missing required field')) {

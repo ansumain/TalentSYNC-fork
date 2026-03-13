@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { authenticationMiddleware } from '../middlewares/authentication.middleware';
 import { requiredRole } from '../middlewares/authorization.middleware';
 import { UserRoleController } from '../controllers/userRole.controller';
-const userRoleRouter = express.Router();
+const userRoleRouter: Router = express.Router();
 
 userRoleRouter.post(
   '/assign-role/:userId',

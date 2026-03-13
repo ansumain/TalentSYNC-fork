@@ -1,0 +1,10 @@
+{
+  "development": {
+    "username": "rms_user",
+    "password": "rms_password",
+    "database": "rms_db",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}

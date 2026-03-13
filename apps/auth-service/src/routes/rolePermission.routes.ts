@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { authenticationMiddleware } from '../middlewares/authentication.middleware';
 import { requiredRole } from '../middlewares/authorization.middleware';
 import { RolePermissionController } from '../controllers/rolePermission.controller';
-const rolePermissionRouter = express.Router();
+const rolePermissionRouter: Router = express.Router();
 
 rolePermissionRouter.post(
   '/assign-permission/:roleId',
