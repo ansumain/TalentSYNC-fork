@@ -193,7 +193,7 @@ export function InterviewsTable({
                     <TableCell className="font-medium">
                       {app?.candidateName ?? <span className="text-xs text-muted-foreground">Unknown candidate</span>}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{app?.jobTitle ?? "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{app?.jobTitle ?? "-"}</TableCell>
                     <TableCell className="whitespace-nowrap text-muted-foreground">
                       {new Date(iv.scheduledAt).toLocaleString()}
                     </TableCell>
@@ -216,7 +216,7 @@ export function InterviewsTable({
                           {iv.result}
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <span className="text-xs text-muted-foreground">-</span>
                       )}
                     </TableCell>
                     <TableCell>

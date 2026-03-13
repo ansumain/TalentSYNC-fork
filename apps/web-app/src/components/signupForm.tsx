@@ -56,7 +56,7 @@ export function SignupForm() {
     }
 
     return (
-        <div className={cn("flex flex-col" )}>
+        <div className={cn("flex flex-col")}>
             <Card>
                 <CardHeader className="text-center">
                     <CardTitle className="text-xl">{AUTH.SIGNUP.CREATE}</CardTitle>
@@ -93,7 +93,7 @@ export function SignupForm() {
                                 <FieldLabel htmlFor="phone">{AUTH.SIGNUP.PHONE}</FieldLabel>
                                 <Input
                                     id="phone"
-                                    type="tel"
+                                    type="number"
                                     placeholder={AUTH.SIGNUP.ENTER_PHONE}
                                     maxLength={10}
                                     {...register("phone")}

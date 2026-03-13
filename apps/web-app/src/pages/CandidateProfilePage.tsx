@@ -158,7 +158,7 @@ export default function CandidateProfilePage() {
                     <p className="font-medium">{exp.designation}</p>
                     <p className="text-muted-foreground">{exp.company}</p>
                     <p className="text-muted-foreground text-xs">
-                      {exp.startDate} — {exp.endDate}
+                      {exp.startDate} - {exp.endDate}
                       {exp.durationMonths != null && ` (${exp.durationMonths} months)`}
                     </p>
                   </div>

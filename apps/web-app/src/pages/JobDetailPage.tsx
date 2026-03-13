@@ -183,7 +183,7 @@ export default function JobDetailPage() {
                 </CardContent>
               </Card>
 
-              {/* Ranked Applicants — admin/manager only */}
+              {/* Ranked Applicants - admin/manager only */}
               {isAdmin && (
                 <Card>
                   <CardHeader className="pb-2">

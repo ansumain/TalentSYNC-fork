@@ -68,7 +68,7 @@ export const sendWelcomeEmail = async (name: string, email: string, phone: strin
       </table>
       <p style="margin-top: 20px; color: #d9534f;"><strong>Please change your password after logging in for the first time.</strong></p>
       <p style="color: #5d5d5d; margin-top: 30px;">If you did not expect this email, please contact our support team.</p>
-      <p style="margin-top: 20px;">— TalentSYNC Team</p>
+      <p style="margin-top: 20px;">- TalentSYNC Team</p>
     </div>
   `;
 

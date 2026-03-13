@@ -48,7 +48,7 @@ const tusServer = new Server({
             throw { status_code: 400, body: 'Unsupported file type' };
         }
 
-        // Read userId from AsyncLocalStorage — set by tusHandler before calling handle()
+        // Read userId from AsyncLocalStorage - set by tusHandler before calling handle()
         const userId = userStorage.getStore();
         if (!userId) throw { status_code: 401, body: 'Unauthorized upload' };
 
@@ -101,7 +101,7 @@ export const tusHandler = (req: Request, res: Response) => {
         res.status(401).json({ error: 'Unauthorized upload' });
         return;
     }
-    // Run tusServer.handle inside userStorage context — propagates userId
+    // Run tusServer.handle inside userStorage context - propagates userId
     // to ALL async callbacks (onUploadCreate, onUploadFinish) regardless of req wrapping
     userStorage.run(userId, () => {
         tusServer.handle(req, res);

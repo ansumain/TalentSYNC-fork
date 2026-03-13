@@ -51,7 +51,7 @@ const connectRabbitMQ = async (): Promise<void> => {
         publishChannel.on('error', (e: Error) => console.error('Publish channel error:', e.message));
         publishChannel.on('close', () => console.warn('Publish channel closed'));
 
-        // Consume channel — with prefetch limit
+        // Consume channel - with prefetch limit
         consumeChannel = (await connection.createChannel()) as Channel;
         consumeChannel.on('error', (e: Error) => console.error('Consume channel error:', e.message));
         consumeChannel.on('close', () => console.warn('Consume channel closed'));

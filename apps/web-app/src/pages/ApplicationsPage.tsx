@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { AppSidebar } from "@/components/home/appSideBar";
 import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -185,11 +185,6 @@ export default function ApplicationsPage() {
 
           {!loading && (total > 0 || applications.length > 0) && (
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base text-left">
-                  {total} {JOB.APPLICATION_PAGE.APPLICATION}{total !== 1 ? "s" : ""}
-                </CardTitle>
-              </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
                   <Table>
@@ -206,9 +201,9 @@ export default function ApplicationsPage() {
                     <TableBody>
                       {filteredApplications.map((app) => (
                         <TableRow key={app.applicationId}>
-                          <TableCell className="font-medium">{app.job?.title ?? "—"}</TableCell>
-                          <TableCell className="text-muted-foreground">{app.job?.location ?? "—"}</TableCell>
-                          <TableCell className="text-muted-foreground">{app.job?.jobType ?? "—"}</TableCell>
+                          <TableCell className="font-medium">{app.job?.title ?? "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{app.job?.location ?? "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{app.job?.jobType ?? "-"}</TableCell>
                           <TableCell>
                             <span
                               className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${

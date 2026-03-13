@@ -173,7 +173,7 @@ export default function MyInterviewsPage() {
                                 {iv.result}
                               </span>
                             ) : (
-                              <span className="text-muted-foreground text-xs">—</span>
+                              <span className="text-muted-foreground text-xs">-</span>
                             )}
                           </TableCell>
                           <TableCell>
