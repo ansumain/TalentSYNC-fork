@@ -4,6 +4,7 @@ import { sequelize } from '@talentsync/config';
 import { QueryTypes } from 'sequelize';
 import { updateUserIdByResumeId } from '../repository/resume.repository';
 import { sendWelcomeEmail } from './emailService';
+import { ParsedResumeJson } from '../types/ExtractData.type';
 
 const DEFAULT_PASSWORD = 'password123';
 const SALT_ROUNDS = 10;
@@ -71,15 +72,15 @@ After parsing a bulk-uploaded resume, determines which user it belongs to.
 export const linkOrCreateUserForResume = async (
     resumeId: string,
     uploaderId: string,
-    parsedJSON: Record<string, any>
+    parsedJSON: ParsedResumeJson
 ): Promise<void> => {
     // skip for candidate self-uploads
     const uploaderIsCandidate = await isUploaderCandidate(uploaderId);
     if (uploaderIsCandidate) return;
 
-    const email: string | undefined = parsedJSON?.email?.trim() || undefined;
-    const phone: string | undefined = parsedJSON?.phone?.trim()?.replace(/\D/g, '').slice(-10) || undefined;
-    const name: string = parsedJSON?.name?.trim() || 'Unknown';
+    const email: string | undefined = (parsedJSON?.email!).toString().trim() || undefined;
+    const phone: string | undefined = (parsedJSON?.phone!).toString().trim()?.replace(/\D/g, '').slice(-10) || undefined;
+    const name: string = (parsedJSON?.name!).toString().trim() || 'Unknown';
 
     // Need at least one identifier to proceed
     if (!email && !phone) return;

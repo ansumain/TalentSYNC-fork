@@ -31,9 +31,10 @@ const startWorker = async () => {
 
             // update resume status to completed
             await updateStatusByResumeId(resumeId, 'completed');
-        } catch (e: any) {
+        } catch (e: unknown) {
             // update resume status to failed
-            await updateStatusByResumeId(resumeId, 'failed', e.message);
+            const errorMessage = e instanceof Error ? e.message : 'parsing failed';
+            await updateStatusByResumeId(resumeId, 'failed', errorMessage);
             throw e;
         }
     })

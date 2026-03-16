@@ -19,8 +19,8 @@ export class ResumeUploaderController {
                 });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
             res.status(500).json({ error: errorMessage });
         }
     }
