@@ -1,5 +1,6 @@
 import { config } from '../config/env';
 import nodemailer from 'nodemailer';
+import { internalServerError } from '@talentsync/types';
 
 interface EmailOptions {
   to: string;
@@ -36,7 +37,7 @@ export const sendEmail = async ({ to, subject, text, html }: EmailOptions): Prom
   const transport = getTransporter();
 
   // throw error if transporter is not configured
-  if (!transport) throw new Error('Failed to send email');
+  if (!transport) throw internalServerError('Failed to send email', 'EMAIL_DELIVERY_FAILED');
 
   // Send mail
   try {
@@ -50,7 +51,7 @@ export const sendEmail = async ({ to, subject, text, html }: EmailOptions): Prom
     console.log(`Email sent successfully to ${to}`);
   } catch (error) {
     console.error('Failed to send email:', error);
-    throw new Error('Failed to send email');
+    throw internalServerError('Failed to send email', 'EMAIL_DELIVERY_FAILED');
   }
 };
 

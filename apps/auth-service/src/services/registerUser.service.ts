@@ -3,6 +3,11 @@ import { User } from '@talentsync/models';
 import { RegisterUserInput } from '../types/RegisterUserInput';
 import { RegisterUserOutput } from '../types/RegisterUserOutput';
 import { Op } from 'sequelize';
+import {
+  badRequestError,
+  conflictError,
+  internalServerError,
+} from '@talentsync/types';
 import Role from '../models/Role';
 import UserRole from '../models/UserRole';
 
@@ -14,11 +19,13 @@ export const registerUser = async ({
   password,
 }: RegisterUserInput): Promise<RegisterUserOutput> => {
   // required fields must not be null
-  if (!name || !email || !phone || !password) throw new Error('Missing required field');
+  if (!name || !email || !phone || !password) {
+    throw badRequestError('Missing required field', 'MISSING_REQUIRED_FIELD');
+  }
 
   // check the name length (min: 3, max: 25)
-  if (name.length < 3) throw new Error('Name too short');
-  if (name.length > 25) throw new Error('Name too long');
+  if (name.length < 3) throw badRequestError('Name too short', 'NAME_TOO_SHORT');
+  if (name.length > 25) throw badRequestError('Name too long', 'NAME_TOO_LONG');
 
   // check if the email/phone is already associated with any existing user
   const checkExistingUser = await User.findOne({
@@ -27,12 +34,12 @@ export const registerUser = async ({
     },
   });
   if (checkExistingUser) {
-    if (checkExistingUser.email === email) throw new Error('Email exists');
-    if (checkExistingUser.phone === phone) throw new Error('Phone exists');
+    if (checkExistingUser.email === email) throw conflictError('Email exists', 'EMAIL_EXISTS');
+    if (checkExistingUser.phone === phone) throw conflictError('Phone exists', 'PHONE_EXISTS');
   }
 
   // check pasword length, min: 6
-  if (password.length < 6) throw new Error('Weak password');
+  if (password.length < 6) throw badRequestError('Weak password', 'WEAK_PASSWORD');
 
   // hash the password to store in DB
   const salt = await bcrypt.genSalt(10);
@@ -46,7 +53,9 @@ export const registerUser = async ({
   });
 
   const candidateRole = await Role.findOne({ where: { role: 'candidate' } });
-  if (!candidateRole) throw new Error('candidate role not found');
+  if (!candidateRole) {
+    throw internalServerError('System configuration error', 'DEFAULT_ROLE_NOT_FOUND');
+  }
 
   await UserRole.create({
     userId: user.id,

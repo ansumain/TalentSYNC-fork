@@ -1,6 +1,7 @@
 import { User } from '@talentsync/models';
 import UserRole from '../models/UserRole';
 import Role from '../models/Role';
+import { notFoundError } from '@talentsync/types';
 import { UserProfileInput } from '../types/UserProfileInput';
 import { UserProfileOutput } from '../types/UserProfileOutput';
 
@@ -8,7 +9,7 @@ import { UserProfileOutput } from '../types/UserProfileOutput';
 export const userProfile = async ({ userId }: UserProfileInput): Promise<UserProfileOutput> => {
   const user = await User.findOne({ where: { id: userId } });
   if (!user) {
-    throw new Error('User not found');
+    throw notFoundError('User not found', 'USER_NOT_FOUND');
   }
 
   // Fetch user roles

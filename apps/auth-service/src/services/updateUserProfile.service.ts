@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { User } from '@talentsync/models';
+import { conflictError } from '@talentsync/types';
 import { UpdateUserProfileInput } from '../types/UpdateUserProfileInput';
 import { UpdateUserProfileOutput } from '../types/UpdateUserProfileOutput';
 
@@ -13,7 +14,7 @@ export const updateUserProfile = async (
     const checkPhone = await User.findOne({
       where: { phone: fieldsToUpdate.phone, id: { [Op.ne]: userId } },
     });
-    if (checkPhone) throw new Error('Phone exists');
+    if (checkPhone) throw conflictError('Phone exists', 'PHONE_EXISTS');
   }
 
   // check if email already exists
@@ -21,7 +22,7 @@ export const updateUserProfile = async (
     const checkEmail = await User.findOne({
       where: { email: fieldsToUpdate.email, id: { [Op.ne]: userId } },
     });
-    if (checkEmail) throw new Error('Email exists');
+    if (checkEmail) throw conflictError('Email exists', 'EMAIL_EXISTS');
   }
 
   await User.update({ ...fieldsToUpdate }, { where: { id: userId } });
