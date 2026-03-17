@@ -1,5 +1,6 @@
 import { CreateJob } from "../types/Job.type";
 import { Job, JobSkill, Skill } from '@talentsync/models';
+import { notFoundError } from "@talentsync/types";
 import { Op } from 'sequelize';
 
 const JOB_SORT_FIELDS = new Set(['title', 'location', 'jobType', 'openings', 'createdAt', 'updatedAt']);
@@ -65,7 +66,7 @@ const getAllJobsRepository = async (params: {
 const getJobByIdRepository = async (jobId: string) => {
     try {
         const job = await Job.findOne({ where: { jobId } });
-        if (!job) throw new Error('job not found');
+        if (!job) throw notFoundError('job not found', 'NOT_FOUND');
 
         const jobSkills = await JobSkill.findAll({
             where: { jobId },
@@ -83,7 +84,7 @@ const getJobByIdRepository = async (jobId: string) => {
 const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob>) => {
     try {
         const existingJob = await Job.findOne({ where: { jobId } });
-        if (!existingJob) throw new Error('job not found');
+        if (!existingJob) throw notFoundError('job not found', 'NOT_FOUND');
 
         await Job.update({ ...job }, { where: { jobId } });
 
@@ -97,7 +98,7 @@ const updateExistingJobRepository = async (jobId: string, job: Partial<CreateJob
 const deleteExistingJobRepository = async (jobId: string) => {
     try {
         const existingJob = await Job.findOne({ where: { jobId } });
-        if (!existingJob) throw new Error('job not found');
+        if (!existingJob) throw notFoundError('job not found', 'NOT_FOUND');
 
         await Job.destroy({ where: { jobId } });
 

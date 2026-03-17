@@ -1,6 +1,7 @@
 import { Applicaiton } from "../types/Application.type";
 import { JobApplication, Job, JobSkill, Skill, UserSkill, ResumeData } from '@talentsync/models';
 import { ApplicationWithJob, EnrichedApplication, RankedApplicant } from "../types/JobApplication.type";
+import { badRequestError, conflictError, notFoundError } from "@talentsync/types";
 
 // checks and updates jobApplication status to 'shortlisted' 
 // when candidate skills match against job required skills
@@ -42,11 +43,11 @@ const addApplicationRepository = async (application: Applicaiton) => {
     try {
         // Check if user has a completed resume before allowing application
         const resume = await ResumeData.findOne({ where: { userId: application.userId, status: 'completed' } });
-        if (!resume) throw new Error('no resume found, please upload your resume before applying');
+        if (!resume) throw notFoundError('no resume found, please upload your resume before applying', 'NOT_FOUND');
 
         // check existing application
         const existingApplication = await JobApplication.findAll({ where: { ...application } });
-        if (existingApplication.length > 0) throw new Error('application already exists');
+        if (existingApplication.length > 0) throw conflictError('application already exists', 'CONFLICT');
 
         // run skill matching to determine initial status : shortlisted or applied
         const initialStatus = await updateInitialStatusForApplication(application.userId, application.jobId);
@@ -140,7 +141,7 @@ const getAllApplicationsRepository = async (params: {
 const getApplicationByIdRepository = async (applicationId: string) => {
     try {
         const applicaiton = await JobApplication.findOne({ where: { applicationId } });
-        if (!applicaiton) throw new Error('application not found');
+        if (!applicaiton) throw notFoundError('application not found', 'NOT_FOUND');
         return applicaiton;
     } catch (error: unknown) {
         throw error;
@@ -151,7 +152,7 @@ const getApplicationByIdRepository = async (applicationId: string) => {
 const getApplicationsByJobIdRepository = async (jobId: string) => {
     try {
         const applications = await JobApplication.findAll({ where: { jobId } });
-        if (!applications) throw new Error('applications not found');
+        if (!applications) throw notFoundError('applications not found', 'NOT_FOUND');
         return applications;
     } catch (error: unknown) {
         throw error;
@@ -161,12 +162,12 @@ const getApplicationsByJobIdRepository = async (jobId: string) => {
 // update application current status: applied -> shortlisted
 const updateApplicationCurrentStatusRepository = async (applicationId: string, currentStatus: string) => {
     try {
-        if (currentStatus !== 'shortlisted') throw new Error('manual status update is only allowed for shortlisting');
+        if (currentStatus !== 'shortlisted') throw badRequestError('manual status update is only allowed for shortlisting', 'BAD_REQUEST');
 
         const existingApplication = await JobApplication.findOne({ where: { applicationId } });
-        if (!existingApplication) throw new Error('application not found');
+        if (!existingApplication) throw notFoundError('application not found', 'NOT_FOUND');
 
-        if (existingApplication.currentStatus !== 'applied') throw new Error('can only shortlist an application that is in applied status');
+        if (existingApplication.currentStatus !== 'applied') throw badRequestError('can only shortlist an application that is in applied status', 'BAD_REQUEST');
 
         await JobApplication.update({ currentStatus }, { where: { applicationId } });
 
@@ -183,7 +184,7 @@ const updateApplicationCurrentStatusRepository = async (applicationId: string, c
 const deleteExistingApplicationRepository = async (applicationId: string) => {
     try {
         const existingApplication = await JobApplication.findOne({ where: { applicationId } });
-        if (!existingApplication) throw new Error('application not found');
+        if (!existingApplication) throw notFoundError('application not found', 'NOT_FOUND');
 
         await JobApplication.destroy({ where: { applicationId } });
 
@@ -285,7 +286,7 @@ const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<Rank
                 const candidateSkills: string[] = parsedJSON?.skills ?? [];
                 const candidateSkillsLower = candidateSkills.map((s: string) => s.toLowerCase());
 
-                const matchedSkills = requiredSkills.filter((rs, idx) => {
+                const matchedSkills = requiredSkills.filter((_rs, idx) => {
                     const rsLower = requiredSkillsLower[idx];
                     return candidateSkillsLower.some(
                         (cs) => cs.includes(rsLower) || rsLower.includes(cs)
@@ -322,10 +323,10 @@ const getRankedApplicantsByJobIdRepository = async (jobId: string): Promise<Rank
 const acceptOrRejectOfferRepository = async (applicationId: string, userId: string, action: 'accept' | 'reject') => {
     try {
         const application = await JobApplication.findOne({ where: { applicationId, userId } });
-        if (!application) throw new Error('application not found');
+        if (!application) throw notFoundError('application not found', 'NOT_FOUND');
 
         if (application.currentStatus !== 'selected') {
-            throw new Error('not a offer can\'t be responded');
+            throw badRequestError('not a offer can\'t be responded', 'BAD_REQUEST');
         }
 
         const newStatus = action === 'accept' ? 'hired' : 'offerRejected';

@@ -2,6 +2,7 @@ import { Interview, User, UserRole, JobApplication, JobSkill, Skill, UserSkill }
 import { sequelize } from '@talentsync/config';
 import { CreateInterview } from "../types/CreateInterview.type";
 import { Op, QueryTypes } from 'sequelize';
+import { badRequestError, notFoundError } from '@talentsync/types';
 
 // get roleId for interviewer role
 const getInterviewerRoleId = async (): Promise<string> => {
@@ -9,7 +10,7 @@ const getInterviewerRoleId = async (): Promise<string> => {
         `SELECT id FROM auth.roles WHERE role = 'interviewer'`,
         { type: QueryTypes.SELECT }
     );
-    if (rows.length === 0) throw new Error('interviewer role not found in database');
+    if (rows.length === 0) throw notFoundError('interviewer role not found in database', 'NOT_FOUND')
     return rows[0].id;
 };
 
@@ -80,14 +81,14 @@ const checkInterviewerEligibilityRepository = async (interviewerId: string, appl
 // schedule a new interview + auto-update application status to interviewing
 const scheduleInterviewRepository = async (newInterviewData: CreateInterview) => {
     const existingApplication = await JobApplication.findOne({ where: { applicationId: newInterviewData.applicationId } });
-    if (!existingApplication) throw new Error('application not found');
+    if (!existingApplication) throw notFoundError('application not found', 'NOT_FOUND');
 
     if (existingApplication.currentStatus !== 'shortlisted') {
-        throw new Error('can only schedule interview for shortlisted applications');
+        throw badRequestError('can only schedule interview for shortlisted applications', 'BAD_REQUEST');
     }
 
     const existingInterview = await Interview.findOne({ where: { applicationId: newInterviewData.applicationId } });
-    if (existingInterview) throw new Error('interview already exists for this application');
+    if (existingInterview) throw badRequestError('interview already exists for this application', 'BAD_REQUEST');
 
     const newInterview = await Interview.create(newInterviewData);
 
@@ -100,14 +101,14 @@ const scheduleInterviewRepository = async (newInterviewData: CreateInterview) =>
 // get all interviews
 const getAllInterviewsRepository = async () => {
     const interviews = await Interview.findAll();
-    if (!interviews) throw new Error('interviews not found');
+    if (!interviews) throw notFoundError('interviews not found', 'NOT_FOUND');
     return interviews;
 };
 
 // get interview by interviewId
 const getInterviewByIdRepository = async (interviewId: string) => {
     const interview = await Interview.findOne({ where: { interviewId } });
-    if (!interview) throw new Error('interview not found');
+    if (!interview) throw notFoundError('interview not found', 'NOT_FOUND');
     return interview;
 };
 
@@ -147,13 +148,13 @@ const getAssignedInterviewsRepository = async (interviewerId: string) => {
 // update interview details
 const updateExistingInterviewRepository = async (interviewId: string, updateData: Partial<CreateInterview> & { status?: string }) => {
     const existingInterview = await Interview.findOne({ where: { interviewId } });
-    if (!existingInterview) throw new Error('interview not found');
+    if (!existingInterview) throw notFoundError('interview not found', 'NOT_FOUND');
 
-    if (existingInterview.status === 'completed') throw new Error('cannot update a completed interview');
+    if (existingInterview.status === 'completed') throw badRequestError('cannot update a completed interview', 'BAD_REQUEST');
 
     // rescheduling - only allowed from cancelled state
     if (updateData.status === 'scheduled' && existingInterview.status !== 'cancelled') {
-        throw new Error('can only reschedule a cancelled interview');
+        throw badRequestError('can only reschedule a cancelled interview', 'BAD_REQUEST');
     }
 
     await Interview.update({ ...updateData }, { where: { interviewId } });
@@ -171,9 +172,9 @@ const updateExistingInterviewRepository = async (interviewId: string, updateData
 // submit interview result + status: completed + update respective jobApplication status
 const submitInterviewResultRepository = async (interviewId: string, result: 'passed' | 'failed') => {
     const interview = await Interview.findOne({ where: { interviewId } });
-    if (!interview) throw new Error('interview not found');
+    if (!interview) throw notFoundError('interview not found', 'NOT_FOUND');
 
-    if (interview.status !== 'scheduled') throw new Error('can only submit result for a scheduled interview');
+    if (interview.status !== 'scheduled') throw badRequestError('can only submit result for a scheduled interview', 'BAD_REQUEST');
 
     // update application status based on result: passed -> selected & failed -> rejected
     const applicationStatus = result === 'passed' ? 'selected' : 'rejected';
@@ -187,10 +188,10 @@ const submitInterviewResultRepository = async (interviewId: string, result: 'pas
 // cancel an interview
 const cancelInterviewRepository = async (interviewId: string) => {
     const interview = await Interview.findOne({ where: { interviewId } });
-    if (!interview) throw new Error('interview not found');
+    if (!interview) throw notFoundError('interview not found', 'NOT_FOUND');
 
-    if (interview.status === 'completed') throw new Error('cannot cancel a completed interview');
-    if (interview.status === 'cancelled') throw new Error('interview is already cancelled');
+    if (interview.status === 'completed') throw badRequestError('cannot cancel a completed interview', 'BAD_REQUEST');
+    if (interview.status === 'cancelled') throw badRequestError('interview is already cancelled', 'BAD_REQUEST');
 
     await Interview.update({ status: 'cancelled' }, { where: { interviewId } });
 
@@ -203,11 +204,11 @@ const cancelInterviewRepository = async (interviewId: string) => {
 // delete an interview
 const deleteExistingInterviewRepository = async (interviewId: string) => {
     const existingInterview = await Interview.findOne({ where: { interviewId } });
-    if (!existingInterview) throw new Error('interview not found');
+    if (!existingInterview) throw notFoundError('interview not found', 'NOT_FOUND');
 
     // prevent deletion of completed interviews
     if (existingInterview.status === 'completed') {
-        throw new Error('cannot delete a completed interview');
+        throw badRequestError('cannot delete a completed interview', 'BAD_REQUEST');
     }
 
     if (existingInterview.status === 'scheduled' || existingInterview.status === 'noshow') {
