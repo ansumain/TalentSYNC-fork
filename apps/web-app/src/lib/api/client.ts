@@ -1,11 +1,8 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, type AxiosProgressEvent } from 'axios';
 import type { AxiosResponse } from 'axios';
 import { API_CONFIG } from './config';
-
-export interface ApiError {
-  message: string;
-  status?: number;
-}
+import type { ApiErrorResponse, ApiError } from '../types/Client.type';
+import { getErrorPayload } from '../utils/getErrorPayload';
 
 // create axios instance
 const axiosInstance = axios.create({
@@ -19,11 +16,16 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response.data,
-  (error: AxiosError<{ error?: string }>) => {
+  (error: AxiosError<ApiErrorResponse>) => {
+    const payload = getErrorPayload(error);
+
     const apiError: ApiError = {
-      message: error.response?.data?.error || error.message || 'Network error! Please check your connection!',
+      message: payload?.message || error.message || 'Network error! Please check your connection!',
+      code: payload?.code || 'NETWORK_ERROR',
+      statusCode: payload?.statusCode || error.response?.status || 0,
       status: error.response?.status || 0,
     };
+
     return Promise.reject(apiError);
   }
 );
@@ -31,7 +33,7 @@ axiosInstance.interceptors.response.use(
 // API client
 export const apiClient = {
   async get<ResponseType>(endpoint: string, params?: Record<string, any>): Promise<ResponseType> {
-    const response = await axiosInstance.get<ResponseType>(endpoint, {params});
+    const response = await axiosInstance.get<ResponseType>(endpoint, { params });
     return response as unknown as ResponseType;
   },
 
@@ -60,9 +62,9 @@ export const apiClient = {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
-      onUploadProgress: (ProgressEvent) => {
-        if (onProgress && ProgressEvent.total) {
-          const percentCompleted = Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100 );
+      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
           onProgress(percentCompleted);
         }
       }
