@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { badRequestError, unauthorizedError } from '@talentsync/types';
 import { updateUserProfile } from '../services/updateUserProfile.service';
 import { UpdateUserProfileInput } from '../types/UpdateUserProfileInput';
 
@@ -6,10 +7,10 @@ export class UpdateUserProfileController {
   // update user profile
   static async updateUserProfile(req: Request, res: Response): Promise<void> {
     try {
-      if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');
+      if (!req.userInfo || !req.userInfo.sub) throw unauthorizedError('Unauthorized', 'UNAUTHORIZED');
       const userId = req.userInfo.sub;
 
-      if (!req.body) throw new Error('Missing body');
+      if (!req.body) throw badRequestError('Missing body', 'MISSING_BODY');
       const { name, email, phone } = req.body;
 
       const toUpdate: Partial<UpdateUserProfileInput> = {
@@ -21,30 +22,8 @@ export class UpdateUserProfileController {
       const updated = await updateUserProfile({ userId, ...toUpdate });
 
       res.status(200).json({ ...updated });
-
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-
-      // 400 - Validation errors
-      if (errorMessage.includes('Missing body')) {
-        res.status(400).json({ error: errorMessage });
-        return;
-      }
-
-      // 401 - Unauthenticated user
-      if (errorMessage.includes('Unauthorized')) {
-        res.status(401).json({ error: errorMessage });
-        return;
-      }
-
-      // 409 - Conflict (duplicate email/phone)
-      if (errorMessage.includes('Email exists') || errorMessage.includes('Phone exists')) {
-        res.status(409).json({ error: errorMessage });
-        return;
-      }
-
-      // 500 - Unexpected errors
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (error) {
+      throw error;
     }
   }
 }

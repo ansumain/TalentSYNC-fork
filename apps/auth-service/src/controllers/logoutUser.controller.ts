@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { unauthorizedError } from '@talentsync/types';
 import { logoutUser } from '../services/logoutUser.service';
 import { cookieOptions } from '../utils/cookieOptions';
 
@@ -6,7 +7,8 @@ export class LogoutUserController {
   // Logout User
   static async logout(req: Request, res: Response): Promise<void> {
     try {
-      if (!req.userInfo || !req.userInfo.sub) throw new Error('Unauthorized');
+      if (!req.userInfo || !req.userInfo.sub) throw unauthorizedError('Unauthorized', 'UNAUTHORIZED');
+
       const userId = req.userInfo.sub;
 
       const result = await logoutUser({ userId });
@@ -22,23 +24,8 @@ export class LogoutUserController {
       res.status(200).json({
         message: result.message,
       });
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-
-      // 400 - Validation errors
-      if (errorMessage.includes('Missing required field')) {
-        res.status(400).json({ error: errorMessage });
-        return;
-      }
-
-      // 401 - Unauthenticated user
-      if (errorMessage.includes('Unauthorized')) {
-        res.status(401).json({ error: errorMessage });
-        return;
-      }
-
-      // 500 - Unexpected errors
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (error) {
+      throw error;
     }
   }
 }
