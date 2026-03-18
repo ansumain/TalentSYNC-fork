@@ -1,19 +1,155 @@
-FROM node:20-alpine
+# # # FROM node:20-alpine AS migrator
+
+# # # WORKDIR /app
+
+# # # RUN npm install -g pnpm
+
+# # # COPY . .
+
+# # # RUN pnpm install --frozen-lockfile
+
+
+# # # FROM node:20-alpine AS pruner
+
+# # # WORKDIR /app
+
+# # # RUN npm install -g pnpm turbo
+
+# # # COPY . .
+
+# # # RUN turbo prune @talentsync/auth-service --docker
+
+
+# # # FROM node:20-alpine AS builder
+
+# # # WORKDIR /app
+
+# # # RUN npm install -g pnpm turbo
+
+# # # COPY --from=pruner /app/out/json/ .
+
+# # # RUN pnpm install --frozen-lockfile
+
+# # # COPY --from=pruner /app/out/full/ .
+
+# # # COPY tsconfig.base.json ./tsconfig.base.json
+
+# # # RUN pnpm turbo run build --filter=@talentsync/auth-service...
+
+# # # RUN pnpm deploy --legacy --filter=@talentsync/auth-service --prod /prod/auth-service
+
+
+# # # FROM node:20-alpine AS runtime
+
+# # # WORKDIR /app
+
+# # # ENV NODE_ENV=production
+
+# # # RUN addgroup -S app && adduser -S app -G app
+
+# # # COPY --from=builder --chown=app:app /prod/auth-service/ .
+
+# # # USER app
+
+# # # EXPOSE 4001
+
+# # # CMD ["node", "dist/server.js"]
+
+# FROM node:20-alpine AS base
+# WORKDIR /app
+# RUN npm install -g pnpm
+
+# FROM base AS migrator
+# RUN npm install -g sequelize-cli@6.6.5 pg@8.20.0 pg-hstore@2.3.4 dotenv@17.3.1
+# COPY .sequelizerc ./.sequelizerc
+# COPY infra ./infra
+
+# FROM base AS deps
+# COPY pnpm-lock.yaml ./
+# COPY pnpm-workspace.yaml ./
+# COPY package.json ./
+# COPY apps/auth-service ./apps/auth-service
+# RUN pnpm install --frozen-lockfile --config.node-linker=hoisted
+
+# FROM base AS build
+# COPY --from=deps /app /app
+# WORKDIR /app/apps/auth-service
+# RUN pnpm run build
+
+# FROM base AS prune
+# WORKDIR /app
+# COPY --from=build /app /app
+# ENV CI=true
+# RUN pnpm prune --prod --ignore-scripts
+
+# FROM node:20-alpine AS runner
+# WORKDIR /app
+# ENV NODE_ENV=production
+
+# COPY --from=migrator /app/.sequelizerc ./.sequelizerc
+# COPY --from=migrator /app/infra ./infra
+
+# COPY --from=prune /app/apps/auth-service/dist ./dist
+# COPY --from=prune /app/apps/auth-service/package.json ./
+# COPY --from=prune /app/node_modules ./node_modules
+
+# EXPOSE 4001
+# CMD ["node", "dist/server.js"]
+
+
+FROM node:20-alpine AS migrator
+
+WORKDIR /app
+
+RUN npm install -g sequelize-cli@6.6.5 pg@8.20.0 pg-hstore@2.3.4 dotenv@17.3.1
+
+COPY .sequelizerc ./.sequelizerc
+COPY infra ./infra
+
+
+ARG TURBO_VERSION=2.8.13
+
+
+FROM node:20-alpine AS pruner
 
 WORKDIR /app
 
 RUN npm install -g pnpm
-ENV CI=true
 
 COPY . .
 
-RUN pnpm install
+RUN pnpm dlx turbo@${TURBO_VERSION} prune @talentsync/auth-service --docker
 
-RUN pnpm --filter @talentsync/types build && \
-    pnpm --filter @talentsync/config build && \
-    pnpm --filter @talentsync/models build && \
-    pnpm --filter @talentsync/auth-service build
+
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY --from=pruner /app/out/json/ .
+
+RUN pnpm install --frozen-lockfile
+
+COPY --from=pruner /app/out/full/ .
+
+RUN pnpm exec turbo run build --filter=@talentsync/auth-service...
+
+RUN pnpm deploy --legacy --filter=@talentsync/auth-service --prod /prod/auth-service
+
+
+FROM node:20-alpine AS runtime
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN addgroup -S app && adduser -S app -G app
+
+COPY --from=builder --chown=app:app /prod/auth-service/ .
+
+USER app
 
 EXPOSE 4001
 
-CMD ["pnpm", "--filter", "@talentsync/auth-service", "start"]
+CMD ["node", "dist/server.js"]

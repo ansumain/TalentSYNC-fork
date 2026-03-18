@@ -1,53 +1,126 @@
-# FROM node:20-alpine AS base
+# # # FROM node:20-alpine AS pruner
 
+# # # WORKDIR /app
+
+# # # RUN npm install -g pnpm turbo
+
+# # # COPY . .
+
+# # # RUN turbo prune @talentsync/application-service --docker
+
+
+# # # FROM node:20-alpine AS builder
+
+# # # WORKDIR /app
+
+# # # RUN npm install -g pnpm turbo
+
+# # # COPY --from=pruner /app/out/json/ .
+
+# # # RUN pnpm install --frozen-lockfile
+
+# # # COPY --from=pruner /app/out/full/ .
+
+# # # COPY tsconfig.base.json ./tsconfig.base.json
+
+# # # RUN pnpm turbo run build --filter=@talentsync/application-service...
+
+# # # RUN pnpm deploy --legacy --filter=@talentsync/application-service --prod /prod/application-service
+
+
+# # # FROM node:20-alpine AS runtime
+
+# # # WORKDIR /app
+
+# # # ENV NODE_ENV=production
+
+# # # RUN addgroup -S app && adduser -S app -G app
+
+# # # COPY --from=builder --chown=app:app /prod/application-service/ .
+
+# # # USER app
+
+# # # EXPOSE 4003
+
+# # # CMD ["node", "dist/server.js"]
+
+
+# FROM node:20-alpine AS base
+# WORKDIR /app
 # RUN npm install -g pnpm
 
-# WORKDIR /app
-
-# COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.base.json ./
-# COPY apps/application-service/package.json ./apps/application-service/
-
-# RUN pnpm install --frozen-lockfile
-
+# FROM base AS deps
+# COPY pnpm-lock.yaml ./
+# COPY pnpm-workspace.yaml ./
+# COPY package.json ./
 # COPY apps/application-service ./apps/application-service
+# RUN pnpm install --frozen-lockfile --config.node-linker=hoisted
 
+# FROM base AS build
+# COPY --from=deps /app /app
 # WORKDIR /app/apps/application-service
-# RUN ../../node_modules/.bin/tsc
+# RUN pnpm run build
 
-# RUN mkdir -p uploads temp
-
-# FROM node:20-alpine
-
+# FROM base AS prune
 # WORKDIR /app
+# COPY --from=build /app /app
+# ENV CI=true
+# RUN pnpm prune --prod --ignore-scripts
 
-# COPY --from=base /app/apps/application-service/dist ./dist
-# COPY --from=base /app/apps/application-service/node_modules ./node_modules
-# COPY --from=base /app/node_modules ../node_modules
-# COPY --from=base /app/apps/application-service/package.json ./
+# FROM node:20-alpine AS runner
+# WORKDIR /app
+# ENV NODE_ENV=production
 
-# RUN mkdir -p uploads temp
+# COPY --from=prune /app/apps/application-service/dist ./dist
+# COPY --from=prune /app/apps/application-service/package.json ./
+# COPY --from=prune /app/node_modules ./node_modules
 
 # EXPOSE 4003
-
 # CMD ["node", "dist/server.js"]
 
 
-FROM node:20-alpine
- 
-WORKDIR /app
- 
-RUN npm install -g pnpm
-ENV CI=true
- 
-COPY . .
- 
-RUN pnpm install
+FROM node:20-alpine AS pruner
 
-RUN pnpm --filter @talentsync/types build && \
-    pnpm --filter @talentsync/config build && \
-    pnpm --filter @talentsync/models build && \
-    pnpm --filter @talentsync/application-service build
- 
+ARG TURBO_VERSION=2.8.13
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY . .
+
+RUN pnpm dlx turbo@${TURBO_VERSION} prune @talentsync/application-service --docker
+
+
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY --from=pruner /app/out/json/ .
+
+RUN pnpm install --frozen-lockfile
+
+COPY --from=pruner /app/out/full/ .
+
+RUN pnpm exec turbo run build --filter=@talentsync/application-service...
+
+RUN pnpm deploy --legacy --filter=@talentsync/application-service --prod /prod/application-service
+
+
+FROM node:20-alpine AS runtime
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN addgroup -S app && adduser -S app -G app
+
+COPY --from=builder --chown=app:app /prod/application-service/ .
+
+USER app
+
 EXPOSE 4003
- 
-CMD ["pnpm", "--filter", "@talentsync/application-service", "start"]
+
+CMD ["node", "dist/server.js"]

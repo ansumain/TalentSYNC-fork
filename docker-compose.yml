@@ -39,25 +39,26 @@ services:
       timeout: 10s
       retries: 3
 
-  db-migrate:
-    build:
-      context: .
-      dockerfile: ./apps/auth-service/Dockerfile
-    container_name: TalentSYNC-db-migrate
-    restart: "no"
-    command: [ "npx", "sequelize-cli", "db:migrate" ]
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: rms_user
-      DB_PASSWORD: rms_password
-      DB_NAME: rms_db
-      NODE_ENV: development
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - TalentSYNC-networks
+  # db-migrate:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/auth-service/Dockerfile
+  #     # target: migrator
+  #   container_name: TalentSYNC-db-migrate
+  #   restart: "no"
+  #   command: [ "npx", "sequelize-cli", "db:migrate" ]
+  #   environment:
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: rms_user
+  #     DB_PASSWORD: rms_password
+  #     DB_NAME: rms_db
+  #     NODE_ENV: development
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - TalentSYNC-networks
 
   auth-service:
     build:
@@ -88,8 +89,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      db-migrate:
-        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
     healthcheck:
@@ -97,7 +98,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 90s
 
   resume-parser-api:
     build:
@@ -133,8 +134,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      db-migrate:
-        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
     healthcheck:
@@ -175,11 +176,11 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      db-migrate:
-        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
-    command: [ "pnpm", "--filter", "@talentsync/resume-parser-service", "worker:start" ]
+    command: [ "node", "dist/worker/resumeParser.worker.js" ]
 
   application-service:
     build:
@@ -202,8 +203,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      db-migrate:
-        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
     healthcheck:
@@ -249,8 +250,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      db-migrate:
-        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
     healthcheck:
@@ -293,11 +294,11 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      db-migrate:
-        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
     networks:
       - TalentSYNC-networks
-    command: [ "pnpm", "--filter", "@talentsync/analytics-service", "worker:start" ]
+    command: [ "node", "dist/worker/export.worker.js" ]
 
   web-app:
     container_name: TalentSYNC-web-app
