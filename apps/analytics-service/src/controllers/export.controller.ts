@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { badRequestError } from '@talentsync/types';
 import { enqueueExportReport } from '../services/export.service';
 import type { ExportFormat } from '../types/Export.type';
 
@@ -7,8 +8,7 @@ export class ExportController {
     try {
       const format = String(req.body?.format ?? '').toLowerCase() as ExportFormat;
       if (!['pdf', 'xlsx'].includes(format)) {
-        res.status(400).json({ error: 'format must be pdf or xlsx' });
-        return;
+        throw badRequestError('format must be pdf or xlsx', 'INVALID_EXPORT_FORMAT');
       }
 
       const requestedByUserId = req.userInfo.sub as string;
@@ -22,10 +22,8 @@ export class ExportController {
       res.status(202).json({
         message: 'export request queued',
       });
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
-      const status = errorMessage.includes('invalid date range') ? 400 : 500;
-      res.status(status).json({ error: errorMessage });
+    } catch (error) {
+      throw error;
     }
   }
 }

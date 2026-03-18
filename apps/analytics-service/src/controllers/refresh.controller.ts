@@ -10,9 +10,8 @@ export class RefreshController {
                 refreshId: result.refreshId,
                 date: result.date,
             });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -20,9 +19,8 @@ export class RefreshController {
         try {
             const latest = await getLatestRefreshStatus();
             res.status(200).json({ latest });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }
