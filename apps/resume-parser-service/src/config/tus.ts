@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { AsyncLocalStorage } from 'async_hooks';
 import { Request, Response } from 'express';
+import { toApiErrorResponse, unauthorizedError } from '@talentsync/types';
 import { addToResumeData } from '../repository/resume.repository';
 import { publishToQueue } from './rabbitmq';
 import { config } from './env';
@@ -34,7 +35,7 @@ const tusServer = new Server({
         directory: uploadPath
     }),
 
-    onUploadCreate: async (req, upload) => {
+    onUploadCreate: async (_req, upload) => {
         const { filename, filetype } = upload.metadata ?? {};
 
         // console.log('(onUploadCreate) - filename:', filename);
@@ -57,7 +58,7 @@ const tusServer = new Server({
         return {};
     },
 
-    onUploadFinish: async (req, upload) => {
+    onUploadFinish: async (_req, upload) => {
         try {
             const { filename, filetype } = upload.metadata ?? {};
 
@@ -98,7 +99,9 @@ const tusServer = new Server({
 export const tusHandler = (req: Request, res: Response) => {
     const userId = (req as any).userInfo?.sub;
     if (!userId) {
-        res.status(401).json({ error: 'Unauthorized upload' });
+        res.status(401).json(
+            toApiErrorResponse(unauthorizedError('Unauthorized upload', 'UNAUTHORIZED_UPLOAD'))
+        );
         return;
     }
     // Run tusServer.handle inside userStorage context - propagates userId

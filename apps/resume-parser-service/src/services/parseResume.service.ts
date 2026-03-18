@@ -1,5 +1,6 @@
 import { getTextUsingMammoth, getTextUsingOCR, getTextUsingPdfparse } from '../utils/extractText';
 import { allowedMimeTypes } from '@talentsync/config';
+import { internalServerError } from '@talentsync/types';
 import { extractBasicDetails } from '../utils/parseToJSONFromRawText';
 import type { ParsedResumeJson } from '../types/ExtractData.type';
 export type { ParsedResumeJson as FormattedJson };
@@ -34,8 +35,8 @@ const parseResume = async (file: FileType): Promise<ParseResumeOutput> => {
             parsedJSON
         }
 
-    } catch (error: any) {
-        throw new Error('Parsing worker failed');
+    } catch {
+        throw internalServerError('Parsing worker failed', 'RESUME_PARSE_FAILED');
     }
 
 }

@@ -5,8 +5,10 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit'
 import path from 'path';
+import { AppError, badRequestError, notFoundError, toApiErrorResponse } from '@talentsync/types';
 import resumeRoutes from './routes/resume.routes'
 import { authenticationMiddleware } from './middlewares/authentication.middleware'
+import { globalErrorHandler, notFoundHandler } from './middlewares/error.middleware';
 // import { tusHandler } from './config/tus';
 // import { authenticationMiddleware } from './middlewares/authentication.middleware';
 
@@ -44,7 +46,23 @@ const limiter = rateLimit({
     max: 10000,
     message: 'Too many requests! Please try again after some time',
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    handler: (_req, res, _next, options) => {
+        const message =
+            typeof options.message === 'string'
+                ? options.message
+                : 'Too many requests! Please try again after some time';
+
+        res.status(options.statusCode).json(
+            toApiErrorResponse(
+                new AppError({
+                    message,
+                    code: 'TOO_MANY_REQUESTS',
+                    statusCode: options.statusCode,
+                })
+            )
+        );
+    },
 })
 
 app.use(limiter);
@@ -57,7 +75,7 @@ app.use(limiter);
 
 app.use(morgan('dev'), express.json());
 
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
     res.status(200).json({
         status: 'OK',
         service: 'resume-parser-service',
@@ -69,22 +87,19 @@ app.use('/api/resume', resumeRoutes);
 // app.all('/api/resume/upload', authenticationMiddleware, tusHandler);
 // app.all('/api/resume/upload/:id', authenticationMiddleware, tusHandler);
 
-app.get('/files/:filename', authenticationMiddleware, (req: Request, res: Response) => {
+app.get('/files/:filename', authenticationMiddleware, (req: Request, res: Response, next: NextFunction) => {
     const filename = path.basename(req.params.filename as string);
     if (!filename) {
-        res.status(400).json({ error: 'Invalid filename' });
+        next(badRequestError('Invalid filename', 'INVALID_FILENAME'));
         return;
     }
     const filePath = path.resolve('/data/uploads', filename);
     res.sendFile(filePath, (err) => {
-        if (err) res.status(404).json({ error: 'File not found' });
+        if (err) next(notFoundError('File not found', 'FILE_NOT_FOUND'));
     });
 });
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err);
-    res.status(500).json({ error: 'Resume-Parser - Internal server error' });
-});
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 export default app;
