@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { badRequestError, forbiddenError } from '@talentsync/types';
 import { getCandiateParsedData, getCandidateDataFromResumeId, getCandidateDataFromUserId, getMyResumeStatus, getMyResumes } from '../services/candidate.service';
 import { parsePaginationParams } from '../utils/parsePaginationParams';
 
@@ -9,8 +10,8 @@ export class CandidateController {
             const userId = req.userInfo.sub as string;
             const hasResume = await getMyResumeStatus(userId);
             res.status(200).json({ hasResume });
-        } catch (e: unknown) {
-            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -26,8 +27,8 @@ export class CandidateController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: unknown) {
-            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -36,13 +37,11 @@ export class CandidateController {
         try {
             const roleName = req.userInfo.role.name;
             if (roleName === 'candidate') {
-                res.status(403).json({ error: 'Access denied.' });
-                return;
+                throw forbiddenError('Access denied.', 'ACCESS_DENIED');
             }
             const userId = req.query.userId as string;
             if (!userId) {
-                res.status(400).json({ error: 'userId is required' });
-                return;
+                throw badRequestError('userId is required', 'USER_ID_REQUIRED');
             }
             const candidateData = await getCandidateDataFromUserId(userId);
 
@@ -52,9 +51,8 @@ export class CandidateController {
                 });
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -64,8 +62,8 @@ export class CandidateController {
             const userId = req.userInfo.sub as string;
             const resumes = await getMyResumes(userId);
             res.status(200).json({ resumes });
-        } catch (e: unknown) {
-            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -73,6 +71,7 @@ export class CandidateController {
     static async getCandidateDataFromResumeId(req: Request, res: Response): Promise<void> {
         try {
             const { resumeId } = req.body;
+            if (!resumeId) throw badRequestError('resumeId is required', 'RESUME_ID_REQUIRED');
             const candidateData = await getCandidateDataFromResumeId(resumeId);
 
             if (candidateData) {
@@ -81,9 +80,8 @@ export class CandidateController {
                 });
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }

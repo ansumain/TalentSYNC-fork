@@ -36,7 +36,7 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   const appError = checkErrorFormat(error);
 
   if (appError.statusCode >= 500) {
-    console.error('Unhandled auth-service error:', {
+    console.error('Unhandled application-service error:', {
       method: req.method,
       path: req.originalUrl,
       error,

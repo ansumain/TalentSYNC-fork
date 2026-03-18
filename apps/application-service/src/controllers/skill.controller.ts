@@ -1,14 +1,15 @@
 import { Request, Response } from 'express';
+import { badRequestError } from '@talentsync/types';
 import { getAllSkills, getUserSkills, addUserSkill, removeUserSkill } from '../services/skill.service';
 
 export class SkillController {
     // get all skills present in the DB
-    static async getAllSkills(req: Request, res: Response): Promise<void> {
+    static async getAllSkills(_req: Request, res: Response): Promise<void> {
         try {
             const skills = await getAllSkills();
             res.status(200).json({ skills });
-        } catch (e: unknown) {
-            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -18,8 +19,8 @@ export class SkillController {
             const userId = req.userInfo.sub as string;
             const skills = await getUserSkills(userId);
             res.status(200).json({ skills });
-        } catch (e: unknown) {
-            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -28,12 +29,11 @@ export class SkillController {
         try {
             const userId = req.userInfo.sub as string;
             const { skillId } = req.body;
-            if (!skillId) { res.status(400).json({ error: 'skillId is required' }); return; }
+            if (!skillId) throw badRequestError('skillId is required', 'SKILL_ID_REQUIRED');
             await addUserSkill(userId, skillId);
             res.status(201).json({ message: 'skill added' });
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-            res.status(errorMessage === 'skill already added' ? 409 : 500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -44,9 +44,8 @@ export class SkillController {
             const skillId = req.params.skillId as string;
             await removeUserSkill(userId, skillId);
             res.status(200).json({ message: 'skill removed' });
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-            res.status(errorMessage === 'skill not found' ? 404 : 500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }   

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { badRequestError } from '@talentsync/types';
 import {
     addApplication,
     getAllApplications,
@@ -18,7 +19,7 @@ export class JobApplicationController {
     static async addApplication(req: Request, res: Response): Promise<void> {
         try {
 
-            if (!req.params.jobId) throw new Error('missing required field');
+            if (!req.params.jobId) throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
             const jobId = req.params.jobId as string;
             const userId = req.userInfo.sub as string;
 
@@ -28,23 +29,8 @@ export class JobApplicationController {
                 res.status(201).json(newApplication);
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('no resume found')) {
-                res.status(403).json({ error: errorMessage });
-                return;
-            }
-            if (errorMessage.includes('missing required field')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-            if (errorMessage.includes('application already exists')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -62,8 +48,8 @@ export class JobApplicationController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: unknown) {
-            res.status(500).json({ error: e instanceof Error ? e.message : 'Internal server error' });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -80,9 +66,8 @@ export class JobApplicationController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -90,7 +75,9 @@ export class JobApplicationController {
     static async getApplicationById(req: Request, res: Response): Promise<void> {
         try {
 
-            if (!req.params.applicationId) throw new Error('missing required field');
+            if (!req.params.applicationId) {
+                throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
+            }
             const applicationId = req.params.applicationId as string;
 
             const application = await getApplicationById(applicationId);
@@ -99,19 +86,8 @@ export class JobApplicationController {
                 res.status(200).json({ application });
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('missing required field')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            if (errorMessage.includes('application not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -119,7 +95,7 @@ export class JobApplicationController {
     static async getApplicationsByJobId(req: Request, res: Response): Promise<void> {
         try {
 
-            if (!req.params.jobId) throw new Error('missing required field');
+            if (!req.params.jobId) throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
             const jobId = req.params.jobId as string;
 
             const applicationsByJobId = await getApplicationsByJobId(jobId);
@@ -128,31 +104,22 @@ export class JobApplicationController {
                 res.status(200).json({ applicationsByJobId });
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('missing required field')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            if (errorMessage.includes('applications not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
     // update application currect status - applied | shortlisted | interviewing | hired/rejected 
     static async updateApplicationCurrentStatus(req: Request, res: Response): Promise<void> {
         try {
-            if (!req.params.applicationId) throw new Error('missing required field');
+            if (!req.params.applicationId) {
+                throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
+            }
             const applicationId = req.params.applicationId as string;
 
             const { currentStatus } = req.body;
 
-            if (!currentStatus) throw new Error('no input');
+            if (!currentStatus) throw badRequestError('no input', 'NO_INPUT');
 
             const updatedApplication = await updateApplicationCurrentStatus(applicationId, currentStatus);
 
@@ -160,22 +127,8 @@ export class JobApplicationController {
                 res.status(200).json(updatedApplication);
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('no input') ||
-                errorMessage.includes('missing required field') ||
-                errorMessage.includes('manual status update') ||
-                errorMessage.includes('can only shortlist')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            if (errorMessage.includes('application not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -183,43 +136,28 @@ export class JobApplicationController {
     static async deleteExistingApplication(req: Request, res: Response): Promise<void> {
         try {
 
-            if (!req.params.applicationId) throw new Error('missing required field');
+            if (!req.params.applicationId) {
+                throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
+            }
             const applicationId = req.params.applicationId as string;
 
             const deleteApplication = await deleteExistingApplication(applicationId);
             if (deleteApplication) res.status(204).send();
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('missing required field')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            if (errorMessage.includes('application not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
     // rank candidates according to job skill requirements
     static async getRankedApplicantsByJobId(req: Request, res: Response): Promise<void> {
         try {
-            if (!req.params.jobId) throw new Error('missing required field');
+            if (!req.params.jobId) throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
             const jobId = req.params.jobId as string;
             const rankedApplicants = await getRankedApplicantsByJobId(jobId);
             res.status(200).json({ rankedApplicants });
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-            if (errorMessage.includes('missing required field')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -227,12 +165,14 @@ export class JobApplicationController {
     // when applicationStatus is "selected" after interview
     static async acceptRejectJobOffer(req: Request, res: Response): Promise<void> {
         try {
-            if (!req.params.applicationId) throw new Error('missing required field');
+            if (!req.params.applicationId) {
+                throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
+            }
             const applicationId = req.params.applicationId as string;
 
             const { action } = req.body;
             if (!action || !['accept', 'reject'].includes(action)) {
-                throw new Error('action must be accept or reject');
+                throw badRequestError('action must be accept or reject', 'INVALID_ACTION');
             }
 
             const userId = req.userInfo.sub as string;
@@ -240,23 +180,8 @@ export class JobApplicationController {
             const result = await acceptOrRejectOffer(applicationId, userId, action as 'accept' | 'reject');
             res.status(200).json(result);
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('missing required field') ||
-                errorMessage.includes('action must be')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-            if (errorMessage.includes('application not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-            if (errorMessage.includes('not a offer can\'t be responded')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }
