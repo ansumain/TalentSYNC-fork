@@ -53,7 +53,7 @@ services:
   #     DB_USER: rms_user
   #     DB_PASSWORD: rms_password
   #     DB_NAME: rms_db
-  #     NODE_ENV: development
+  #     NODE_ENV: production
   #   depends_on:
   #     postgres:
   #       condition: service_healthy
@@ -83,7 +83,7 @@ services:
       EMAIL_PASSWORD: "uqvt jjlk djxl pqtq"
       EMAIL_FROM: "TalentSYNC <mfsi.ansuman@gmail.com>"
       FRONTEND_URL: http://localhost
-      NODE_ENV: development
+      NODE_ENV: production
     depends_on:
       postgres:
         condition: service_healthy
@@ -121,7 +121,7 @@ services:
       RABBIT_MQ_PORT: 5672
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
-      NODE_ENV: development
+      NODE_ENV: production
       EMAIL_SERVICE: gmail
       EMAIL_USER: mfsi.ansuman@gmail.com
       EMAIL_PASSWORD: uqvt jjlk djxl pqtq
@@ -163,7 +163,7 @@ services:
       RABBIT_MQ_PORT: 5672
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
-      NODE_ENV: development
+      NODE_ENV: production
       EMAIL_SERVICE: gmail
       EMAIL_USER: mfsi.ansuman@gmail.com
       EMAIL_PASSWORD: uqvt jjlk djxl pqtq
@@ -199,7 +199,7 @@ services:
       DB_USER: rms_user
       DB_PASSWORD: rms_password
       DB_NAME: rms_db
-      NODE_ENV: development
+      NODE_ENV: production
     depends_on:
       postgres:
         condition: service_healthy
@@ -234,7 +234,7 @@ services:
       RABBIT_MQ_PORT: 5672
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
-      NODE_ENV: development
+      NODE_ENV: production
       EMAIL_SERVICE: gmail
       EMAIL_USER: mfsi.ansuman@gmail.com
       EMAIL_PASSWORD: uqvt jjlk djxl pqtq
@@ -278,7 +278,7 @@ services:
       RABBIT_MQ_PORT: 5672
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
-      NODE_ENV: development
+      NODE_ENV: production
       EMAIL_SERVICE: gmail
       EMAIL_USER: mfsi.ansuman@gmail.com
       EMAIL_PASSWORD: uqvt jjlk djxl pqtq
