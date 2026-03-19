@@ -199,9 +199,8 @@ export function InterviewsTable({
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                          STATUS_COLORS[iv.status] ?? "bg-secondary text-secondary-foreground"
-                        }`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_COLORS[iv.status] ?? "bg-secondary text-secondary-foreground"
+                          }`}
                       >
                         {iv.status}
                       </span>
@@ -209,9 +208,8 @@ export function InterviewsTable({
                     <TableCell>
                       {iv.result ? (
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                            RESULT_COLORS[iv.result] ?? ""
-                          }`}
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${RESULT_COLORS[iv.result] ?? ""
+                            }`}
                         >
                           {iv.result}
                         </span>

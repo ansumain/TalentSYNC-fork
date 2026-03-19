@@ -1,17 +1,42 @@
-export const UPLOAD_ROLES = ['candidate', 'admin', 'manager'];
-export const CANDIDATE_ROLES = ['admin', 'manager'];
-export const JOB_ROLES = ['admin', 'manager'];
-export const APPLICATIONS_ROLES = ['admin', 'manager', 'candidate'];
-export const INTERVIEWS_ROLES = ['admin', 'interviewer', 'manager', 'candidate'];
-export const ANALYTICS_ROLES = ['admin', 'manager'];
-export const ADMIN_ROLES = ['admin'];
+const UPLOAD_ROLES = ['admin', 'manager', 'candidate'];
+const CANDIDATE_ROLES = ['admin', 'manager', 'interviewer'];
+const JOB_MANAGEMENT_ROLES = ['admin', 'manager'];
+const JOB_BOARD_ROLES = ['candidate'];
+const APPLICATIONS_ROLES = ['candidate'];
+const ADMIN_APPLICATIONS_ROLES = ['admin', 'manager'];
+const INTERVIEWS_MANAGEMENT_ROLES = ['admin', 'manager'];
+const MY_INTERVIEWS_ROLES = ['interviewer'];
+const CANDIDATE_INTERVIEWS_ROLES = ['candidate'];
+const ANALYTICS_ROLES = ['admin', 'manager'];
+const ADMIN_ROLES = ['admin'];
+const MY_RESUMES_ROLES = ['candidate'];
 
-export default {
+// export default {
+//   UPLOAD_ROLES,
+//   CANDIDATE_ROLES,
+//   JOB_MANAGEMENT_ROLES,
+//   JOB_BOARD_ROLES,
+//   APPLICATIONS_ROLES,
+//   ADMIN_APPLICATIONS_ROLES,
+//   INTERVIEWS_MANAGEMENT_ROLES,
+//   MY_INTERVIEWS_ROLES,
+//   CANDIDATE_INTERVIEWS_ROLES,
+//   ANALYTICS_ROLES,
+//   ADMIN_ROLES,
+//   MY_RESUMES_ROLES,
+// };
+
+export {
   UPLOAD_ROLES,
   CANDIDATE_ROLES,
-  JOB_ROLES,
+  JOB_MANAGEMENT_ROLES,
+  JOB_BOARD_ROLES,
   APPLICATIONS_ROLES,
-  INTERVIEWS_ROLES,
+  ADMIN_APPLICATIONS_ROLES,
+  INTERVIEWS_MANAGEMENT_ROLES,
+  MY_INTERVIEWS_ROLES,
+  CANDIDATE_INTERVIEWS_ROLES,
   ANALYTICS_ROLES,
   ADMIN_ROLES,
-};
+  MY_RESUMES_ROLES
+}

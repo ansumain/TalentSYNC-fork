@@ -63,7 +63,7 @@ export function NavUser({
 
   const handleLogout = async () => {
     if (isLoggingOut) return
-    
+
     setIsLoggingOut(true)
     try {
       const response = await authService.logout()
