@@ -1,5 +1,6 @@
 import amqp, { ChannelModel } from 'amqplib';
 import { config } from './env';
+import { logger } from '@talentsync/config';
 
 type Channel = amqp.Channel;
 
@@ -27,11 +28,11 @@ const DLX_ROUTING_FAILED = 'failed';
 // connect with the rabbitMQ
 const connectRabbitMQ = async (): Promise<void> => {
     if (isConnecting) {
-        console.log('Connection already in progress');
+        logger.info('Connection already in progress');
         return;
     }
     if (isShuttingDown) {
-        console.log('Shutdown in progress');
+        logger.info('Shutdown in progress');
         return;
     }
 
@@ -48,13 +49,13 @@ const connectRabbitMQ = async (): Promise<void> => {
 
         // Publish channel
         publishChannel = (await connection.createChannel()) as Channel;
-        publishChannel.on('error', (e: Error) => console.error('Publish channel error:', e.message));
-        publishChannel.on('close', () => console.warn('Publish channel closed'));
+        publishChannel.on('error', (e: Error) => logger.error(`Publish channel error: ${e.message}`));
+        publishChannel.on('close', () => logger.warn('Publish channel closed'));
 
         // Consume channel - with prefetch limit
         consumeChannel = (await connection.createChannel()) as Channel;
-        consumeChannel.on('error', (e: Error) => console.error('Consume channel error:', e.message));
-        consumeChannel.on('close', () => console.warn('Consume channel closed'));
+        consumeChannel.on('error', (e: Error) => logger.error(`Consume channel error: ${e.message}`));
+        consumeChannel.on('close', () => logger.warn('Consume channel closed'));
         await consumeChannel.prefetch(config.queues.prefetch);
 
         await setupQueues();
@@ -70,7 +71,7 @@ const connectRabbitMQ = async (): Promise<void> => {
         connection = null;
         publishChannel = null;
         consumeChannel = null;
-        console.error('Failed to connect to RabbitMQ:', error);
+        logger.error(`Failed to connect to RabbitMQ: ${error}`);
         await attemptReconnect();
         throw error;
     }
@@ -95,7 +96,7 @@ const publishToQueue = async (
         { persistent: true, headers }
     );
 
-    console.log(`Published to ${queue}:`, { message, retryCount });
+    logger.info(`Published to ${queue}: ${{ message, retryCount }}`);
 }
 
 // consume the message from queue
@@ -103,12 +104,12 @@ const consumeQueue = async (
     queue: string,
     handler: (content: any) => Promise<void>,
 ): Promise<void> => {
-    console.log('consumption initiated')
+    logger.info('consumption initiated')
     if (!consumeChannel) {
         throw new Error('Consume channel not initialized. Call connectRabbitMQ() first.');
     }
 
-    console.log('consumption started')
+    logger.info('consumption started')
 
     const channel = consumeChannel as Channel;
 
@@ -116,12 +117,12 @@ const consumeQueue = async (
         queue,
         async (message) => {
             if (!message) {
-                console.warn('Received null message');
+                logger.warn('Received null message');
                 return;
             }
 
             if (isShuttingDown) {
-                console.log('Shutdown in progress');
+                logger.info('Shutdown in progress');
                 channel.nack(message, false, true);
                 return;
             }
@@ -142,12 +143,12 @@ const consumeQueue = async (
                 channel.ack(message);
 
             } catch (e: any) {
-                console.error('Message processing failed:', {
+                logger.error(`Message processing failed: ${{
                     messageId: content?.id || 'unknown',
                     retryCount,
                     error: e.message,
                     rawMessage: rawMessage || 'No raw message '
-                });
+                }}`);
 
                 if (retryCount >= MAX_RETRIES) {
                     try {
@@ -162,7 +163,7 @@ const consumeQueue = async (
                         });
                         channel.ack(message);
                     } catch (publishError) {
-                        console.error('Failed to publish to failed_queue:', publishError);
+                        logger.error(`Failed to publish to failed_queue: ${publishError}`);
                         channel.nack(message, false, false);
                     }
 
@@ -173,7 +174,7 @@ const consumeQueue = async (
                         await publishToQueue(RESUME_RETRY_QUEUE, content, nextRetryCount);
                         channel.ack(message);
                     } catch (publishError) {
-                        console.error('Failed to publish to retry queue:', publishError);
+                        logger.error(`Failed to publish to retry queue: ${publishError}`);
                         channel.nack(message, false, true);
                     }
                 }
@@ -192,12 +193,12 @@ const consumeQueue = async (
 // closes channels + connection
 const gracefulShutdown = async (signal: string): Promise<void> => {
     if (isShuttingDown) {
-        console.log('Shutdown already in progress');
+        logger.info('Shutdown already in progress');
         return;
     }
 
     isShuttingDown = true;
-    console.log(`\n${signal} received. Starting graceful shutdown`);
+    logger.info(`\n${signal} received. Starting graceful shutdown`);
 
     try {
         const maxWaitTime = 10000;
@@ -208,34 +209,34 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
         }
 
         if (inFlightMessages > 0) {
-            console.warn(`Timeout: ${inFlightMessages} messages still in-flight. Forcing shutdown.`);
+            logger.warn(`Timeout: ${inFlightMessages} messages still in-flight. Forcing shutdown.`);
         } else {
-            console.log('All in-flight messages processed');
+            logger.info('All in-flight messages processed');
         }
 
         if (consumeChannel) {
             await consumeChannel.close();
             consumeChannel = null;
-            console.log('Consume channel closed');
+            logger.info('Consume channel closed');
         }
 
         if (publishChannel) {
             await publishChannel.close();
             publishChannel = null;
-            console.log('Publish channel closed');
+            logger.info('Publish channel closed');
         }
 
         if (connection) {
             await connection.close();
             connection = null;
-            console.log('RabbitMQ connection closed');
+            logger.info('RabbitMQ connection closed');
         }
 
-        console.log('Graceful shutdown complete');
+        logger.info('Graceful shutdown complete');
         process.exit(0);
 
     } catch (error) {
-        console.error('Error during graceful shutdown:', error);
+        logger.error(`Error during graceful shutdown: ${error}`);
         process.exit(1);
     }
 }
@@ -267,11 +268,11 @@ const setupQueues = async (): Promise<void> => {
 // try to reconnect with a delay if failed to connect initially
 const attemptReconnect = async (): Promise<void> => {
     if (isShuttingDown) {
-        console.log('Shutdown in progress, skipping reconnect');
+        logger.info('Shutdown in progress, skipping reconnect');
         return;
     }
     if (reconnectAttempts >= config.rabbitmq.reconnect.maxAttempts) {
-        console.error(`Max reconnection attempts reached. Exiting`);
+        logger.error(`Max reconnection attempts reached. Exiting`);
         process.exit(1);
     }
 
@@ -283,25 +284,25 @@ const attemptReconnect = async (): Promise<void> => {
     try {
         await connectRabbitMQ();
     } catch (e) {
-        console.error('Reconnect attempt failed:', e);
+        logger.error(`Reconnect attempt failed: ${e}`);
     }
 }
 
 // logs the error in console in case of connection error 
 const handleConnectionError = (error: Error): void => {
-    console.error('RabbitMQ connection error:', error.message);
+    logger.error(`RabbitMQ connection error: ${error.message}`);
 }
 
 // tries to reconnect if rabbitMQ connection is shut unexpectedly
 const handleConnectionClose = (): void => {
     if (!isShuttingDown) {
-        console.warn('RabbitMQ connection closed unexpectedly. Reconnecting');
+        logger.warn('RabbitMQ connection closed unexpectedly. Reconnecting');
         connection = null;
         publishChannel = null;
         consumeChannel = null;
         isConnecting = false;
         attemptReconnect().catch((e) => {
-            console.error('Reconnect failed', e);
+            logger.error('Reconnect failed', e);
         });
     }
 }

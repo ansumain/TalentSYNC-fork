@@ -2,6 +2,7 @@ import { connectRabbitMQ, consumeQueue, gracefulShutdown } from '../config/rabbi
 import { config } from '../config/env';
 import { processExportReport } from '../services/export.service';
 import type { ExportReportQueueMessage } from '../types/Export.type';
+import { logger } from '@talentsync/config';
 
 const startExportWorker = async (): Promise<void> => {
   await connectRabbitMQ();
@@ -10,7 +11,7 @@ const startExportWorker = async (): Promise<void> => {
     await processExportReport(message);
   });
 
-  console.log('[analytics-export-worker] listening for export jobs');
+  logger.info('[analytics-export-worker] listening for export jobs');
 };
 
 process.on('SIGINT', async () => {
@@ -24,6 +25,6 @@ process.on('SIGTERM', async () => {
 });
 
 startExportWorker().catch((error) => {
-  console.error('[analytics-export-worker] failed to start', error);
+  logger.error(`[analytics-export-worker] failed to start: ${error}`);
   process.exit(1);
 });

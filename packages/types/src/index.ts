@@ -11,3 +11,4 @@ export {
 	unauthorizedError,
 } from './error';
 export type { ApiErrorPayload, ApiErrorResponse } from './error';
+export * from './express';

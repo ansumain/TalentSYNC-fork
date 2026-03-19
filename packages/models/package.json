@@ -1,18 +1,15 @@
 {
   "name": "@talentsync/models",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "build": "tsup --format cjs",
+    "dev": "tsup --watch --format cjs"
   },
   "dependencies": {
     "@talentsync/config": "workspace:*"

@@ -1,11 +1,13 @@
 import tesseract from 'node-tesseract-ocr';
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
+// const require = createRequire(import.meta.url);
+const require = createRequire(__filename);
 const pdf = require('pdf-parse');
 import fs from 'fs/promises';
 import { convertPDFToImages } from './pdfToImage';
 import mammoth from 'mammoth';
 import { tesseractConfig } from '../config/tesseract-config';
+import { logger } from '@talentsync/config';
 
 // File - Image
 const getTextUsingOCR = async (filePath: string) => {
@@ -13,7 +15,7 @@ const getTextUsingOCR = async (filePath: string) => {
         const text = await tesseract.recognize(filePath, tesseractConfig);
         return text.trim();
     } catch (error) {
-        console.log('Error parsing image using tesseract', error);
+        logger.error(`Error parsing image using tesseract: ${error}`);
         throw new Error('Error parsing image using tesseract');
     }
 }
@@ -28,7 +30,7 @@ const getTextUsingPdfparse = async (filePath: string) => {
         }
         return data.text.trim();
     } catch (error) {
-        console.log('Error parsing PDF using pdf-parse', error);
+        logger.error(`Error parsing PDF using pdf-parse: ${error}`);
         throw new Error('Error parsing PDF using pdf-parse');
     }
 }
@@ -46,7 +48,7 @@ const extractTextFromPDFImage = async (filePath: string) => {
 
         return textFromPages.join('\n');
     } catch (error) {
-        console.log('Error parsing image based PDF', error);
+        logger.error(`Error parsing image based PDF: ${error}`);
         throw new Error('Error parsing image based PDF');
     }
 }
@@ -57,12 +59,12 @@ export const getTextUsingMammoth = async (filePath: string): Promise<string> => 
         const result = await mammoth.extractRawText({ path: filePath });
 
         if (result.messages.length > 0) {
-            console.log('Mammoth warnings:', result.messages);
+            logger.info(`Mammoth warnings: ${result.messages}`);
         }
 
         return result.value.trim();
     } catch (error) {
-        console.log('Error parsing DOCX with Mammoth:', error);
+        logger.error(`Error parsing DOCX with Mammoth: ${error}`);
         throw new Error('Error parsing DOCX with Mammoth');
     }
 };

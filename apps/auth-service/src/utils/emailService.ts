@@ -1,6 +1,7 @@
 import { config } from '../config/env';
 import nodemailer from 'nodemailer';
 import { internalServerError } from '@talentsync/types';
+import { logger } from '@talentsync/config';
 
 interface EmailOptions {
   to: string;
@@ -17,7 +18,7 @@ const getTransporter = () => {
 
   // If email credentials not configured
   if (!config.emailUser || !config.emailPassword) {
-    console.warn('Email credentials not configured. Emails will be logged to console.');
+    logger.warn('Email credentials not configured.');
     return null;
   }
 
@@ -48,9 +49,9 @@ export const sendEmail = async ({ to, subject, text, html }: EmailOptions): Prom
       text,
       html: html || text,
     });
-    console.log(`Email sent successfully to ${to}`);
+    logger.info(`Email sent successfully to ${to}`);
   } catch (error) {
-    console.error('Failed to send email:', error);
+    logger.error(`Failed to send email: ${error}`);
     throw internalServerError('Failed to send email', 'EMAIL_DELIVERY_FAILED');
   }
 };

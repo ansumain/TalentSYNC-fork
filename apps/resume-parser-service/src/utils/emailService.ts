@@ -1,3 +1,4 @@
+import { logger } from '@talentsync/config';
 import { config } from '../config/env';
 import nodemailer from 'nodemailer';
 
@@ -15,7 +16,7 @@ const getTransporter = () => {
   if (transporter) return transporter;
 
   if (!config.emailUser || !config.emailPassword) {
-    console.warn('Email credentials not configured. Emails will be logged to console.');
+    logger.warn('Email credentials not configured.');
     return null;
   }
 
@@ -44,9 +45,9 @@ const sendEmail = async ({ to, subject, text, html }: EmailOptions): Promise<voi
       text,
       html: html || text,
     });
-    console.log(`Email sent successfully to ${to}`);
+    logger.info(`Email sent successfully to ${to}`);
   } catch (error) {
-    console.error('Failed to send email:', error);
+    logger.error(`Failed to send email: ${error}`);
     throw new Error('Failed to send email');
   }
 };

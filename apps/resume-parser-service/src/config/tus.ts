@@ -8,6 +8,7 @@ import { toApiErrorResponse, unauthorizedError } from '@talentsync/types';
 import { addToResumeData } from '../repository/resume.repository';
 import { publishToQueue } from './rabbitmq';
 import { config } from './env';
+import { logger } from '@talentsync/config';
 
 export const uploadPath = path.join(process.cwd(), 'uploads');
 
@@ -38,8 +39,8 @@ const tusServer = new Server({
     onUploadCreate: async (_req, upload) => {
         const { filename, filetype } = upload.metadata ?? {};
 
-        // console.log('(onUploadCreate) - filename:', filename);
-        // console.log('(onUploadCreate) - filetype:', filetype);
+        // logger.info(`(onUploadCreate) - filename: ${filename}`);
+        // logger.info(`(onUploadCreate) - filetype: ${filetype}`);
 
         if (!filename || !filetype) {
             throw { status_code: 400, body: 'Missing upload metadata' };
@@ -62,8 +63,8 @@ const tusServer = new Server({
         try {
             const { filename, filetype } = upload.metadata ?? {};
 
-            // console.log('(onUploadFinish) - filename:', filename);
-            // console.log('(onUploadFinish) - filetype:', filetype);
+            // logger.info(`(onUploadFinish) - filename: ${filename}`);
+            // logger.info(`(onUploadFinish) - filetype: ${filetype}`);
 
             if (!filename || !filetype) {
                 throw { status_code: 500, body: 'Missing upload metadata on finish' };
@@ -90,7 +91,7 @@ const tusServer = new Server({
 
             return {};
         } catch (error) {
-            console.error('onUploadFinish error:', error);
+            logger.error(`onUploadFinish error: ${error}`);
             throw error;
         }
     }
