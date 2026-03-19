@@ -1,6 +1,5 @@
 import express, { Router } from 'express';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
-import { requiredRole } from '../middlewares/authorization.middleware';
+import { authenticationMiddleware, requiredRole } from '@talentsync/auth-middlewares';
 import { UserRoleController } from '../controllers/userRole.controller';
 const userRoleRouter: Router = express.Router();
 

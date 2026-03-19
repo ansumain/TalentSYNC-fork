@@ -10,7 +10,7 @@ import graphRoutes from './routes/graphs.routes';
 import tableRoutes from './routes/tables.routes';
 import refreshRoutes from './routes/refresh.routes';
 import exportRoutes from './routes/export.routes';
-import { globalErrorHandler, notFoundHandler } from './middlewares/error.middleware';
+import { globalErrorHandler, notFoundHandler } from '@talentsync/auth-middlewares';
 
 const app: Application = express();
 
@@ -18,7 +18,7 @@ app.use(helmet());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 150,
+    max: 300,
     message: 'Too many requests! Please try again after some time',
     standardHeaders: true,
     legacyHeaders: false,

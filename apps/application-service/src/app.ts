@@ -11,7 +11,7 @@ import jobApplicationRoutes from './routes/jobApplication.routes';
 import skillRoutes from './routes/skill.routes';
 import docsRouter from './docs/index';
 import { toApiErrorResponse, AppError } from '@talentsync/types';
-import { notFoundHandler, globalErrorHandler } from './middlewares/error.middleware';
+import { notFoundHandler, globalErrorHandler } from '@talentsync/auth-middlewares';
 
 const app: Application = express();
 
@@ -19,7 +19,7 @@ app.use(helmet());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 20,
+    max: 200,
     message: 'Too many requests! Please try again after some time',
     standardHeaders: true,
     legacyHeaders: false,

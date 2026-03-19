@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { SkillController } from '../controllers/skill.controller';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
+import { authenticationMiddleware } from '@talentsync/auth-middlewares';
 
 const skillRouter: Router = express.Router();
 

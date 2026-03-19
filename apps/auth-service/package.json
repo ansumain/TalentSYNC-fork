@@ -1,10 +1,10 @@
 {
   "name": "@talentsync/auth-service",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "tsx --watch src/server.ts",
-    "build": "esbuild src/server.ts --bundle --platform=node --format=esm --outdir=dist --packages=external",
+    "build": "esbuild src/server.ts --bundle --platform=node --format=cjs --outdir=dist --packages=external",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@talentsync/types": "workspace:*",
     "@talentsync/config": "workspace:*",
-    "@talentsync/models": "workspace:*"
+    "@talentsync/models": "workspace:*",
+    "@talentsync/auth-middlewares": "workspace:*"
   }
 }

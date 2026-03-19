@@ -1,7 +1,6 @@
 import express, { Router } from 'express';
 import { ExportController } from '../controllers/export.controller';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
-import { requiredAnyRole } from '../middlewares/authorization.middleware';
+import { authenticationMiddleware, requiredAnyRole } from '@talentsync/auth-middlewares';
 
 const exportRouter: Router = express.Router();
 

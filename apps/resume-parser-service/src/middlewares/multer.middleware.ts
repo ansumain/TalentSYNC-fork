@@ -12,17 +12,17 @@ if (!fs.existsSync(uploadDir)) {
 
 // destination specification + renaming
 const storage = multer.diskStorage({
-    destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+    destination: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
         cb(null, uploadDir);
     },
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
         const suffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, file.fieldname + '-' + suffix + path.extname(file.originalname));
     }
 });
 
 // accepts only allowed formats
-const FileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+const FileFilter = (_req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
     if (allowedMimeTypes.IMAGE.includes(file.mimetype) || allowedMimeTypes.PDF.includes(file.mimetype) || allowedMimeTypes.DOC.includes(file.mimetype) || allowedMimeTypes.DOCX.includes(file.mimetype)) {
         cb(null, true)
     } else {

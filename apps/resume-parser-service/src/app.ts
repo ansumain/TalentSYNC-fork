@@ -7,10 +7,10 @@ import rateLimit from 'express-rate-limit'
 import path from 'path';
 import { AppError, badRequestError, notFoundError, toApiErrorResponse } from '@talentsync/types';
 import resumeRoutes from './routes/resume.routes'
-import { authenticationMiddleware } from './middlewares/authentication.middleware'
-import { globalErrorHandler, notFoundHandler } from './middlewares/error.middleware';
+import { authenticationMiddleware, globalErrorHandler, notFoundHandler } from '@talentsync/auth-middlewares'
+
 // import { tusHandler } from './config/tus';
-// import { authenticationMiddleware } from './middlewares/authentication.middleware';
+
 
 const app: Application = express();
 
@@ -25,19 +25,19 @@ app.use(helmet());
 // }));
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:4003', 'http://localhost'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'Tus-Resumable', 
-    'Upload-Length', 
-    'Upload-Metadata', 
-    'Upload-Offset',
-    'X-HTTP-Method-Override'
-  ],
-  exposedHeaders: ['Location', 'Upload-Offset', 'Upload-Length', 'Tus-Resumable']
+    origin: ['http://localhost:5173', 'http://localhost:4003', 'http://localhost'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'Tus-Resumable',
+        'Upload-Length',
+        'Upload-Metadata',
+        'Upload-Offset',
+        'X-HTTP-Method-Override'
+    ],
+    exposedHeaders: ['Location', 'Upload-Offset', 'Upload-Length', 'Tus-Resumable']
 }));
 
 

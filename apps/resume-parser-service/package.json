@@ -1,12 +1,12 @@
 {
   "name": "@talentsync/resume-parser-service",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "tsx --watch src/server.ts",
     "worker:dev": "tsx --watch src/worker/resumeParser.worker.ts",
-    "build": "esbuild src/server.ts --bundle --platform=node --format=esm --outdir=dist --packages=external",
-    "worker:build": "esbuild src/worker/resumeParser.worker.ts --bundle --platform=node --format=esm --outdir=dist/worker --packages=external",
+    "build": "esbuild src/server.ts --bundle --platform=node --format=cjs --outdir=dist --packages=external",
+    "worker:build": "esbuild src/worker/resumeParser.worker.ts --bundle --platform=node --format=cjs --outdir=dist/worker --packages=external",
     "worker:start": "node dist/worker/resumeParser.worker.js",
     "start": "node dist/server.js",
     "test": "jest",
@@ -17,6 +17,7 @@
     "@talentsync/config": "workspace:*",
     "@talentsync/models": "workspace:*",
     "@talentsync/types": "workspace:*",
+    "@talentsync/auth-middlewares": "workspace:*",
     "@tus/file-store": "^2.0.0",
     "@tus/server": "^2.3.0",
     "mammoth": "^1.11.0",

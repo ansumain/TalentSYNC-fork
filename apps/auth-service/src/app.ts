@@ -13,7 +13,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { AppError, toApiErrorResponse } from '@talentsync/types';
-import { globalErrorHandler, notFoundHandler } from './middlewares/error.middleware';
+import { globalErrorHandler, notFoundHandler } from '@talentsync/auth-middlewares'
 
 const app: Application = express();
 
@@ -21,7 +21,7 @@ app.use(helmet());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 200,
   message: 'Too many requests! Please try again after some time',
   standardHeaders: true,
   legacyHeaders: false,
