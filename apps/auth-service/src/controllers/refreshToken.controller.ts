@@ -22,7 +22,7 @@ export class RefreshTokenController {
 
     } catch (error) {
       if (isAppError(error) && error.statusCode === 401) {
-        res.clearCookie('refresh_token', { ...cookieOptions, path: '/auth/refresh-token' });
+        res.clearCookie('refresh_token', { ...cookieOptions, path: '/api/auth/refresh-token' });
       }
       throw error;
     }

@@ -21,7 +21,7 @@ export class LoginUserController {
 
       res.cookie('refresh_token', tokens.refreshToken, {
         ...cookieOptions,
-        path: '/auth/refresh-token',
+        path: '/api/auth/refresh-token',
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 

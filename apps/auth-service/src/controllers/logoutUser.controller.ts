@@ -18,7 +18,7 @@ export class LogoutUserController {
       });
       res.clearCookie('refresh_token', {
         ...cookieOptions,
-        path: '/auth/refresh-token',
+        path: '/api/auth/refresh-token',
       });
 
       res.status(200).json({
