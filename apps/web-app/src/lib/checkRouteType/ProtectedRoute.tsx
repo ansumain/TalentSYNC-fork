@@ -2,7 +2,6 @@ import type { ReactElement } from 'react'
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { RouteLoader } from '../../components/RouteLoader';
-import { getDefaultRouteForRoles } from '../auth/defaultRoute';
 
 interface ProtectedRouteProps {
     children: ReactElement;
@@ -19,14 +18,11 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     if (!user) return <Navigate to="/signin" state={{ from: location }} replace />;
 
     if (allowedRoles && allowedRoles.length > 0) {
-        const hasAllowedRole = user.roles?.some(role => allowedRoles.includes(role));
+        const normalizedAllowedRoles = new Set(allowedRoles.map((role) => role.toLowerCase()));
+        const hasAllowedRole = (user.roles ?? []).some((role) => normalizedAllowedRoles.has(role.toLowerCase()));
 
         if (!hasAllowedRole) {
-            const fallbackPath = getDefaultRouteForRoles(user.roles);
-            // const safeFallbackPath = fallbackPath === location.pathname ? '/signin' : fallbackPath;
-            // return <Navigate to={safeFallbackPath} replace />;
-
-            return <Navigate to={fallbackPath} replace />;
+            return <Navigate to="/unauthorized" replace state={{ from: `${location.pathname}${location.search}${location.hash}` }} />;
         }
     }
 

@@ -1,6 +1,6 @@
 // App Routes Component
 
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { ProtectedRoute } from '../lib/checkRouteType/ProtectedRoute';
@@ -42,7 +42,20 @@ const AnalyticsDashboardPage = lazy(() => import('../pages/AnalyticsDashboardPag
 
 function AppRoutes() {
   const user = useAuthStore((state: { user: { roles: string[] } | null }) => state.user);
+  const loading = useAuthStore((state: { loading: boolean }) => state.loading);
+  const location = useLocation();
   const homeRedirectPath = getDefaultRouteForRoles(user?.roles);
+
+  if (loading) {
+    return <RouteLoader />;
+  }
+
+  if (location.pathname.length > 1 && location.pathname.endsWith('/')) {
+    const normalizedPath = location.pathname.replace(/\/+$/, '');
+    const normalizedTarget = `${normalizedPath}${location.search}${location.hash}`;
+
+    return <Navigate to={normalizedTarget} replace />;
+  }
 
   return (
     <RouteErrorBoundary>
@@ -67,52 +80,56 @@ function AppRoutes() {
           <Route
             path='/signin'
             element={
-              user ? (
-                <Navigate to={homeRedirectPath} replace />
-              ) : (
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              )
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
             }
           />
 
           <Route
             path='/signup'
             element={
-              user ? (
-                <Navigate to={homeRedirectPath} replace />
-              ) : (
-                <PublicRoute>
-                  <SignupPage />
-                </PublicRoute>
-              )
+              <PublicRoute>
+                <SignupPage />
+              </PublicRoute>
             }
           />
 
           <Route
             path='/forgot-password'
             element={
-              user ? (
-                <Navigate to={homeRedirectPath} replace />
-              ) : (
-                <PublicRoute>
-                  <ForgotPasswordPage />
-                </PublicRoute>
-              )
+              <PublicRoute>
+                <ForgotPasswordPage />
+              </PublicRoute>
             }
           />
 
           <Route
             path='/reset-password'
             element={
-              user ? (
-                <Navigate to={homeRedirectPath} replace />
-              ) : (
-                <PublicRoute>
-                  <ResetPasswordPage />
-                </PublicRoute>
-              )
+              <PublicRoute>
+                <ResetPasswordPage />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path='/unauthorized'
+            element={
+              <div className='flex min-h-screen items-center justify-center bg-background px-4'>
+                <div className='w-full max-w-md rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm'>
+                  <h2 className='text-lg font-semibold'>Access denied</h2>
+                  <p className='mt-2 text-sm text-muted-foreground'>
+                    You do not have permission to access this route.
+                  </p>
+                  <Link
+                    to={user ? homeRedirectPath : '/signin'}
+                    className='mt-4 inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90'
+                  >
+                    {user ? 'Go to my dashboard' : 'Go to sign in'}
+                  </Link>
+                </div>
+              </div>
             }
           />
 
@@ -245,8 +262,8 @@ function AppRoutes() {
           />
 
           {/* FALLBACK ROUTE */}
-          {/* invalid routes are redirected to signin - add page-not-found Page*/}
-          <Route path='*' element={<Navigate to='/signin' replace />} />
+          {/* invalid routes are redirected to home/signin */}
+          <Route path='*' element={<Navigate to={user ? homeRedirectPath : '/signin'} replace />} />
         </Routes>
       </Suspense>
     </RouteErrorBoundary>
