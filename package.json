@@ -10,7 +10,13 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,js,json,css,md,tsx,jsx}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "migrate": "npx sequelize-cli db:migrate",
+    "undo-migrations": "npx sequelize-cli db:migrate:undo:all",
+    "seed": "npx sequelize-cli db:seed:all",
+    "undo-seeders": "npx sequelize-cli db:seed:undo:all",
+    "add-migration": "npx sequelize-cli migration:generate --name",
+    "add-seeder": "npx sequelize-cli seed:generate --name"
   },
   "dependencies": {
     "amqplib": "^0.10.9",
