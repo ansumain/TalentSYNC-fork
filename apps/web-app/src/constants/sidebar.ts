@@ -71,7 +71,7 @@ const navigationByRole = {
             isActive: true,
             items: [
                 {
-                    title: "My Candidates",
+                    title: "Candidates",
                     url: "/candidates",
                 }
             ],

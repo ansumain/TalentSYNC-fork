@@ -1,9 +1,21 @@
 import { useEffect, useRef } from 'react';
-import { authService } from '@/lib/api/auth.service';
+import { renewAccessToken } from '@/lib/api/client';
 import { useAuthStore } from '@/stores/authStore';
 import { useNavigate } from 'react-router-dom';
+import type { ApiError } from '../types/Client.type';
 
 const REFRESH_INTERVAL = 13 * 60 * 1000;
+
+function isAuthFailure(error: unknown): boolean {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const apiError = error as Partial<ApiError>;
+  const status = apiError.status ?? apiError.statusCode;
+
+  return status === 401 || status === 403;
+}
 
 export function GetAccessTokenFromRefreshTokenInterval() {
   const user = useAuthStore((state) => state.user);
@@ -14,10 +26,12 @@ export function GetAccessTokenFromRefreshTokenInterval() {
   useEffect(() => {
     async function refresh() {
       try {
-        await authService.refreshToken();
-      } catch {
-        clearUser();
-        navigate('/signin', { replace: true });
+        await renewAccessToken();
+      } catch (error) {
+        if (isAuthFailure(error)) {
+          clearUser();
+          navigate('/signin', { replace: true });
+        }
       }
     }
 
