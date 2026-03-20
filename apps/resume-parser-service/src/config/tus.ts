@@ -4,9 +4,11 @@ import path from 'path';
 import fs from 'fs';
 import { AsyncLocalStorage } from 'async_hooks';
 import { Request, Response } from 'express';
+import { toApiErrorResponse, unauthorizedError } from '@talentsync/types';
 import { addToResumeData } from '../repository/resume.repository';
 import { publishToQueue } from './rabbitmq';
 import { config } from './env';
+import { logger } from '@talentsync/config';
 
 export const uploadPath = path.join(process.cwd(), 'uploads');
 
@@ -34,11 +36,11 @@ const tusServer = new Server({
         directory: uploadPath
     }),
 
-    onUploadCreate: async (req, upload) => {
+    onUploadCreate: async (_req, upload) => {
         const { filename, filetype } = upload.metadata ?? {};
 
-        // console.log('(onUploadCreate) - filename:', filename);
-        // console.log('(onUploadCreate) - filetype:', filetype);
+        // logger.info(`(onUploadCreate) - filename: ${filename}`);
+        // logger.info(`(onUploadCreate) - filetype: ${filetype}`);
 
         if (!filename || !filetype) {
             throw { status_code: 400, body: 'Missing upload metadata' };
@@ -48,7 +50,7 @@ const tusServer = new Server({
             throw { status_code: 400, body: 'Unsupported file type' };
         }
 
-        // Read userId from AsyncLocalStorage — set by tusHandler before calling handle()
+        // Read userId from AsyncLocalStorage - set by tusHandler before calling handle()
         const userId = userStorage.getStore();
         if (!userId) throw { status_code: 401, body: 'Unauthorized upload' };
 
@@ -57,12 +59,12 @@ const tusServer = new Server({
         return {};
     },
 
-    onUploadFinish: async (req, upload) => {
+    onUploadFinish: async (_req, upload) => {
         try {
             const { filename, filetype } = upload.metadata ?? {};
 
-            // console.log('(onUploadFinish) - filename:', filename);
-            // console.log('(onUploadFinish) - filetype:', filetype);
+            // logger.info(`(onUploadFinish) - filename: ${filename}`);
+            // logger.info(`(onUploadFinish) - filetype: ${filetype}`);
 
             if (!filename || !filetype) {
                 throw { status_code: 500, body: 'Missing upload metadata on finish' };
@@ -89,7 +91,7 @@ const tusServer = new Server({
 
             return {};
         } catch (error) {
-            console.error('onUploadFinish error:', error);
+            logger.error(`onUploadFinish error: ${error}`);
             throw error;
         }
     }
@@ -98,10 +100,12 @@ const tusServer = new Server({
 export const tusHandler = (req: Request, res: Response) => {
     const userId = (req as any).userInfo?.sub;
     if (!userId) {
-        res.status(401).json({ error: 'Unauthorized upload' });
+        res.status(401).json(
+            toApiErrorResponse(unauthorizedError('Unauthorized upload', 'UNAUTHORIZED_UPLOAD'))
+        );
         return;
     }
-    // Run tusServer.handle inside userStorage context — propagates userId
+    // Run tusServer.handle inside userStorage context - propagates userId
     // to ALL async callbacks (onUploadCreate, onUploadFinish) regardless of req wrapping
     userStorage.run(userId, () => {
         tusServer.handle(req, res);

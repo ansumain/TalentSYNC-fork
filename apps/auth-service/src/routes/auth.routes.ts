@@ -4,7 +4,7 @@ import { RegisterUserController } from '../controllers/registerUser.controller';
 import { LoginUserController } from '../controllers/loginUser.controller';
 import { LogoutUserController } from '../controllers/logoutUser.controller';
 import { RefreshTokenController } from '../controllers/refreshToken.controller';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
+import { authenticationMiddleware } from '@talentsync/auth-middlewares';
 import { RequestPasswordResetController } from '../controllers/requestPasswordReset.controller';
 import { ResetPasswordController } from '../controllers/resetPassword.controller';
 

@@ -1,48 +1,8 @@
 import { apiClient } from './client';
 import { API_ENDPOINTS } from './config';
+import type { RegisterData, RegisterResponse, LoginData, LoginResponse, ForgotPasswordData, ForgotPasswordResponse, ResetPasswordData, ResetPasswordResponse } from '../types/AuthService.type';
 
-export interface RegisterData {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-}
-
-export interface RegisterResponse {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  message: string;
-}
-
-export interface ForgotPasswordData {
-  email: string;
-}
-
-export interface ForgotPasswordResponse {
-  message: string;
-}
-
-export interface ResetPasswordData {
-  email: string;
-  otp: string;
-  newPassword: string;
-}
-
-export interface ResetPasswordResponse {
-  message: string;
-}
-
-export const authService = {
+const authService = {
   async register(data: RegisterData): Promise<RegisterResponse> {
     return apiClient.post<RegisterResponse>(API_ENDPOINTS.AUTH.REGISTER, data);
   },
@@ -63,7 +23,9 @@ export const authService = {
     return apiClient.post<ResetPasswordResponse>(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
   },
 
-  async refreshToken(): Promise<{accessToken: string}> {
-    return apiClient.post<{accessToken: string}>(API_ENDPOINTS.AUTH.REFRESH);
+  async refreshToken(): Promise<{ message: string }> {
+    return apiClient.post<{ message: string }>(API_ENDPOINTS.AUTH.REFRESH);
   },
 };
+
+export { authService }

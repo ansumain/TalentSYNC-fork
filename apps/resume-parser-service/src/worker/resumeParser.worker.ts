@@ -3,15 +3,16 @@ import { config } from "../config/env";
 import { parseResume } from "../services/parseResume.service";
 import { getResumeByResumeId, updateAfterParsing, updateStatusByResumeId } from "../repository/resume.repository";
 import { linkOrCreateUserForResume } from "../utils/linkOrCreateUserForResume";
+import { logger } from "@talentsync/config";
 
 // function to start the worker - resume parising worker
 const startWorker = async () => {
     // connects to rabbitMQ
     await connectRabbitMQ().catch((err) => {
-        console.log('Initial Connection Failed! Reconnecting...', err);
+        logger.info(`Initial Connection Failed! Reconnecting... : ${err}`);
     });
 
-    console.log('Worker starting consuming')
+    logger.info('Worker starting consuming')
     // starts the consumption of the messages from the queue
     await consumeQueue(config.queues.resumeParse, async ({ resumeId }) => {
         try {
@@ -31,13 +32,14 @@ const startWorker = async () => {
 
             // update resume status to completed
             await updateStatusByResumeId(resumeId, 'completed');
-        } catch (e: any) {
+        } catch (e: unknown) {
             // update resume status to failed
-            await updateStatusByResumeId(resumeId, 'failed', e.message);
+            const errorMessage = e instanceof Error ? e.message : 'parsing failed';
+            await updateStatusByResumeId(resumeId, 'failed', errorMessage);
             throw e;
         }
     })
 
 }
 
-startWorker().catch(console.error);
+startWorker().catch(logger.error);

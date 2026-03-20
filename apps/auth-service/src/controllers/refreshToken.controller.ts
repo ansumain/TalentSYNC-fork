@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { isAppError } from '@talentsync/types';
 import { refreshToken } from '../services/refreshToken.service';
 import { cookieOptions } from '../utils/cookieOptions';
 
@@ -19,37 +20,11 @@ export class RefreshTokenController {
         message: 'Access Token Renewed Successfully!',
       });
 
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-
-      // 400 - Validation errors
-      if (errorMessage.includes('Missing required field')) {
-        res.status(400).json({ error: errorMessage });
-        return;
+    } catch (error) {
+      if (isAppError(error) && error.statusCode === 401) {
+        res.clearCookie('refresh_token', { ...cookieOptions, path: '/api/auth/refresh-token' });
       }
-
-      // 401 - Invalid/expired/revoked token
-      if (
-        errorMessage.includes('Invalid token') ||
-        errorMessage.includes('Invalid or expired refresh token')
-      ) {
-        res.clearCookie('refresh_token', { ...cookieOptions, path: '/auth/refresh-token' });
-        res.status(401).json({ error: errorMessage });
-        return;
-      }
-
-      // 404 - User/Role not found
-      if (
-        errorMessage.includes('User not found') ||
-        errorMessage.includes('User has no assigned role') ||
-        errorMessage.includes('Role not found')
-      ) {
-        res.status(404).json({ error: errorMessage });
-        return;
-      }
-
-      // 500 - Unexpected errors
-      res.status(500).json({ error: 'Internal server error' });
+      throw error;
     }
   }
 }

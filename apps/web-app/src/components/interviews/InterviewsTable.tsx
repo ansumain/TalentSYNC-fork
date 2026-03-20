@@ -193,15 +193,14 @@ export function InterviewsTable({
                     <TableCell className="font-medium">
                       {app?.candidateName ?? <span className="text-xs text-muted-foreground">Unknown candidate</span>}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{app?.jobTitle ?? "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{app?.jobTitle ?? "-"}</TableCell>
                     <TableCell className="whitespace-nowrap text-muted-foreground">
                       {new Date(iv.scheduledAt).toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                          STATUS_COLORS[iv.status] ?? "bg-secondary text-secondary-foreground"
-                        }`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_COLORS[iv.status] ?? "bg-secondary text-secondary-foreground"
+                          }`}
                       >
                         {iv.status}
                       </span>
@@ -209,14 +208,13 @@ export function InterviewsTable({
                     <TableCell>
                       {iv.result ? (
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                            RESULT_COLORS[iv.result] ?? ""
-                          }`}
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${RESULT_COLORS[iv.result] ?? ""
+                            }`}
                         >
                           {iv.result}
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <span className="text-xs text-muted-foreground">-</span>
                       )}
                     </TableCell>
                     <TableCell>

@@ -1,7 +1,6 @@
 import express, { Router } from 'express';
 import { JobApplicationController } from '../controllers/jobApplication.controller';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
-import { requiredAnyRole } from '../middlewares/authorization.middleware';
+import { authenticationMiddleware, requiredAnyRole } from '@talentsync/auth-middlewares';
 const jobApplicationRouter: Router = express.Router();
 
 jobApplicationRouter.get('/', authenticationMiddleware, requiredAnyRole(['admin', 'manager']), JobApplicationController.getAllApplications);

@@ -27,8 +27,8 @@ export function JobApplicationsPieChart({ data }: JobApplicationsPieChartProps) 
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={82}
-            innerRadius={44}
+            outerRadius={85}
+            innerRadius={40}
             paddingAngle={2}
           >
             {chartData.map((entry, index) => (

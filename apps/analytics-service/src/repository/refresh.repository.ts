@@ -1,6 +1,7 @@
 import { QueryTypes } from 'sequelize';
 import type { Transaction } from 'sequelize';
 import { sequelize } from '@talentsync/config';
+import { internalServerError } from '@talentsync/types';
 import type { RefreshRunStatus } from '../types/Refresh.type';
 
 type TriggeredBy = 'cron' | 'manual';
@@ -25,7 +26,7 @@ const insertRefreshRunRepository = async (
   );
 
   if (!Array.isArray(rows) || rows.length === 0) {
-    throw new Error('failed to create refresh run');
+    throw internalServerError('failed to create refresh run', 'REFRESH_RUN_CREATE_FAILED');
   }
 
   return Number(rows[0].refreshId);

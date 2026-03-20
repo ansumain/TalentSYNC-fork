@@ -3,22 +3,6 @@ import { SquareTerminal } from "lucide-react"
 const navigationByRole = {
     candidate: [
         {
-            title: "Resume",
-            url: "#",
-            icon: SquareTerminal,
-            isActive: true,
-            items: [
-                {
-                    title: "Upload Resume",
-                    url: "/upload",
-                },
-                {
-                    title: "My Resumes",
-                    url: "/my-resumes",
-                }
-            ],
-        },
-        {
             title: "Jobs",
             url: "#",
             icon: SquareTerminal,
@@ -29,7 +13,7 @@ const navigationByRole = {
                     url: "/job-board",
                 },
                 {
-                    title: "Applied",
+                    title: "My Applications",
                     url: "/my-applications",
                 }
             ],
@@ -47,6 +31,22 @@ const navigationByRole = {
                 {
                     title: "Completed",
                     url: "/candidate-interviews?status=completed",
+                }
+            ],
+        },
+        {
+            title: "Resume",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Upload Resume",
+                    url: "/upload",
+                },
+                {
+                    title: "My Resumes",
+                    url: "/my-resumes",
                 }
             ],
         }
@@ -79,14 +79,14 @@ const navigationByRole = {
     ],
     manager: [
         {
-            title: "Interviews",
+            title: "Analytics",
             url: "#",
             icon: SquareTerminal,
             isActive: true,
             items: [
                 {
-                    title: "Manage Interviews",
-                    url: "/interviews",
+                    title: "Dashboard",
+                    url: "/analytics",
                 },
             ],
         },
@@ -123,20 +123,6 @@ const navigationByRole = {
             ]
         },
         {
-            title: "Analytics",
-            url: "#",
-            icon: SquareTerminal,
-            isActive: true,
-            items: [
-                {
-                    title: "Dashboard",
-                    url: "/analytics",
-                },
-            ],
-        }
-    ],
-    admin: [
-        {
             title: "Interviews",
             url: "#",
             icon: SquareTerminal,
@@ -145,6 +131,20 @@ const navigationByRole = {
                 {
                     title: "Manage Interviews",
                     url: "/interviews",
+                },
+            ],
+        }
+    ],
+    admin: [
+        {
+            title: "Analytics",
+            url: "#",
+            icon: SquareTerminal,
+            isActive: true,
+            items: [
+                {
+                    title: "Dashboard",
+                    url: "/analytics",
                 },
             ],
         },
@@ -181,17 +181,17 @@ const navigationByRole = {
             ],
         },
         {
-            title: "Analytics",
+            title: "Interviews",
             url: "#",
             icon: SquareTerminal,
             isActive: true,
             items: [
                 {
-                    title: "Dashboard",
-                    url: "/analytics",
+                    title: "Manage Interviews",
+                    url: "/interviews",
                 },
             ],
-        }
+        },
     ]
 }
 

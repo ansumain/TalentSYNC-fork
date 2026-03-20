@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { badRequestError } from '@talentsync/types';
 import { addAJob, deleteExistingJob, getJobById, getAllJobs, updateExistingJob } from '../services/job.service';
 import { CreateJob } from '../types/Job.type';
 import { parsePaginationParams } from '../utils/parsePaginationParams';
@@ -14,13 +15,15 @@ export class JobController {
                 req.body.openings === undefined ||
                 !req.body.location ||
                 !req.body.jobType
-            ) throw new Error('missing required field');
+            ) throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
 
             const userId = req.userInfo.sub as string;
 
             const { title, description, location, jobType, openings, skillIds } = req.body;
 
-            if (!Number.isInteger(openings) || openings < 1) throw new Error('invalid openings');
+            if (!Number.isInteger(openings) || openings < 1) {
+                throw badRequestError('invalid openings', 'INVALID_OPENINGS');
+            }
 
             const newJob = {
                 title: title.trim(),
@@ -33,7 +36,9 @@ export class JobController {
             }
 
             for (const key of Object.keys(newJob) as Array<keyof typeof newJob>)
-                if (typeof newJob[key] === 'string' && newJob[key].length === 0) throw new Error('missing required field');
+                if (typeof newJob[key] === 'string' && newJob[key].length === 0) {
+                    throw badRequestError('missing required field', 'MISSING_REQUIRED_FIELD');
+                }
 
             const newJobCreated = await addAJob(newJob);
 
@@ -41,15 +46,8 @@ export class JobController {
                 res.status(201).json(newJobCreated);
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('missing required field')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -67,9 +65,8 @@ export class JobController {
                 limit: result.limit,
                 totalPages: result.totalPages,
             });
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -77,7 +74,7 @@ export class JobController {
     static async getJobById(req: Request, res: Response): Promise<void> {
         try {
 
-            if (!req.params.jobId) throw new Error('Missing required field');
+            if (!req.params.jobId) throw badRequestError('Missing required field', 'MISSING_REQUIRED_FIELD');
             const jobId = req.params.jobId as string;
 
             const job = await getJobById(jobId);
@@ -86,21 +83,15 @@ export class JobController {
                 res.status(200).json({ job });
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('job not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
     // update job
     static async updateExistingJob(req: Request, res: Response): Promise<void> {
         try {
-            if (!req.params.jobId) throw new Error('Missing required field');
+            if (!req.params.jobId) throw badRequestError('Missing required field', 'MISSING_REQUIRED_FIELD');
             const jobId = req.params.jobId as string;
 
             const { title, description, location, jobType, openings } = req.body;
@@ -112,11 +103,15 @@ export class JobController {
             if (jobType) fieldsToUpdate.jobType = jobType.trim();
 
             if (openings !== undefined) {
-                if (!Number.isInteger(openings) || openings < 1) throw new Error('invalid openings');
+                if (!Number.isInteger(openings) || openings < 1) {
+                    throw badRequestError('invalid openings', 'INVALID_OPENINGS');
+                }
                 fieldsToUpdate.openings = openings;
             }
 
-            if (Object.keys(fieldsToUpdate).length === 0) throw new Error('no input');
+            if (Object.keys(fieldsToUpdate).length === 0) {
+                throw badRequestError('no input', 'NO_INPUT');
+            }
 
             const updatedJob = await updateExistingJob(jobId, fieldsToUpdate);
 
@@ -124,24 +119,8 @@ export class JobController {
                 res.status(200).json(updatedJob);
             }
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('no input')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            if (errorMessage.includes('invalid openings')) {
-                res.status(400).json({ error: errorMessage });
-                return;
-            }
-
-            if (errorMessage.includes('job not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -149,21 +128,14 @@ export class JobController {
     static async deleteExistingJob(req: Request, res: Response): Promise<void> {
         try {
 
-            if (!req.params.jobId) throw new Error('Missing required field');
+            if (!req.params.jobId) throw badRequestError('Missing required field', 'MISSING_REQUIRED_FIELD');
             const jobId = req.params.jobId as string;
 
             const deleteJob = await deleteExistingJob(jobId);
             if (deleteJob) res.status(204).send();
 
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Internal server error';
-
-            if (errorMessage.includes('job not found')) {
-                res.status(404).json({ error: errorMessage });
-                return;
-            }
-
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }

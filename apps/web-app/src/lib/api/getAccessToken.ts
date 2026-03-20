@@ -15,16 +15,21 @@ export function GetAccessTokenFromRefreshTokenInterval() {
     async function refresh() {
       try {
         await authService.refreshToken();
-      } catch (e) {
+      } catch {
         clearUser();
         navigate('/signin', { replace: true });
       }
     }
 
-    if (user) {
-      intervalIdRef.current = setInterval(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible' && user) {
         refresh();
-      }, REFRESH_INTERVAL);
+      }
+    }
+
+    if (user) {
+      intervalIdRef.current = setInterval(refresh, REFRESH_INTERVAL);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
     return () => {
@@ -32,7 +37,9 @@ export function GetAccessTokenFromRefreshTokenInterval() {
         clearInterval(intervalIdRef.current);
         intervalIdRef.current = null;
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [user, clearUser, navigate]);
+
 }
 

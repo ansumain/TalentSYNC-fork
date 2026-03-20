@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { badRequestError } from '@talentsync/types';
 import { getDefaultDateRange } from "../utils/getDefaultDateRange";
 import { getAllGraphData } from "../services/graphs.service";
 
@@ -13,20 +14,17 @@ export class Graphs {
             const topInput = Number(req.query.top ?? 5);
 
             if (!isValidDateOnly(fromDate) || !isValidDateOnly(toDate)) {
-                res.status(400).json({ error: 'invalid date range' });
-                return;
+                throw badRequestError('invalid date range', 'INVALID_DATE_RANGE');
             }
 
             if (![3, 5, 10].includes(topInput)) {
-                res.status(400).json({ error: 'top must be 3, 5, or 10' });
-                return;
+                throw badRequestError('top must be 3, 5, or 10', 'INVALID_TOP_VALUE');
             }
 
             const graphData = await getAllGraphData(fromDate, toDate, topInput as 3 | 5 | 10);
             res.status(200).json({ graphData });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }

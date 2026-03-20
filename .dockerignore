@@ -4,6 +4,13 @@
 **/.env.*
 **/coverage
 **/*.log
+.turbo
+.pnpm-store
+.idea
+.vscode
+tmp
+temp
+uploads
 .git
 .gitignore
 .github

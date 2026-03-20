@@ -3,11 +3,12 @@ import { config } from './config/env';
 import { sequelize } from '@talentsync/config';
 import { startAnalyticsRefreshScheduler } from './services/refresh.scheduler';
 import { connectRabbitMQ, gracefulShutdown as gracefulRabbitShutdown } from './config/rabbitmq';
+import { logger } from '@talentsync/config';
 
 process.on('uncaughtException', (error: Error) => {
-  console.error('Uncaught Exception:', error);
+  logger.error(`Uncaught Exception: ${error}`);
   setTimeout(() => {
-    console.error('Forced exit after uncaughtException timeout');
+    logger.error('Forced exit after uncaughtException timeout');
     process.exit(1);
   }, 15000).unref();
 });
@@ -15,19 +16,19 @@ process.on('uncaughtException', (error: Error) => {
 const startServer = async (): Promise<void> => {
   try {
     await sequelize.authenticate();
-    console.log('Database connected successfully');
+    logger.info('Database connected successfully');
 
     await connectRabbitMQ();
-    console.log('RabbitMQ connected successfully');
+    logger.info('RabbitMQ connected successfully');
 
     app.listen(config.port, () => {
-      console.log(`Analytics service running on port ${config.port}`);
+      logger.info(`Analytics service running on port ${config.port}`);
     });
 
     startAnalyticsRefreshScheduler();
 
   } catch (error) {
-    console.error('Unable to start Application service:', error);
+    logger.error(`Unable to start Application service: ${error}`);
     process.exit(1);
   }
 };

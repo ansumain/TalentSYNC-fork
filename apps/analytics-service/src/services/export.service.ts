@@ -1,5 +1,6 @@
 import { config } from '../config/env';
 import { publishToQueue } from '../config/rabbitmq';
+import { badRequestError } from '@talentsync/types';
 import { getUserEmailByIdRepository } from '../repository/export.repository';
 import { getAllCounterDataRepository } from '../repository/counters.repository';
 import { getAllGraphDataRepository } from '../repository/graphs.repository';
@@ -25,7 +26,7 @@ const normalizeFilters = (input: Partial<ExportFilters>): ExportFilters => {
   const toDate = input.toDate ?? defaults.toDate;
 
   if (!isValidDateOnly(fromDate) || !isValidDateOnly(toDate)) {
-    throw new Error('invalid date range');
+    throw badRequestError('invalid date range', 'INVALID_DATE_RANGE');
   }
 
   const top = [3, 5, 10].includes(Number(input.top)) ? (Number(input.top) as 3 | 5 | 10) : 5;

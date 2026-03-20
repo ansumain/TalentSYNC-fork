@@ -4,6 +4,11 @@ import { LoginUserOutput } from '../types/LoginUserOutput';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/env';
+import {
+  badRequestError,
+  notFoundError,
+  unauthorizedError,
+} from '@talentsync/types';
 import RefreshToken from '../models/RefreshToken';
 import UserRole from '../models/UserRole';
 import Role from '../models/Role';
@@ -11,24 +16,26 @@ import Role from '../models/Role';
 // login user service
 export const loginUser = async ({ email, password }: LoginUserInput): Promise<LoginUserOutput> => {
   // required fields must not be null
-  if (!email || !password) throw new Error('Missing required field');
+  if (!email || !password) throw badRequestError('Missing required field', 'MISSING_REQUIRED_FIELD');
 
   // User trying to login must exist
   const user = await User.findOne({ where: { email } });
-  if (!user) throw new Error('User not found');
+  if (!user) throw notFoundError('User not found', 'USER_NOT_FOUND');
 
   // check if valid password is entered
   const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
-  if (!isPasswordValid) throw new Error('Invalid Password');
+  if (!isPasswordValid) throw unauthorizedError('Invalid Password', 'INVALID_PASSWORD');
 
   // Fetch user's role(s)
   const userRoles = await UserRole.findAll({ where: { userId: user.id } });
-  if (!userRoles || userRoles.length === 0) throw new Error('User has no assigned role');
+  if (!userRoles || userRoles.length === 0) {
+    throw notFoundError('User has no assigned role', 'USER_ROLE_NOT_FOUND');
+  }
 
   // Get the first role details
   const firstUserRole = userRoles[0];
   const role = await Role.findOne({ where: { id: firstUserRole.roleId } });
-  if (!role) throw new Error('Role not found');
+  if (!role) throw notFoundError('Role not found', 'ROLE_NOT_FOUND');
 
   // create the access token
   const accessToken = jwt.sign(
@@ -42,7 +49,6 @@ export const loginUser = async ({ email, password }: LoginUserInput): Promise<Lo
     },
     config.accessTokenSecret as string,
     {
-      /* eslint-disable @typescript-eslint/no-explicit-any */
       expiresIn: config.jwtExpiresIn as any,
     }
   );

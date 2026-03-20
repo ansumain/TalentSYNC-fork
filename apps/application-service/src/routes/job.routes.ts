@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { JobController } from '../controllers/job.controller';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
+import { authenticationMiddleware } from '@talentsync/auth-middlewares';
 const jobRouter: Router = express.Router();
 
 jobRouter.post('/', authenticationMiddleware, JobController.addAJob);

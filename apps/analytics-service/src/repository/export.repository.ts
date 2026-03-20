@@ -1,5 +1,6 @@
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '@talentsync/config';
+import { notFoundError } from '@talentsync/types';
 
 const getUserEmailByIdRepository = async (userId: string): Promise<string> => {
     const [row] = await sequelize.query<{ email: string }>(
@@ -13,7 +14,9 @@ const getUserEmailByIdRepository = async (userId: string): Promise<string> => {
         }
     );
 
-    if (!row?.email) throw new Error('requesting user email not found');
+    if (!row?.email) {
+        throw notFoundError('requesting user email not found', 'REQUESTING_USER_EMAIL_NOT_FOUND');
+    }
     return row.email;
 };
 

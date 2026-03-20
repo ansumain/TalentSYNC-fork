@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { badRequestError } from '@talentsync/types';
 import { getAllTableData } from "../services/tables.service";
 import { getDefaultDateRange } from "../utils/getDefaultDateRange";
 
@@ -13,15 +14,13 @@ export class Tables {
             const jobId = req.query.jobId ? String(req.query.jobId) : undefined;
 
             if (!isValidDateOnly(fromDate) || !isValidDateOnly(toDate)) {
-                res.status(400).json({ error: 'invalid date range' });
-                return;
+                throw badRequestError('invalid date range', 'INVALID_DATE_RANGE');
             }
 
             const tableData = await getAllTableData(fromDate, toDate, jobId);
             res.status(200).json({ tableData });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }

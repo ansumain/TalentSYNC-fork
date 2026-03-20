@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
+import { authenticationMiddleware } from '@talentsync/auth-middlewares';
 import { UserProfileController } from '../controllers/userProfile.controller';
 import { UpdateUserProfileController } from '../controllers/updateUserProfile.controller';
 import { UpdatePasswordController } from '../controllers/updatePassword.controller';

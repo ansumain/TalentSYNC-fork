@@ -1,6 +1,7 @@
 import Role from '../models/Role';
 import RolePermission from '../models/RolePermission';
 import Permission from '../models/Permission';
+import { badRequestError, conflictError, notFoundError } from '@talentsync/types';
 
 // gety all roles service
 const getAllRoles = async (): Promise<string[]> => {
@@ -11,20 +12,20 @@ const getAllRoles = async (): Promise<string[]> => {
 
 // get role by id service
 const getRoleById = async (roleId: string) => {
-  if (!roleId) throw new Error('Missing role ID');
+  if (!roleId) throw badRequestError('Missing role ID', 'ROLE_ID_MISSING');
 
   const getRole = await Role.findOne({ where: { id: roleId } });
-  if (!getRole) throw new Error('Role not found');
+  if (!getRole) throw notFoundError('Role not found', 'ROLE_NOT_FOUND');
 
   return getRole.role;
 };
 
 // get permissions of a particular role
 const getRolePermissions = async (roleId: string): Promise<string[]> => {
-  if (!roleId) throw new Error('Missing role ID');
+  if (!roleId) throw badRequestError('Missing role ID', 'ROLE_ID_MISSING');
 
   const role = await Role.findOne({ where: { id: roleId } });
-  if (!role) throw new Error('Role not found');
+  if (!role) throw notFoundError('Role not found', 'ROLE_NOT_FOUND');
 
   const rolePermissions = await RolePermission.findAll({ where: { roleId } });
   const permissionIds = rolePermissions.map((rolePermission) => rolePermission.permissionId);
@@ -40,21 +41,21 @@ const getRolePermissions = async (roleId: string): Promise<string[]> => {
 
 // create role service
 const createRole = async (role: string) => {
-  if (!role) throw new Error('Missing required field');
+  if (!role) throw badRequestError('Missing required field', 'MISSING_REQUIRED_FIELD');
 
   // Check if role already exists
   const existingRole = await Role.findOne({ where: { role } });
-  if (existingRole) throw new Error('Role already exists');
+  if (existingRole) throw conflictError('Role already exists', 'ROLE_ALREADY_EXISTS');
 
   await Role.create({ role });
 };
 
 // delete role service
 const deleteRole = async (roleId: string) => {
-  if (!roleId) throw new Error('Missing role ID');
+  if (!roleId) throw badRequestError('Missing role ID', 'ROLE_ID_MISSING');
 
   const role = await Role.findOne({ where: { id: roleId } });
-  if (!role) throw new Error('Role not found');
+  if (!role) throw notFoundError('Role not found', 'ROLE_NOT_FOUND');
 
   await Role.destroy({ where: { id: roleId } });
 };

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { badRequestError } from '@talentsync/types';
 import { uploadResume } from '../services/uploadResume.service';
 import { UploadedFileModel } from '../types/UploadedFile.type';
 
@@ -6,7 +7,9 @@ export class ResumeUploaderController {
     // upload resume controller
     static async uploadResume(req: Request, res: Response): Promise<void> {
         try {
-            if (!req.files || (req.files as any).length === 0) throw new Error('No File Uploaded');
+            if (!req.files || (req.files as any).length === 0) {
+                throw badRequestError('No File Uploaded', 'NO_FILE_UPLOADED');
+            }
             const userId = req.userInfo.sub as string;
             const roleName = req.userInfo.role.name;
 
@@ -19,9 +22,8 @@ export class ResumeUploaderController {
                 });
             }
 
-        } catch (e: any) {
-            const errorMessage = e.message || 'Internal server error';
-            res.status(500).json({ error: errorMessage });
+        } catch (error) {
+            throw error;
         }
     }
 }

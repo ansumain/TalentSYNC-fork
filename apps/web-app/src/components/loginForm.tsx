@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate, Link } from "react-router-dom"
 import { toast } from "sonner"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,

@@ -1,4 +1,5 @@
 import { Skill, UserSkill } from '@talentsync/models';
+import { conflictError, notFoundError } from '@talentsync/types';
 
 // fetch all skills from DB
 const getAllSkillsRepository = async () => {
@@ -22,14 +23,14 @@ const getUserSkillsRepository = async (userId: string) => {
 // add a skill to a user
 const addUserSkillRepository = async (userId: string, skillId: string) => {
     const existing = await UserSkill.findOne({ where: { userId, skillId } });
-    if (existing) throw new Error('skill already added');
+    if (existing) throw conflictError('skill already added', 'CONFLICT');
     await UserSkill.create({ userId, skillId });
 };
 
 // remove a skill from a user
 const removeUserSkillRepository = async (userId: string, skillId: string) => {
     const deleted = await UserSkill.destroy({ where: { userId, skillId } });
-    if (deleted === 0) throw new Error('skill not found');
+    if (deleted === 0) throw notFoundError('skill not found', 'NOT_FOUND');
 };
 
 export { getAllSkillsRepository, getUserSkillsRepository, addUserSkillRepository, removeUserSkillRepository };

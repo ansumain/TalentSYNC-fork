@@ -3,6 +3,7 @@ import PasswordResetOtp from '../models/PasswordResetOtp';
 import { RequestPasswordResetInput } from '../types/RequestPasswordResetInput';
 import { RequestPasswordResetOutput } from '../types/RequestPasswordResetOutput';
 import bcrypt from 'bcryptjs';
+import { badRequestError, notFoundError } from '@talentsync/types';
 import { sendOtpEmail } from '../utils/emailService';
 
 // request password reset service
@@ -10,11 +11,11 @@ export const requestPasswordReset = async ({
   email,
 }: RequestPasswordResetInput): Promise<RequestPasswordResetOutput> => {
   // Validate email
-  if (!email) throw new Error('Missing required field');
+  if (!email) throw badRequestError('Missing required field', 'MISSING_REQUIRED_FIELD');
 
   // Check if user exists
   const user = await User.findOne({ where: { email } });
-  if (!user) throw new Error('User not found');
+  if (!user) throw notFoundError('User not found', 'USER_NOT_FOUND');
 
   // Generate 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();

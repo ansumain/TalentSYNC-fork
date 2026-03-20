@@ -1,7 +1,6 @@
 import express, { Router } from 'express';
 import { InterviewController } from '../controllers/interview.controller';
-import { authenticationMiddleware } from '../middlewares/authentication.middleware';
-import { requiredAnyRole } from '../middlewares/authorization.middleware';
+import { authenticationMiddleware, requiredAnyRole } from '@talentsync/auth-middlewares';
 const interviewRouter: Router = express.Router();
 
 interviewRouter.get('/interviewers/available', authenticationMiddleware, requiredAnyRole(['admin', 'manager']), InterviewController.getAvailableInterviewers);

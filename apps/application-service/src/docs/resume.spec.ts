@@ -16,7 +16,7 @@ const resumeSpec = {
                                     resume: {
                                         type: 'array',
                                         items: { type: 'string', format: 'binary' },
-                                        description: 'Resume file(s) — PDF, DOCX, or image',
+                                        description: 'Resume file(s) - PDF, DOCX, or image',
                                     },
                                 },
                             },

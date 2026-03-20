@@ -128,7 +128,7 @@ export function ScheduleInterviewDialog({
               <SelectContent>
                 {schedulableApps.map((a) => (
                   <SelectItem key={a.applicationId} value={a.applicationId}>
-                    {a.candidateName ?? a.applicationId.slice(0, 8)} — {a.jobTitle ?? "Unknown Job"}
+                    {a.candidateName ?? a.applicationId.slice(0, 8)} - {a.jobTitle ?? "Unknown Job"}
                   </SelectItem>
                 ))}
               </SelectContent>
