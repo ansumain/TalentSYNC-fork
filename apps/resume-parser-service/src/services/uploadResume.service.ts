@@ -4,7 +4,7 @@ import { badRequestError, internalServerError, isAppError } from '@talentsync/ty
 import { addToResumeData } from "../repository/resume.repository";
 import { ResumeModel } from "../types/ResumeModel.type";
 import { UploadedFileModel } from "../types/UploadedFile.type";
-import path from 'node:path';
+import { buildMinioFileURL, buildMinioObjectKey, uploadResumeObject } from "./minio-storage.service";
 
 // upload resume service
 const uploadResume = async (files: UploadedFileModel[], userId: string, roleName: string): Promise<boolean> => {
@@ -17,11 +17,18 @@ const uploadResume = async (files: UploadedFileModel[], userId: string, roleName
         }
 
         for (const file of files) {
+            if (!file.buffer || file.buffer.length === 0) {
+                throw badRequestError('Invalid upload payload', 'INVALID_UPLOAD_PAYLOAD');
+            }
+
+            const objectKey = buildMinioObjectKey(file.originalname);
+            await uploadResumeObject(objectKey, file);
+
             const resumeData = {
                 userId,
-                fileName: file.filename,
+                fileName: objectKey,
                 mimeType: file.mimetype,
-                fileURL: path.isAbsolute(file.path) ? file.path : path.join('/data', file.path),
+                fileURL: buildMinioFileURL(objectKey),
                 status: 'queued'
             } as ResumeModel
             const resumeId = await addToResumeData(resumeData);
