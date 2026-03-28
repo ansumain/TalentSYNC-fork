@@ -1,25 +1,6 @@
 import multer, { FileFilterCallback } from 'multer'
 import { Request, RequestHandler } from 'express'
-import path from 'path';
-import fs from 'fs';
 import { allowedMimeTypes } from '@talentsync/config';
-
-// uploaded file directory
-const uploadDir = '/data/uploads/';
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true })
-}
-
-// destination specification + renaming
-const storage = multer.diskStorage({
-    destination: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-        cb(null, uploadDir);
-    },
-    filename: (_req, file, cb) => {
-        const suffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + suffix + path.extname(file.originalname));
-    }
-});
 
 // accepts only allowed formats
 const FileFilter = (_req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
@@ -32,7 +13,7 @@ const FileFilter = (_req: Request, file: Express.Multer.File, cb: FileFilterCall
 
 // multer instance
 const resumeUpload: RequestHandler = multer({
-    storage,
+    storage: multer.memoryStorage(),
     fileFilter: FileFilter,
     limits: {
         fileSize: 10 * 1024 * 1024   // 10MB
