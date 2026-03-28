@@ -6,6 +6,15 @@ export const config = {
   accessTokenSecret: requireEnv('ACCESS_TOKEN_SECRET'),
   refreshTokenSecret: requireEnv('REFRESH_TOKEN_SECRET'),
 
+  minio: {
+    endpoint: requireEnv('MINIO_ENDPOINT', 'localhost'),
+    port: requireEnvNumber('MINIO_PORT', 9000),
+    useSSL: requireEnv('MINIO_USE_SSL', 'false') === 'true',
+    accessKey: requireEnv('MINIO_ACCESS_KEY', 'minioadmin'),
+    secretKey: requireEnv('MINIO_SECRET_KEY', 'minioadmin123'),
+    bucket: requireEnv('MINIO_BUCKET', 'resumes'),
+  },
+
   rabbitmq: {
     hostname: requireEnv('RABBIT_MQ_HOST', 'localhost'),
     port: requireEnvNumber('RABBIT_MQ_PORT', 5672),

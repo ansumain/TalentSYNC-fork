@@ -14,13 +14,14 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@talentsync/auth-middlewares": "workspace:*",
     "@talentsync/config": "workspace:*",
     "@talentsync/models": "workspace:*",
     "@talentsync/types": "workspace:*",
-    "@talentsync/auth-middlewares": "workspace:*",
     "@tus/file-store": "^2.0.0",
     "@tus/server": "^2.3.0",
     "mammoth": "^1.11.0",
+    "minio": "^8.0.7",
     "multer": "^2.1.1",
     "node-tesseract-ocr": "^2.2.1",
     "pdf-parse": "1.1.1"
