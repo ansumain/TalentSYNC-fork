@@ -39,6 +39,44 @@ services:
       timeout: 10s
       retries: 3
 
+  minio:
+    image: minio/minio:latest
+    container_name: TalentSYNC-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - TalentSYNC-networks
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: TalentSYNC-minio-init
+    restart: on-failure
+    depends_on:
+      minio:
+        condition: service_started
+    networks:
+      - TalentSYNC-networks
+    entrypoint: >
+      /bin/sh -c "
+      i=0;
+      until mc alias set local http://minio:9000 minioadmin minioadmin123; do
+        i=$((i+1));
+        if [ $i -ge 60 ]; then
+          echo 'MinIO not reachable after 120s'; exit 1;
+        fi;
+        echo 'Waiting for MinIO...'; sleep 2;
+      done &&
+      mc mb --ignore-existing local/resumes
+      "
+
   # db-migrate:
   #   build:
   #     context: .
@@ -121,19 +159,28 @@ services:
       RABBIT_MQ_PORT: 5672
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: false
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET: resumes
       NODE_ENV: production
       EMAIL_SERVICE: gmail
       EMAIL_USER: mfsi.ansuman@gmail.com
       EMAIL_PASSWORD: uqvt jjlk djxl pqtq
       EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
     volumes:
-      - resume_uploads:/data/uploads
       - resume_temp:/data/temp
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      minio:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
       # db-migrate:
       #   condition: service_completed_successfully
     networks:
@@ -163,19 +210,28 @@ services:
       RABBIT_MQ_PORT: 5672
       RABBIT_MQ_USER: admin
       RABBIT_MQ_PASSWORD: password
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: false
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET: resumes
       NODE_ENV: production
       EMAIL_SERVICE: gmail
       EMAIL_USER: mfsi.ansuman@gmail.com
       EMAIL_PASSWORD: uqvt jjlk djxl pqtq
       EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
     volumes:
-      - resume_uploads:/data/uploads
       - resume_temp:/data/temp
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      minio:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
       # db-migrate:
       #   condition: service_completed_successfully
     networks:
@@ -337,7 +393,7 @@ volumes:
     driver: local
   rabbitmq_data:
     driver: local
-  resume_uploads:
+  minio_data:
     driver: local
   resume_temp:
     driver: local
