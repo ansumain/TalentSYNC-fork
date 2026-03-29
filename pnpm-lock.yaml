@@ -53,6 +53,9 @@ importers:
       sequelize:
         specifier: ^6.37.7
         version: 6.37.7(pg-hstore@2.3.4)(pg@8.20.0)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@commitlint/cli':
         specifier: ^20.4.1
@@ -165,6 +168,9 @@ importers:
       '@talentsync/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@talentsync/validation-middleware':
+        specifier: workspace:*
+        version: link:../../packages/validation-middleware
       amqplib:
         specifier: ^0.10.8
         version: 0.10.9
@@ -211,6 +217,9 @@ importers:
       '@talentsync/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@talentsync/validation-middleware':
+        specifier: workspace:*
+        version: link:../../packages/validation-middleware
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@5.2.1)
@@ -233,6 +242,9 @@ importers:
       '@talentsync/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@talentsync/validation-middleware':
+        specifier: workspace:*
+        version: link:../../packages/validation-middleware
 
   apps/resume-parser-service:
     dependencies:
@@ -248,6 +260,9 @@ importers:
       '@talentsync/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@talentsync/validation-middleware':
+        specifier: workspace:*
+        version: link:../../packages/validation-middleware
       '@tus/file-store':
         specifier: ^2.0.0
         version: 2.0.0
@@ -412,6 +427,12 @@ importers:
         version: link:../config
 
   packages/types: {}
+
+  packages/validation-middleware:
+    dependencies:
+      '@talentsync/types':
+        specifier: workspace:*
+        version: link:../types
 
 packages:
 
@@ -6198,6 +6219,9 @@ packages:
 
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
   zustand@5.0.11:
     resolution: {integrity: sha512-fdZY+dk7zn/vbWNCYmzZULHRrss0jx5pPFiOuMZ/5HJN6Yv3u+1Wswy/4MpZEkEGhtNH+pwxZB8OKgUBPzYAGg==}
@@ -12298,6 +12322,8 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
+
+  zod@4.3.6: {}
 
   zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4)):
     optionalDependencies:
