@@ -18,6 +18,7 @@
     "@talentsync/config": "workspace:*",
     "@talentsync/models": "workspace:*",
     "@talentsync/types": "workspace:*",
+    "@talentsync/validation-middleware": "workspace:*",
     "@tus/file-store": "^2.0.0",
     "@tus/server": "^2.3.0",
     "mammoth": "^1.11.0",
