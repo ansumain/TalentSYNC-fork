@@ -70,7 +70,8 @@ export class CandidateController {
     // get candidate parsed formatted JSON data by resumeId
     static async getCandidateDataFromResumeId(req: Request, res: Response): Promise<void> {
         try {
-            const { resumeId } = req.body;
+            // const { resumeId } = req.body;
+            const resumeId = req.query.resumeId as string;
             if (!resumeId) throw badRequestError('resumeId is required', 'RESUME_ID_REQUIRED');
             const candidateData = await getCandidateDataFromResumeId(resumeId);
 

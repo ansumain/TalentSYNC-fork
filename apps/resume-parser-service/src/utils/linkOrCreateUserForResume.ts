@@ -9,6 +9,12 @@ import { ParsedResumeJson } from '../types/ExtractData.type';
 const DEFAULT_PASSWORD = 'password123';
 const SALT_ROUNDS = 10;
 
+const normalizeString = (value: unknown): string | undefined => {
+    if (value === null || value === undefined) return undefined;
+    const normalized = String(value).trim();
+    return normalized.length > 0 ? normalized : undefined;
+};
+
 
 // Checks if the uploader of a resume is a candidate.
 // Candidates upload their own resume – no re-linking needed.
@@ -78,9 +84,10 @@ export const linkOrCreateUserForResume = async (
     const uploaderIsCandidate = await isUploaderCandidate(uploaderId);
     if (uploaderIsCandidate) return;
 
-    const email: string | undefined = (parsedJSON?.email!).toString().trim() || undefined;
-    const phone: string | undefined = (parsedJSON?.phone!).toString().trim()?.replace(/\D/g, '').slice(-10) || undefined;
-    const name: string = (parsedJSON?.name!).toString().trim() || 'Unknown';
+    const email = normalizeString(parsedJSON?.email);
+    const normalizedPhone = normalizeString(parsedJSON?.phone);
+    const phone = normalizedPhone ? normalizedPhone.replace(/\D/g, '').slice(-10) : undefined;
+    const name = normalizeString(parsedJSON?.name) || 'Unknown';
 
     // Need at least one identifier to proceed
     if (!email && !phone) return;

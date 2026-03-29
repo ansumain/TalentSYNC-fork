@@ -44,7 +44,7 @@ RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=builder --chown=app:app /prod/resume-parser-service/ .
 
-USER app
+USER root
 
 EXPOSE 4002
 

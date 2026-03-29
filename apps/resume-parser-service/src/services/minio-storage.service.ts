@@ -46,6 +46,17 @@ const getResumeObjectStream = async (objectKey: string) => {
   return minioClient.getObject(config.minio.bucket, objectKey);
 };
 
+const getResumeObjectContentType = async (objectKey: string): Promise<string | null> => {
+  const stat = await minioClient.statObject(config.minio.bucket, objectKey);
+  const rawContentType = stat.metaData?.['content-type'];
+
+  if (!rawContentType) {
+    return null;
+  }
+
+  return String(rawContentType);
+};
+
 const downloadResumeObjectToTempFile = async (objectKey: string): Promise<string> => {
   await ensureTempDir();
 
@@ -77,6 +88,7 @@ export {
   getObjectKeyFromFileURL,
   uploadResumeObject,
   getResumeObjectStream,
+  getResumeObjectContentType,
   downloadResumeObjectToTempFile,
   cleanupTempFile,
 };

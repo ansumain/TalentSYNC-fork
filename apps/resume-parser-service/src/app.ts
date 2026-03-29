@@ -8,6 +8,8 @@ import path from 'path';
 import { AppError, badRequestError, notFoundError, toApiErrorResponse } from '@talentsync/types';
 import resumeRoutes from './routes/resume.routes'
 import { authenticationMiddleware, globalErrorHandler, notFoundHandler } from '@talentsync/auth-middlewares'
+import { getResumeObjectContentType, getResumeObjectStream } from './services/minio-storage.service';
+import { getMimeTypeFromExtension } from './utils/getMimitypeFromExtension';
 
 // import { tusHandler } from './config/tus';
 
@@ -87,16 +89,34 @@ app.use('/api/resume', resumeRoutes);
 // app.all('/api/resume/upload', authenticationMiddleware, tusHandler);
 // app.all('/api/resume/upload/:id', authenticationMiddleware, tusHandler);
 
-app.get('/files/:filename', authenticationMiddleware, (req: Request, res: Response, next: NextFunction) => {
+app.get('/files/:filename', authenticationMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     const filename = path.basename(req.params.filename as string);
     if (!filename) {
         next(badRequestError('Invalid filename', 'INVALID_FILENAME'));
         return;
     }
-    const filePath = path.resolve('/data/uploads', filename);
-    res.sendFile(filePath, (err) => {
-        if (err) next(notFoundError('File not found', 'FILE_NOT_FOUND'));
-    });
+
+    try {
+        const contentTypeFromObject = await getResumeObjectContentType(filename).catch(() => null);
+        const contentType = contentTypeFromObject || getMimeTypeFromExtension(filename);
+        const fileStream = await getResumeObjectStream(filename);
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+
+        fileStream.on('error', () => {
+            if (!res.headersSent) {
+                next(notFoundError('File not found', 'FILE_NOT_FOUND'));
+            } else {
+                res.destroy();
+            }
+        });
+
+        fileStream.pipe(res);
+    } catch {
+        next(notFoundError('File not found', 'FILE_NOT_FOUND'));
+    }
 });
 
 app.use(notFoundHandler);

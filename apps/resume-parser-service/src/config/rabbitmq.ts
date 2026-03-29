@@ -96,7 +96,7 @@ const publishToQueue = async (
         { persistent: true, headers }
     );
 
-    logger.info(`Published to ${queue}: ${{ message, retryCount }}`);
+    logger.info(`Published to ${queue}: ${JSON.stringify({ message, retryCount })}`);
 }
 
 // consume the message from queue
@@ -143,12 +143,13 @@ const consumeQueue = async (
                 channel.ack(message);
 
             } catch (e: any) {
-                logger.error(`Message processing failed: ${{
-                    messageId: content?.id || 'unknown',
+                logger.error(`Message processing failed: ${JSON.stringify({
+                    resumeId: content?.resumeId || 'unknown',
                     retryCount,
-                    error: e.message,
-                    rawMessage: rawMessage || 'No raw message '
-                }}`);
+                    error: e?.message || 'Unknown error',
+                    stack: e?.stack,
+                    rawMessage: rawMessage || 'No raw message'
+                })}`);
 
                 if (retryCount >= MAX_RETRIES) {
                     try {

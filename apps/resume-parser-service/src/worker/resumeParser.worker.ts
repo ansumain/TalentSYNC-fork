@@ -3,6 +3,7 @@ import { config } from "../config/env";
 import { parseResume } from "../services/parseResume.service";
 import { getResumeByResumeId, updateAfterParsing, updateStatusByResumeId } from "../repository/resume.repository";
 import { linkOrCreateUserForResume } from "../utils/linkOrCreateUserForResume";
+import { cleanupTempFile, downloadResumeObjectToTempFile, getObjectKeyFromFileURL } from "../services/minio-storage.service";
 import { logger } from "@talentsync/config";
 
 // function to start the worker - resume parising worker
@@ -23,12 +24,29 @@ const startWorker = async () => {
             const resume = await getResumeByResumeId(resumeId);
             if (!resume) throw new Error(`Resume not found`);
 
-            // calls the parsing functions passing the resume path to parse the resumes
-            const resumeData = await parseResume({ fileURL: resume.fileURL, mimeType: resume.mimeType });
+            const objectKey = getObjectKeyFromFileURL(resume.fileURL);
+            if (!objectKey) {
+                throw new Error('Invalid MinIO file reference');
+            }
+
+            const tempFilePath = await downloadResumeObjectToTempFile(objectKey);
+            let resumeData: Awaited<ReturnType<typeof parseResume>>;
+
+            try {
+                // calls the parsing functions passing the temporary path to parse the resumes
+                resumeData = await parseResume({ fileURL: tempFilePath, mimeType: resume.mimeType });
+            } finally {
+                await cleanupTempFile(tempFilePath).catch((cleanupError) => {
+                    logger.warn(`Temp file cleanup failed: ${cleanupError}`);
+                });
+            }
+
             await updateAfterParsing(resumeId, resumeData);
 
             // link resume to existing user or create user 
-            await linkOrCreateUserForResume(resumeId, resume.userId, resumeData.parsedJSON);
+            await linkOrCreateUserForResume(resumeId, resume.userId, resumeData.parsedJSON).catch((linkError) => {
+                logger.warn(`User linking skipped for resume ${resumeId}: ${linkError}`);
+            });
 
             // update resume status to completed
             await updateStatusByResumeId(resumeId, 'completed');
