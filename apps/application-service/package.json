@@ -15,6 +15,7 @@
     "@talentsync/models": "workspace:*",
     "@talentsync/types": "workspace:*",
     "@talentsync/auth-middlewares": "workspace:*",
+    "@talentsync/validation-middleware": "workspace:*",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
