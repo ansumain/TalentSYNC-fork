@@ -18,6 +18,7 @@
     "@talentsync/models": "workspace:*",
     "@talentsync/types": "workspace:*",
     "@talentsync/auth-middlewares": "workspace:*",
+    "@talentsync/validation-middleware": "workspace:*",
     "amqplib": "^0.10.8",
     "exceljs": "^4.4.0",
     "jsonwebtoken": "^9.0.2",
