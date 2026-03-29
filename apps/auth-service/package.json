@@ -14,6 +14,7 @@
     "@talentsync/types": "workspace:*",
     "@talentsync/config": "workspace:*",
     "@talentsync/models": "workspace:*",
-    "@talentsync/auth-middlewares": "workspace:*"
+    "@talentsync/auth-middlewares": "workspace:*",
+    "@talentsync/validation-middleware": "workspace:*"
   }
 }
