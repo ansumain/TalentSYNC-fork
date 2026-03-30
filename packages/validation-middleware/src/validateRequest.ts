@@ -42,7 +42,7 @@ const validateRequest = (schema: ValidationSchema) => {
       if (!zodSchema) continue;
 
       const parsed = zodSchema.safeParse(value);
-      if (!parsed.success) {
+      if (parsed.success === false) {
         next(
           badRequestError(
             formatValidationMessage(parsed.error.issues.map((issue: ValidationIssue) => ({ path: [key, ...(issue.path ?? [])], message: issue.message }))),
@@ -51,8 +51,6 @@ const validateRequest = (schema: ValidationSchema) => {
         );
         return;
       }
-
-      (req as any)[key] = parsed.data;
     }
 
     next();
