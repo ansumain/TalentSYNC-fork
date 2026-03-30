@@ -43,7 +43,7 @@ export default function InterviewsPage() {
     fetchInterviews();
     // Fetch applications to build candidate/job lookup map
     applicationService
-      .getAllApplications({ page: 1, limit: 500 })
+      .getAllApplications({ page: 1, limit: 100 })
       .then((res) => setApplications(res.allApplications))
       .catch(() => {});
   }, [fetchInterviews]);

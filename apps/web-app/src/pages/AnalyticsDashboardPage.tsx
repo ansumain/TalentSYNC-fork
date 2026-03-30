@@ -77,7 +77,7 @@ export default function AnalyticsDashboardPage() {
 
   const fetchJobs = async () => {
     try {
-      const response = await jobService.getAllJobs({ page: 1, limit: 200, sortBy: 'createdAt', sortOrder: 'desc' });
+      const response = await jobService.getAllJobs({ page: 1, limit: 100, sortBy: 'createdAt', sortOrder: 'desc' });
       setJobs(
         response.currentJobs.map((job) => ({
           jobId: job.jobId,
