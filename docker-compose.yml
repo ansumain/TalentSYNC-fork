@@ -1,10 +1,8 @@
-version: "3.9"
-
 services:
-  postgres: 
-    image: postgres:15
-    container_name: rms-postgres
-    restart: always
+  postgres:
+    image: postgres:15-alpine
+    container_name: TalentSYNC-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: rms_user
       POSTGRES_PASSWORD: rms_password
@@ -12,4 +10,394 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - D:/rms_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U rms_user -d rms_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: TalentSYNC-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  minio:
+    image: minio/minio:latest
+    container_name: TalentSYNC-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - TalentSYNC-networks
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: TalentSYNC-minio-init
+    restart: on-failure
+    depends_on:
+      minio:
+        condition: service_started
+    networks:
+      - TalentSYNC-networks
+    entrypoint: >
+      /bin/sh -c "
+      i=$$((0));
+      until mc alias set local http://minio:9000 minioadmin minioadmin123; do
+        i=$$((i+1));
+        if [ $$i -ge 60 ]; then
+          echo 'MinIO not reachable after 120s'; exit 1;
+        fi;
+        echo 'Waiting for MinIO...'; sleep 2;
+      done &&
+      mc mb --ignore-existing local/resumes
+      "
+
+  # db-migrate:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/auth-service/Dockerfile
+  #     # target: migrator
+  #   container_name: TalentSYNC-db-migrate
+  #   restart: "no"
+  #   command: [ "npx", "sequelize-cli", "db:migrate" ]
+  #   environment:
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: rms_user
+  #     DB_PASSWORD: rms_password
+  #     DB_NAME: rms_db
+  #     NODE_ENV: production
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - TalentSYNC-networks
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    container_name: TalentSYNC-auth-service
+    restart: unless-stopped
+    ports:
+      - "4001:4001"
+    environment:
+      PORT: 4001
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
+      JWT_EXPIRES_IN: 15m
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: "uqvt jjlk djxl pqtq"
+      EMAIL_FROM: "TalentSYNC <mfsi.ansuman@gmail.com>"
+      FRONTEND_URL: http://localhost
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      # db-migrate:
+      #   condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4001/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  resume-parser-api:
+    build:
+      context: .
+      dockerfile: ./apps/resume-parser-service/Dockerfile
+    container_name: TalentSYNC-resume-parser-api
+    restart: unless-stopped
+    ports:
+      - "4002:4002"
+    environment:
+      PORT: 4002
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: false
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET: resumes
+      NODE_ENV: production
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
+    volumes:
+      - resume_temp:/data/temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4002/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  resume-parser-worker:
+    build:
+      context: .
+      dockerfile: ./apps/resume-parser-service/Dockerfile
+    container_name: TalentSYNC-resume-parser-worker
+    restart: unless-stopped
+    environment:
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: false
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET: resumes
+      NODE_ENV: production
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
+    volumes:
+      - resume_temp:/data/temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
+      # db-migrate:
+      #   condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    command: [ "node", "dist/worker/resumeParser.worker.js" ]
+
+  application-service:
+    build:
+      context: .
+      dockerfile: ./apps/application-service/Dockerfile
+    container_name: TalentSYNC-applicaton-service
+    restart: unless-stopped
+    ports:
+      - "4003:4003"
+    environment:
+      PORT: 4003
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # db-migrate:
+      #   condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4003/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: ./apps/analytics-service/Dockerfile
+    container_name: TalentSYNC-analytics-service
+    restart: unless-stopped
+    ports:
+      - "4004:4004"
+    environment:
+      PORT: 4004
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      NODE_ENV: production
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
+      QUEUE_ANALYTICS_EXPORT: analytics.export.report
+      QUEUE_ANALYTICS_EXPORT_RETRY: analytics.export.retry
+      QUEUE_ANALYTICS_EXPORT_FAILED: analytics.export.failed
+      QUEUE_MAX_RETRIES: 3
+      QUEUE_RETRY_DELAY: 5000
+      QUEUE_PREFETCH: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      # db-migrate:
+      #   condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4004/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  analytics-worker:
+    build:
+      context: .
+      dockerfile: ./apps/analytics-service/Dockerfile
+    container_name: TalentSYNC-analytics-worker
+    restart: unless-stopped
+    environment:
+      ACCESS_TOKEN_SECRET: ACCESS_TOKEN_SECRET
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: rms_user
+      DB_PASSWORD: rms_password
+      DB_NAME: rms_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: admin
+      RABBIT_MQ_PASSWORD: password
+      NODE_ENV: production
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: mfsi.ansuman@gmail.com
+      EMAIL_PASSWORD: uqvt jjlk djxl pqtq
+      EMAIL_FROM: TalentSYNC <mfsi.ansuman@gmail.com>
+      QUEUE_ANALYTICS_EXPORT: analytics.export.report
+      QUEUE_ANALYTICS_EXPORT_RETRY: analytics.export.retry
+      QUEUE_ANALYTICS_EXPORT_FAILED: analytics.export.failed
+      QUEUE_MAX_RETRIES: 3
+      QUEUE_RETRY_DELAY: 5000
+      QUEUE_PREFETCH: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      # db-migrate:
+      #   condition: service_completed_successfully
+    networks:
+      - TalentSYNC-networks
+    command: [ "node", "dist/worker/export.worker.js" ]
+
+  web-app:
+    container_name: TalentSYNC-web-app
+    build:
+      context: .
+      dockerfile: ./apps/web-app/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+    networks:
+      - TalentSYNC-networks
+
+  nginx:
+    image: nginx:alpine
+    container_name: TalentSYNC-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      analytics-service:
+        condition: service_healthy
+      web-app:
+        condition: service_started
+    networks:
+      - TalentSYNC-networks
+
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  minio_data:
+    driver: local
+  resume_temp:
+    driver: local
+
+networks:
+  TalentSYNC-networks:
+    driver: bridge

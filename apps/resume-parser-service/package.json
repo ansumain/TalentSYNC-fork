@@ -1,0 +1,35 @@
+{
+  "name": "@talentsync/resume-parser-service",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "tsx --watch src/server.ts",
+    "worker:dev": "tsx --watch src/worker/resumeParser.worker.ts",
+    "build": "esbuild src/server.ts --bundle --platform=node --format=cjs --outdir=dist --packages=external",
+    "worker:build": "esbuild src/worker/resumeParser.worker.ts --bundle --platform=node --format=cjs --outdir=dist/worker --packages=external",
+    "worker:start": "node dist/worker/resumeParser.worker.js",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@talentsync/auth-middlewares": "workspace:*",
+    "@talentsync/config": "workspace:*",
+    "@talentsync/models": "workspace:*",
+    "@talentsync/types": "workspace:*",
+    "@talentsync/validation-middleware": "workspace:*",
+    "@tus/file-store": "^2.0.0",
+    "@tus/server": "^2.3.0",
+    "mammoth": "^1.11.0",
+    "minio": "^8.0.7",
+    "multer": "^2.1.1",
+    "node-tesseract-ocr": "^2.2.1",
+    "pdf-parse": "1.1.1"
+  },
+  "devDependencies": {
+    "@types/multer": "^2.0.0",
+    "@types/node": "^25.3.0",
+    "@types/pdf-parse": "^1.1.5"
+  }
+}
