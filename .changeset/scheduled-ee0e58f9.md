@@ -1,0 +1,5 @@
+---
+"@talentsync/resume-parser-service": patch
+---
+
+Scheduled release for @talentsync/resume-parser-service
