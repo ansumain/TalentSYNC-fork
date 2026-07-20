@@ -18,5 +18,9 @@ jobs:
       - name: Build
         run: |
           echo "Building package: ${{ github.event.inputs.package }}"
-          sleep 10
+          if [ -n "${{ github.event.inputs.package }}" ]; then
+            pnpm turbo build --filter=${{ github.event.inputs.package }}
+          else
+            pnpm turbo build
+          fi
           echo "Build completed successfully!"
